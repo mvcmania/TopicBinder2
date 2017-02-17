@@ -3,44 +3,18 @@
 <head>
 	<title>Topic Binder</title>
   <link rel="stylesheet" href="/css/bootstrap.css"/>
-    <link rel="stylesheet" href="/css/style.css"/>
+  {{#if islogin}}
+  <link rel="stylesheet" href="/css/login.css"/>
+  {{else}}
+  <link rel="stylesheet" href="/css/style.css"/>
+  {{/if}}
 </head>
 <body>
-  <div class="container">
-      <div class="header clearfix">
-        <nav>
-          <ul class="nav nav-pills pull-right">
-            {{#if user}}
-            <li role="presentation" class="active"><a href="/">Dashboard</a></li>
-            <li role="presentation"><a href="/users/logout">Logout</a></li>
-            {{else}}
-            <li role="presentation"><a href="/users/login">Login</a></li>
-            <li role="presentation"><a href="/users/register">Register</a></li>
-            {{/if}}
-          </ul>
-        </nav>
-        <h3 class="text-muted">Topic Binder</h3>
-      </div>
-
-      <div class="row">
-        <div class="col-lg-12">
-          {{#if success_msg}}
-            <div class="alert alert-success">{{success_msg}}</div>
-          {{/if}}
-
-          {{#if error_msg}}
-            <div class="alert alert-danger">{{error_msg}}</div>
-          {{/if}}
-
-          {{#if error}}
-            <div class="alert alert-danger">{{error}}</div>
-          {{/if}}
-          {{{body}}}
-        </div>
-      </div>
-      <footer class="footer">
-       <p>&copy; 2016 Company, Inc.</p>
-     </footer>
-    </div>
+   {{{body}}}
+   <script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
+   <script type="text/javascript" src="/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -6,12 +6,12 @@ var User  = require('../models/user');
 
 // Get Homepage
 router.get('/register', function(req, res){
-	res.render('register');
+	res.render('register',{ islogin : true });
 });
 
 // Get Homepage
 router.get('/login', function(req, res){
-	res.render('login');
+	res.render('login',{ islogin : true });
 });
 
 // Get Homepage
@@ -44,7 +44,7 @@ router.post('/register', function(req, res){
     });
     User.createUser(newUser,function (err,msg) {
       if(err) throw err;
-      console.log(User);
+      //console.log(User);
       req.flash('success_msg','You are registered and can now login.');
       res.redirect('login');
     });
