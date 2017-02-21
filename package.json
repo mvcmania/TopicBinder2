@@ -11,14 +11,15 @@
     "start": "node app.js"
   },
   "author": "",
-  "repository" :{ 
-    "type" : "git",
-    "url" : "git@github.com:mvcmania/topicbinder.git"
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mvcmania/topicbinder.git"
   },
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "*",
     "body-parser": "*",
+    "busboy": "^0.2.14",
     "connect-flash": "*",
     "cookie-parser": "^1.4.1",
     "express": "*",
