@@ -15,13 +15,14 @@ var poolSchema = mongoose.Schema({
         type: Number,
         default: null
     },
-    "isrelated": {
-        type: Boolean,
+    "search_engine_id": {
+        type: String,
         default: null,
+        required: false
     }
 });
 
-var User = module.exports = mongoose.model('Pool', poolSchema);
+var pools = module.exports = mongoose.model('sorguHavuzu', poolSchema);
 module.exports.createPoolItems = function(poolItems, callback) {
     poolItems.save(callback);
 }
