@@ -1,29 +1,27 @@
 var mongoose = require('mongoose');
 
 var poolSchema = mongoose.Schema({
-    "document_id" :{
+    "document_id": {
         type: String,
-        default :null,
-        required : true
+        default: null,
+        required: true
     },
-    "topic_id" :{
+    "topic_id": {
         type: String,
-        default :null,
-        required : true
+        default: null,
+        required: true
     },
-    "score" :{
+    "score": {
         type: Number,
-        default :null
+        default: null
     },
-    "isrelated" :{
+    "isrelated": {
         type: Boolean,
-        default :null,
+        default: null,
     }
 });
 
-var User = module.exports =  mongoose.model('Pool', poolSchema);
-
-module.exports.createPoolItems = function (poolItems , callback){
-  poolItems.save(callback);
+var User = module.exports = mongoose.model('Pool', poolSchema);
+module.exports.createPoolItems = function(poolItems, callback) {
+    poolItems.save(callback);
 }
-

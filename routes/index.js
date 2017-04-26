@@ -24,7 +24,7 @@ router.get('/', ensureAuthenticated, function(req, res,next){
 });
 // Get Homepage
 router.get('/users/login', function(req, res,next){
-	if(req.isAuthenticated()){
+  if(req.isAuthenticated()){
     res.redirect('/');
   }else{
     return next();

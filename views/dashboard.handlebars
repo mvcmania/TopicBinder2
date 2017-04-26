@@ -27,7 +27,12 @@
           <ul class="nav nav-tabs">
               {{#if user.isadmin}}
               <li class="active">
-                <a  href="#1" data-toggle="tab">Upload Topic-Document</a>
+                  <a  href="#1" data-toggle="tab">Upload Topic-Document</a>
+                  <form action="/" enctype="multipart/form-data" method="post" class="form"> 
+                      <h2 class="page-header">Upload File</h2>
+                      <input type="file" name="topic-file" id="file-upload" /> 
+                      <button>Import File</button> 
+                  </form>
               </li>
               <li>
                   <a href="#2" data-toggle="tab">Pool</a>
@@ -48,6 +53,24 @@
           <div class="tab-content ">
               <div class="tab-pane active" id="1">
                 <h3>Upload topic content</h3>
+                <table style="width: 100%"> 
+                    <thead>
+                        <th>Id</th>
+                        <th>Document Id</th>
+                        <th>Topic Id</th>
+                        <th>Score</th>
+                    </thead>
+                    <tbody> 
+                        {{#each pools as |pool|}}
+                          <tr>
+                              <td> {{ pool._id }} </td>
+                              <td> {{ pool.document_id }} </td>
+                              <td> {{ pool.topic_id }} </td>
+                              <td> {{ pool.score }} </td>
+                          </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
               </div>
               <div class="tab-pane" id="2">
                 <h3>Pool tab content</h3>
