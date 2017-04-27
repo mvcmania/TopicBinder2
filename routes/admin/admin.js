@@ -1,18 +1,17 @@
 var express = require('express');
 var router = express.Router();
 var Busboy = require('busboy');
-var Pool = require('./models/pool');
-
+console.log(__dirname);
+var Pool = require('../../models/pool');
 
 router.get('/', function(req, res) {
-    Pool.find({}, function(err, pools) {
+    Pool.getTopics(function(err, pools) {
         res.render('dashboard', { pools: pools });
     });
 
 });
-var pool = require('../models/pool');
-var app = express();
-app.post('/', function(req, res, next) {
+
+router.post('/', function(req, res, next) {
     var busboy = new Busboy({ headers: req.headers });
     busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
         var all_rows = '';
@@ -31,6 +30,7 @@ app.post('/', function(req, res, next) {
     req.pipe(busboy);
 
     //res.render('dashboard');
+
 });
 
 function csv_parse(records, res) {
@@ -38,13 +38,14 @@ function csv_parse(records, res) {
     var arr = records.split("\n");
     var pool_array = [];
     arr.map(function(val) {
-        var splitted = val.split(" ");
-        var obj = {
-            "document_id": splitted[2],
-            "topic_id": splitted[0],
-            "score": parseInt(splitted[3]),
-            "isrelated": false,
-        };
+        var splitted = val.split("\t");
+        var obj = new Pool({
+            topic_id: splitted[0],
+            document_id: splitted[2],
+            index: splitted[3],
+            score: splitted[4],
+            search_engine_id: splitted[5],
+        });
         pool_array.push(obj);
     });
     if (pool_array.length > 0) {

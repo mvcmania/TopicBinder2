@@ -18,6 +18,8 @@ var db = mongoose.connection;
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var admins = require('./routes/admin/admin');
+var members = require('./routes/user/user');
 
 //Init app
 
@@ -79,11 +81,13 @@ app.use(function(req, res, next) {
 
 app.use('/', routes);
 app.use('/users', users);
+app.use('/admin', admins);
+app.use('/member', members);
 
 
 
 // Set Port
-app.set('port', (process.env.PORT || 3000));
+app.set('port', (3000));
 
 app.listen(app.get('port'), function() {
     console.log('Server started on port ' + app.get('port'));

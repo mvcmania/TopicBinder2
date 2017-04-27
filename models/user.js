@@ -20,7 +20,7 @@ var userSchema = mongoose.Schema({
         default: false
     }
 
-});
+}, { collection: "kullanicilar" });
 
 var User = module.exports = mongoose.model('kullanicilar', userSchema);
 
