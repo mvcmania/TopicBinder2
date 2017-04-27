@@ -1,7 +1,13 @@
 var express = require('express');
 var router = express.Router();
+var Busboy = require('busboy');
 var Pool = require('../../models/pool');
 
+router.get('/', function(req, res) {
+    Pool.getTopics(function(err, pools) {
+        res.render('dashboard', { pools: pools });
+    });
+});
 
 router.get('/',function(req,res){
      Pool.find({},function(err,pools){
