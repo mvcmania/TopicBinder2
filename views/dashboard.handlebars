@@ -1,89 +1,251 @@
-<nav class="navbar navbar-default navbar-fixed-top">
-  <div class="container">
-     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="#">TOPIC BINDER</a>
-    </div>
-    <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{user.name}} <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="/users/logout">Logout</a></li><!--
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">Separated link</a></li>-->
-          </ul>
-        </li>
-      </ul>
-  </div>
-</nav>
-<div class="container tab-container">
-          <ul class="nav nav-tabs">
-              {{#if user.isadmin}}
-              <li class="active">
-                  <a  href="#1" data-toggle="tab">Upload Topic-Document</a>
-                  <form action="/admin" enctype="multipart/form-data" method="post" class="form"> 
-                      <h2 class="page-header">Upload File</h2>
-                      <input type="file" name="topic-file" id="file-upload" /> 
-                      <button type="submit">Import File</button> 
-                  </form>
-              </li>
-              <li>
-                  <a href="#2" data-toggle="tab">Pool</a>
-              </li>
-              <li>
-                  <a href="#3" data-toggle="tab">Review</a>
-              </li>
-              {{else}}
-              <li>
-                  <a href="#3" data-toggle="tab">Merge</a>
-              </li>
-              <li>
-                  <a href="#3" data-toggle="tab">History</a>
-              </li>
-              {{/if}}
-          </ul>
-
-          <div class="tab-content ">
-              <div class="tab-pane active" id="1">
-                <h3>Upload topic content</h3>
-                <table style="width: 100%"> 
-                    <thead>
-                        <th>Topic Id</th>
-                        <th>Document Id</th>
-                        <th>Index</th>
-                        <th>Score</th>
-                        <th>Search Engine</th>
-                    </thead>
-                    <tbody> 
-                        {{#each pools as |pool|}}
-                          <tr>
-                              <td> {{ pool.topic_id }} </td>
-                              <td> {{ pool.document_id }} </td>
-                              <td> {{ pool.index }} </td>
-                              <td> {{ pool.score }} </td>
-                              <td> {{ pool.search_engine_id }} </td>
-                          </tr>
-                        {{/each}}
-                    </tbody>
-                </table>
-              </div>
-              <div class="tab-pane" id="2">
-                <h3>Pool tab content</h3>
-              </div>
-              <div class="tab-pane" id="3">
-                <h3>Review tab content</h3>
-              </div>
-          </div>
-</div>
-<div class="container">
+<div id="page-wrapper">
     <div class="row">
-     {{user.username}}
+                    <div class="col-lg-12">
+                        <h1 class="page-header">Dashboard</h1>
+                    </div>
+                    <!-- /.col-lg-12 -->
     </div>
-</div>
+     <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> SUMMARY OF TOPIC IN THE SYSTEM
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                        Actions
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                        <li><a href="/topicsummary">Get Summary</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div id="topic-summary" class="table-responsive">
+                          <div class="alert alert-info">
+                              Loading...
+                          </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-comments fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="huge">26</div>
+                                        <div>New Comments!</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-green">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-tasks fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="huge">12</div>
+                                        <div>New Tasks!</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-yellow">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-shopping-cart fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="huge">124</div>
+                                        <div>New Orders!</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-red">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-support fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="huge">13</div>
+                                        <div>Support Tickets!</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+    </div>
+    <!-- /.row -->
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Basic Form Elements
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <form role="form">
+                                <div class="form-group">
+                                    <label>Text Input</label>
+                                    <input class="form-control">
+                                    <p class="help-block">Example block-level help text here.</p>
+                                </div>
+                                <div class="form-group">
+                                    <label>Text Input with Placeholder</label>
+                                    <input class="form-control" placeholder="Enter text">
+                                </div>
+                                <div class="form-group">
+                                    <label>Static Control</label>
+                                    <p class="form-control-static">email@example.com</p>
+                                </div>
+                                <div class="form-group">
+                                    <label>File input</label>
+                                    <input type="file">
+                                </div>
+                                <div class="form-group">
+                                    <label>Text area</label>
+                                    <textarea class="form-control" rows="3"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Checkboxes</label>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" value="">Checkbox 1
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" value="">Checkbox 2
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" value="">Checkbox 3
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Inline Checkboxes</label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox">1
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox">2
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox">3
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>Radio Buttons</label>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>Radio 1
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">Radio 2
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">Radio 3
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Inline Radio Buttons</label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline1" value="option1" checked>1
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline2" value="option2">2
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline3" value="option3">3
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>Selects</label>
+                                    <select class="form-control">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Multiple Selects</label>
+                                    <select multiple class="form-control">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-default">Submit Button</button>
+                                <button type="reset" class="btn btn-default">Reset Button</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+</div><!--#Page-wrapper-->

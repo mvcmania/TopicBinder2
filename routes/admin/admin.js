@@ -4,23 +4,25 @@ var Busboy = require('busboy');
 var Pool = require('../../models/pool');
 
 router.get('/', function(req, res) {
-    Pool.getTopics(function(err, pools) {
+    /*Pool.getTopics(function(err, pools) {
         res.render('dashboard', { pools: pools });
     });
+*/
+    res.render('dashboard', { pools: {} });
 });
-
-router.get('/',function(req,res){
-     Pool.find({},function(err,pools){
-        res.render('dashboard',{ pools:pools });
-     });
-
+router.get('/topicsummary', function(req, res, next) {
+    Pool.getTopicsSummary(function(err, result) {
+        res.send(result, {
+            'Content-Type': 'application/json'
+        }, 200);
+    });
 });
-router.post('/',function(req,res,next){
-    var busboy = new Busboy({headers : req.headers});
-    busboy.on('file',function(fieldname,file,filename,encoding,mimetype){
-        var all_rows='';
-        file.on('data',function(data){
-          all_rows += data;
+router.post('/', function(req, res, next) {
+    var busboy = new Busboy({ headers: req.headers });
+    busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+        var all_rows = '';
+        file.on('data', function(data) {
+            all_rows += data;
         });
         file.on('end',function(data){
           console.log('Finished with read data : file name :'+filename);
