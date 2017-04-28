@@ -5,12 +5,19 @@ console.log(__dirname);
 var Pool = require('../../models/pool');
 
 router.get('/', function(req, res) {
-    Pool.getTopics(function(err, pools) {
+    /*Pool.getTopics(function(err, pools) {
         res.render('dashboard', { pools: pools });
     });
-
+*/
+    res.render('dashboard', { pools: {} });
 });
-
+router.get('/topicsummary', function(req, res, next) {
+    Pool.getTopicsSummary(function(err, result) {
+        res.send(result, {
+            'Content-Type': 'application/json'
+        }, 200);
+    });
+});
 router.post('/', function(req, res, next) {
     var busboy = new Busboy({ headers: req.headers });
     busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {

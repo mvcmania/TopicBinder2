@@ -35,3 +35,14 @@ module.exports.getTopics = function(callback) {
     Pools.find({}, {}, { limit: 100 }, callback);
     //User.findOne(query, callback);
 }
+module.exports.getTopicsSummary = function(callback) {
+    Pools.aggregate([{
+        $group: {
+            _id: "$topic_id",
+            count: { $sum: 1 },
+            pols: { $push: "$$ROOT" }
+        }
+    }], callback);
+
+    //User.findOne(query, callback);
+}

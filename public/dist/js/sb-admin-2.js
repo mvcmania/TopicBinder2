@@ -45,3 +45,17 @@ $(function() {
         }
     }
 });
+//Query for topics 
+$(function() {
+    var getTopicsSummary = function() {
+        $.ajax({
+            url: "/topicsummary",
+            type: "GET",
+            success: function(data) {
+                $.get('/views/partials/topicsummary.handlebars', function(source) {
+                    var template = Exphbs
+                });
+            }
+        })
+    }
+})
