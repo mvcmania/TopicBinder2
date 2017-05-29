@@ -49,13 +49,15 @@ $(function() {
 $(function() {
     var getTopicsSummary = function() {
         $.ajax({
-            url: "/topicsummary",
+            url: "admin/topicsummary",
             type: "GET",
             success: function(data) {
-                $.get('/views/partials/topicsummary.handlebars', function(source) {
-                    var template = Exphbs
+                $.get('views/partials/topicsummary.handlebars', function(source) {
+                    console.log(source);
+                    //$('#topic-summary').html(source);
                 });
             }
         })
     }
+    getTopicsSummary();
 })

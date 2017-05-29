@@ -7,7 +7,9 @@ router.get('/', function(req, res) {
     /*Pool.getTopics(function(err, pools) {
         res.render('dashboard', { pools: pools });
     });
-*/
+*/  /*Pool.getDistinctTopicIds(function(err,ids){
+        console.log(ids);
+    });*/
     res.render('dashboard', { pools: {} });
 });
 router.get('/topicsummary', function(req, res, next) {

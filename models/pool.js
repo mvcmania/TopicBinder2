@@ -46,3 +46,6 @@ module.exports.getTopicsSummary = function(callback) {
 
     //User.findOne(query, callback);
 }
+module.exports.getDistinctTopicIds =  function(callback){
+    Pools.find().distinct('topic_id',callback);
+}

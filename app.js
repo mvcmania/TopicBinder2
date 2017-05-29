@@ -25,9 +25,13 @@ var members = require('./routes/user/user');
 
 var app = express();
 
+app.engine('handlebars', exphbs({ 
+    defaultLayout: 'layout',
+    layoutsDir: path.join(__dirname, "views/layouts"),
+    partialsDir: path.join(__dirname, "views/partials")
+}));
 //View Engine
 app.set('views', path.join(__dirname, 'views'));
-app.engine('handlebars', exphbs({ defaultLayout: 'layout' }));
 app.set('view engine', 'handlebars');
 
 //Body Parser middleware
