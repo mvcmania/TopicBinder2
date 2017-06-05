@@ -1,4 +1,5 @@
 var express = require('express');
+var exphbs = require('express-handlebars');
 var router = express.Router();
 var Busboy = require('busboy');
 var Pool = require('../../models/pool');
@@ -20,8 +21,10 @@ router.get('/topicsummary', function(req, res, next) {
     });
 });
 router.post('/', function(req, res, next) {
+    console.log('post file',req.headers);
     var busboy = new Busboy({ headers: req.headers });
     busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+        console.log('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
         var all_rows = '';
         file.on('data', function(data) {
             all_rows += data;
@@ -47,10 +50,11 @@ function csv_parse(records,res){
   arr.map(function(val){
     var splitted = val.split(" ");
     var obj = {
-      "document_id" : splitted[2],
       "topic_id" : splitted[0],
-      "score" : parseInt(splitted[3]),
-      "isrelated" : false,
+      "document_id" : splitted[2],
+      "index" : parseInt(splitted[3]),
+      "score" :  parseInt(splitted[4]),
+      "search_engine_id" : splitted[5]
      };
      pool_array.push(obj);
   });

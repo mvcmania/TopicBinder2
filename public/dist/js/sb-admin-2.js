@@ -52,12 +52,11 @@ $(function() {
             url: "admin/topicsummary",
             type: "GET",
             success: function(data) {
-                $.get('views/partials/topicsummary.handlebars', function(source) {
-                    console.log(source);
-                    //$('#topic-summary').html(source);
-                });
+                console.log(data);
+                var tp = document.getElementById('topic-summary');
+                tp.innerHTML = Handlebars.templates.topicsummary({'pools':data});
             }
-        })
+        });
     }
     getTopicsSummary();
 })
