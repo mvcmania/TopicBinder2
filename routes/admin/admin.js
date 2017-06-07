@@ -3,6 +3,7 @@ var exphbs = require('express-handlebars');
 var router = express.Router();
 var Busboy = require('busboy');
 var Pool = require('../../models/pool');
+var User = require('../../models/user');
 
 router.get('/', function(req, res) {
     /*Pool.getTopics(function(err, pools) {
@@ -11,7 +12,10 @@ router.get('/', function(req, res) {
 */  /*Pool.getDistinctTopicIds(function(err,ids){
         console.log(ids);
     });*/
-    res.render('dashboard', { pools: {} });
+    User.pullNonAdmins(function(err, result){
+        res.render('dashboard', { pools: {},users: result});
+    });
+    
 });
 router.get('/topicsummary', function(req, res, next) {
     Pool.getTopicsSummary(function(err, result) {

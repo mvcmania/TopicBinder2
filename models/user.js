@@ -46,3 +46,7 @@ module.exports.comparePassword = function(candidatePassword, hash, callback) {
         callback(null, isMatch);
     });
 }
+module.exports.pullNonAdmins = function(callback) {
+      var query = { isadmin: false };
+      User.find(query, callback);
+}

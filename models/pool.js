@@ -36,13 +36,14 @@ module.exports.getTopics = function(callback) {
     //User.findOne(query, callback);
 }
 module.exports.getTopicsSummary = function(callback) {
-    Pools.aggregate([{
-        $group: {
+    Pools.aggregate([
+        //{$match:{ topic_id : { $not : ['']}}},
+        {$group: {
             _id: "$topic_id",
             count: { $sum: 1 },
             pols: { $push: "$$ROOT" }
-        }
-    }], callback);
+        }}
+    ], callback);
 
     //User.findOne(query, callback);
 }

@@ -11,6 +11,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
+var helpers = require('./public/lib/helper');
 
 
 mongoose.connect(process.env.MONGODB_URI);
@@ -28,7 +29,8 @@ var app = express();
 app.engine('handlebars', exphbs({ 
     defaultLayout: 'layout',
     layoutsDir: path.join(__dirname, "views/layouts"),
-    partialsDir: path.join(__dirname, "views/partials")
+    partialsDir: path.join(__dirname, "views/partials"),
+    helpers : helpers
 }));
 //View Engine
 app.set('views', path.join(__dirname, 'views'));

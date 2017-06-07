@@ -6,7 +6,7 @@ var User = require('../models/user');
 
 // Get Homepage
 router.get('/register', function(req, res) {
-    res.render('register', { islogin: true });
+    res.render('register', { islogin: true , layout: "loginlayout"});
 });
 
 // Get Homepage
@@ -33,7 +33,8 @@ router.post('/register', function(req, res) {
     var errors = req.validationErrors();
     if (errors) {
         res.render('register', {
-            errors: errors
+            errors: errors,
+            layout: "loginlayout"
         });
     } else {
         var newUser = new User({
