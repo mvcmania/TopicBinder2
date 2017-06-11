@@ -1,274 +1,197 @@
-<div id="page-wrapper">
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        Dashboard
+        <small>Control panel</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Dashboard</li>
+    </ol>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <!-- Small boxes (Stat box) -->
     <div class="row">
-                    <div class="col-lg-12">
-                        <h1 class="page-header">Dashboard</h1>
-                    </div>
-                    <!-- /.col-lg-12 -->
-    </div>
-     <div class="row">
-                    <div class="col-lg-3 col-md-6">
-                        <div class="panel panel-primary">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <i class="fa fa-users fa-5x"></i>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div class="huge">{{len users}}</div>
-                                        <div>Users in System</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <a href="#">
-                                <div class="panel-footer">
-                                    <span class="pull-left">View Details</span>
-                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="panel panel-green">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <i class="fa fa-file-text fa-5x"></i>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div class="huge">26</div>
-                                        <div>Approved Topics</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <a href="#">
-                                <div class="panel-footer">
-                                    <span class="pull-left">View Details</span>
-                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="panel panel-yellow">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <i class="fa fa-file-text fa-5x"></i>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div class="huge">124</div>
-                                        <div>Pending Topics!</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <a href="#">
-                                <div class="panel-footer">
-                                    <span class="pull-left">View Details</span>
-                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="panel panel-red">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <i class="fa fa-file-text fa-5x"></i>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div class="huge">11</div>
-                                        <div>In Progress Topics</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <a href="#">
-                                <div class="panel-footer">
-                                    <span class="pull-left">View Details</span>
-                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-    </div>
-     <!-- /.row -->
-    <div class="row">
-        <div class="col-sm-1 col-md-6 col-lg-6">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <i class="fa fa-bar-chart-o fa-fw"></i> SUMMARY OF TOPIC IN THE SYSTEM
-                            <div class="pull-right">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                                        Actions
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu pull-right" role="menu">
-                                        <li><a href="/topicsummary">Get Summary</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-aqua">
+                <div class="inner">
+                    <h3>{{len users}}</h3>
+                    <p>Users in System</p>
                 </div>
-                <!-- /.panel-heading -->
-                <div class="panel-body">
-                    <div id="topic-summary" class="table-responsive">
-                          <div class="alert alert-info">
-                              Loading...
-                          </div>
-                    </div>
+                <div class="icon">
+                    <i class="ion ion-person-stalker"></i>
                 </div>
+                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
-         <div class="col-sm-1 col-md-6 col-lg-6">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    Upload Topic File
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3>53<sup style="font-size: 20px">%</sup></h3>
+
+                    <p>Approved Topics</p>
                 </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <form role="form"  method="post">
-                                <div class="form-group">
-                                    <label>Choose file</label>
-                                    <input type="file" name="topic-file">
-                                 </div>
-                                    <button type="submit" class="btn btn-prinary">Submit Button</button>
-                                    <button type="reset" class="btn btn-default">Reset Button</button>
-                               
-                            </form>
-                        </div>
-                    </div>
+                <div class="icon">
+                    <i class="ion ion-stats-bars"></i>
                 </div>
-            </div>
-         </div>
-    </div>
-   
-    <!-- /.row -->
-    <!-- /.row -->
-   <!-- <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    Basic Form Elements
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <form role="form">
-                                <div class="form-group">
-                                    <label>Text Input</label>
-                                    <input class="form-control">
-                                    <p class="help-block">Example block-level help text here.</p>
-                                </div>
-                                <div class="form-group">
-                                    <label>Text Input with Placeholder</label>
-                                    <input class="form-control" placeholder="Enter text">
-                                </div>
-                                <div class="form-group">
-                                    <label>Static Control</label>
-                                    <p class="form-control-static">email@example.com</p>
-                                </div>
-                                <div class="form-group">
-                                    <label>File input</label>
-                                    <input type="file">
-                                </div>
-                                <div class="form-group">
-                                    <label>Text area</label>
-                                    <textarea class="form-control" rows="3"></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label>Checkboxes</label>
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" value="">Checkbox 1
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" value="">Checkbox 2
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" value="">Checkbox 3
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Inline Checkboxes</label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox">1
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox">2
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox">3
-                                    </label>
-                                </div>
-                                <div class="form-group">
-                                    <label>Radio Buttons</label>
-                                    <div class="radio">
-                                        <label>
-                                            <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>Radio 1
-                                        </label>
-                                    </div>
-                                    <div class="radio">
-                                        <label>
-                                            <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">Radio 2
-                                        </label>
-                                    </div>
-                                    <div class="radio">
-                                        <label>
-                                            <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">Radio 3
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Inline Radio Buttons</label>
-                                    <label class="radio-inline">
-                                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline1" value="option1" checked>1
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline2" value="option2">2
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline3" value="option3">3
-                                    </label>
-                                </div>
-                                <div class="form-group">
-                                    <label>Selects</label>
-                                    <select class="form-control">
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                        <option>5</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Multiple Selects</label>
-                                    <select multiple class="form-control">
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                        <option>5</option>
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn btn-default">Submit Button</button>
-                                <button type="reset" class="btn btn-default">Reset Button</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
-    </div>-->
-   
-</div><!--#Page-wrapper-->
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-yellow">
+                <div class="inner">
+                    <h3>44</h3>
+
+                    <p>Pending Topics</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-person-add"></i>
+                </div>
+                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-red">
+                <div class="inner">
+                    <h3>65</h3>
+
+                    <p>In Progress Topics</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-pie-graph"></i>
+                </div>
+                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+    </div>
+    <!-- .row-->
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <div class="box box-primary" id="topic-summary-box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Topic Summary</h3>
+
+                    <div class="box-tools pull-right">
+                        <div class="has-feedback">
+                            <input type="text" class="form-control input-sm" placeholder="Search Topic ID">
+                            <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                        </div>
+                    </div>
+                    <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="mailbox-controls">
+                        <!-- Check all button -->
+                        <!--<button type="button" class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button>-->
+                        <div class="btn-group">
+                            <label for="projects">Projects : </label>
+                            <select onchange="getTopicsSummary()" class="input-sm" id="projects">
+                                {{#each projects as |proj|}}
+                                    <option value="{{proj}}">{{proj}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <!-- /.btn-group -->
+                        <button type="button" onclick="getTopicsSummary()" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                        <div class="pull-right">
+                            1-50/200
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+                            </div>
+                            <!-- /.btn-group -->
+                        </div>
+                        <!-- /.pull-right -->
+                    </div>
+                    <div class="table-responsive mailbox-messages" id="topic-summary">
+                        
+                    </div>
+                   
+                    <!-- /.mail-box-messages -->
+                </div>
+                <!-- /.box-body -->
+                 <div class="overlay hide">
+                        <div class="loading-text">Project summary is loading!</div>
+                        <i class="fa fa-refresh fa-spin"></i>
+                    </div>
+            </div>
+        </div>
+        <!-- col-sm-12-->
+        <div class="col-sm-12 col-md-6">
+            <!-- general form elements -->
+            <div class="box box-primary" id="upload-box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Upload Project</h3>
+                </div>
+                <!-- /.box-header -->
+                <!-- form start -->
+                
+                    <div class="box-body">
+                    <form role="form" id="upload-form" action="/admin/upload" enctype="multipart/form-data" method="post">
+                        <div class="form-group">
+                            <label for="exampleInputFile">File input</label>
+                            <input id="topic-file" type="file" name="topic-file">
+                            <p class="help-block">Every file will be a standalone project so you will be able to see on the dropdown options.</p>
+                        </div>
+                     </form>
+                    </div>
+                     <div class="overlay hide">
+                        <div class="loading-text">Please wait, your file is uploading!</div>
+                        <i class="fa fa-refresh fa-spin"></i>
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <button type="button" onclick="postUploadForm()" class="btn btn-primary">Upload</button>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Assign modal-->
+    <div class="modal fade" id="assignModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="assignModalTitle">Topic Assignment</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form method="POST" action="/admin/assign" id="assignment-form">
+                        <div class="form-group">
+                            <label for="recipient-name" class="control-label">Recipient:</label>
+                            <select required="true" class="form-control" id="recipient" name="recipient">
+                 <option value="">--none--</option>
+                {{#each users as |us|}}
+                    <option value="{{us._id}}">{{us.name}}</option>
+                {{/each}}
+            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="number-of-topic" class="control-label">How many of them?</label>
+                            <input type="number" required="true" class="form-control" name="numberoftopic" id="number-of-topic" />
+                        </div>
+                        <input type="hidden" name="topicid" id="topic-id-hidden" />
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" onclick="postAssignment()" class="btn btn-primary">Submit</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>

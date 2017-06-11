@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 var poolSchema = mongoose.Schema({
     "topic_id": {
-        type: String,
+        type: Number,
         default: null,
         required: true
     },
@@ -23,6 +23,20 @@ var poolSchema = mongoose.Schema({
         type: String,
         default: null,
         required: false
+    },
+    "is_assigned": {
+        type: Boolean,
+        default: false,
+        required: false
+    },
+    "project":{
+        type:String,
+        default: false,
+        required: true
+    },
+    "createddate":{
+        type:Date,
+        default : Date.now
     }
 }, { collection: "sorguHavuzu" });
 
@@ -31,22 +45,40 @@ module.exports.createPoolItems = function(poolItems, callback) {
     poolItems.save(callback);
 }
 
-module.exports.getTopics = function(callback) {
-    Pools.find({}, {}, { limit: 100 }, callback);
+module.exports.getTopics = function(topicId, nofRec,callback) {
+     var query = {"topic_id":topicId,"is_assigned":false};
+    Pools.find(query,{},{limit:parseInt(nofRec)},callback);
     //User.findOne(query, callback);
 }
-module.exports.getTopicsSummary = function(callback) {
+/*
+not started  - bg-teal
+in progress - bg-yellow
+success : bg-green
+*/
+module.exports.getTopicsSummary = function(projectid,callback) {
     Pools.aggregate([
-        //{$match:{ topic_id : { $not : ['']}}},
+        {$match:{ "project" : projectid , "topic_id": {$ne: null}}},
+        {$sort : {  "topic_id" :1 } },
         {$group: {
             _id: "$topic_id",
-            count: { $sum: 1 },
-            pols: { $push: "$$ROOT" }
-        }}
+            count: { $sum: 1 }
+        }},
+        {$project : { "_id":"$_id", "count":"$count", "status":{ $literal: "bg-light-blue" } }}
+       
     ], callback);
 
     //User.findOne(query, callback);
 }
-module.exports.getDistinctTopicIds =  function(callback){
-    Pools.find().distinct('topic_id',callback);
+module.exports.getDistinctValues =  function(distinctCol,callback){
+    Pools.find().distinct(distinctCol,callback);
+}
+module.exports.getTopicByNumber =  function(topicid,callback){
+    var query = {'topic_id':topicid};
+    Pools.findOne(query,callback);
+}
+module.exports.updateTopicsByNumber = function(idArray, isaAssigned, callback){
+    var query = { "_id" : { $in: idArray}};
+    var upt =  { $set : {"is_assigned": (isaAssigned ? isaAssigned : false)} };
+    var opt = {multi : true};
+    Pools.update(query , upt,opt, callback);
 }
