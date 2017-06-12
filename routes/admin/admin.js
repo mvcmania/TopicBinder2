@@ -72,7 +72,7 @@ router.get('/topicsummary', function(req, res, next) {
 router.post('/assign', function(req, res, next) {
     async.waterfall([
         function(next){
-            Pool.getTopics(req.body.topicid, req.body.numberoftopic, function(err, res1){
+            Pool.getTopics(req.body.topicid, req.body.projectid, req.body.numberoftopic, function(err, res1){
                 var assignItemArr = [];
                 var tpid= [];
                 for(var tp in res1){

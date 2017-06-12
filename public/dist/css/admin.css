@@ -3,3 +3,6 @@
   top: 60%;
   left: 36%;
 }
+#topic-summary .dataTables_filter{
+  display: none;
+}

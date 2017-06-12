@@ -1,10 +1,10 @@
-  <table class="table table-condensed">
+  <table id="summary-table" class="table table-bordered table-hover">
     <thead>
         <tr>
-            <th>#</th>
+            <th class="no-sort">#</th>
             <th>TOPIC ID</th>
-            <th>COUNT</th>
-            <th></th>
+            <th class="no-sort">COUNT</th>
+            <th class="no-sort"></th>
         </tr>
     </thead>
     <tbody>
@@ -14,7 +14,7 @@
                 <td class="mailbox-name">{{pool._id}}</td>
                 <td id="td-{{pool._id}}">{{pool.count}}</td>
                 <td>
-                   <button onclick="launchAssignModal(this)" type="button" role="assign" data-topicid="{{pool._id}}" class="btn btn-xs btn-default"><i class="fa fa-plus"></i>
+                   <button onclick="launchAssignModal(this)" type="button" role="assign"  data-topicid="{{pool._id}}" class="btn btn-xs btn-default"><i class="fa fa-plus"></i>
                    Assign
                     </button>
                 </td>

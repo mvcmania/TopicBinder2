@@ -45,8 +45,8 @@ module.exports.createPoolItems = function(poolItems, callback) {
     poolItems.save(callback);
 }
 
-module.exports.getTopics = function(topicId, nofRec,callback) {
-     var query = {"topic_id":topicId,"is_assigned":false};
+module.exports.getTopics = function(topicId, projectid, nofRec,callback) {
+     var query = {"topic_id":topicId,"is_assigned":false,'project':projectid};
     Pools.find(query,{},{limit:parseInt(nofRec)},callback);
     //User.findOne(query, callback);
 }
@@ -58,12 +58,12 @@ success : bg-green
 module.exports.getTopicsSummary = function(projectid,callback) {
     Pools.aggregate([
         {$match:{ "project" : projectid , "topic_id": {$ne: null}}},
-        {$sort : {  "topic_id" :1 } },
         {$group: {
             _id: "$topic_id",
             count: { $sum: 1 }
         }},
-        {$project : { "_id":"$_id", "count":"$count", "status":{ $literal: "bg-light-blue" } }}
+        {$sort : {  "_id" :1 } },
+        {$project : { "_id":"$_id", "count":"$count", "status":{ $literal: "bg-red" } }}
        
     ], callback);
 

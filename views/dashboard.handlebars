@@ -32,12 +32,11 @@
             <!-- small box -->
             <div class="small-box bg-green">
                 <div class="inner">
-                    <h3>53<sup style="font-size: 20px">%</sup></h3>
-
-                    <p>Approved Topics</p>
+                    <h3 id="completed-count">53</h3>
+                    <p>Completed Topics</p>
                 </div>
                 <div class="icon">
-                    <i class="ion ion-stats-bars"></i>
+                    <i class="ion ion-ios-checkmark-outline"></i>
                 </div>
                 <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
@@ -47,12 +46,12 @@
             <!-- small box -->
             <div class="small-box bg-yellow">
                 <div class="inner">
-                    <h3>44</h3>
+                    <h3 id="inprogress-count">44</h3>
 
                     <p>Pending Topics</p>
                 </div>
                 <div class="icon">
-                    <i class="ion ion-person-add"></i>
+                    <i class="ion ion-load-a"></i>
                 </div>
                 <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
@@ -62,12 +61,12 @@
             <!-- small box -->
             <div class="small-box bg-red">
                 <div class="inner">
-                    <h3>65</h3>
+                    <h3 id="notstarted-count">65</h3>
 
-                    <p>In Progress Topics</p>
+                    <p>Not Started Topics</p>
                 </div>
                 <div class="icon">
-                    <i class="ion ion-pie-graph"></i>
+                    <i class="ion ion-alert"></i>
                 </div>
                 <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
@@ -82,7 +81,7 @@
 
                     <div class="box-tools pull-right">
                         <div class="has-feedback">
-                            <input type="text" class="form-control input-sm" placeholder="Search Topic ID">
+                            <input type="text" data-column="1" class="form-control input-sm" placeholder="Search Topic ID" id="search-topic-id">
                             <span class="glyphicon glyphicon-search form-control-feedback"></span>
                         </div>
                     </div>
@@ -104,11 +103,11 @@
                         <!-- /.btn-group -->
                         <button type="button" onclick="getTopicsSummary()" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
                         <div class="pull-right">
-                            1-50/200
+                           <!-- 1-50/200
                             <div class="btn-group">
                                 <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
                                 <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
-                            </div>
+                            </div>-->
                             <!-- /.btn-group -->
                         </div>
                         <!-- /.pull-right -->
@@ -161,7 +160,7 @@
     <!-- Assign modal-->
     <div class="modal fade" id="assignModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
         <div class="modal-dialog" role="document">
-            <div class="modal-content">
+            <div class="modal-content box" id="assign-modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="assignModalTitle">Topic Assignment</h4>
@@ -183,14 +182,19 @@
                             <input type="number" required="true" class="form-control" name="numberoftopic" id="number-of-topic" />
                         </div>
                         <input type="hidden" name="topicid" id="topic-id-hidden" />
+                        <input type="hidden" name="projectid" id="project-id-hidden" />
                     </form>
+                   
                 </div>
-
+               
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="button" onclick="postAssignment()" class="btn btn-primary">Submit</button>
                 </div>
-
+                  <div class="overlay hide">
+                        <div class="loading-text">Assignment is completing!</div>
+                        <i class="fa fa-refresh fa-spin"></i>
+                    </div>
             </div>
         </div>
     </div>
