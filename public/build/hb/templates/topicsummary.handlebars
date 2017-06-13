@@ -1,22 +1,27 @@
   <table id="summary-table" class="table table-bordered table-hover">
     <thead>
         <tr>
-            <th class="no-sort">#</th>
+            <th style="width:10%">#Status</th>
             <th>TOPIC ID</th>
-            <th class="no-sort">COUNT</th>
+            <th>COUNT</th>
             <th class="no-sort"></th>
         </tr>
     </thead>
     <tbody>
         {{#each pools as |pool|}}
-            <tr class="{{pool.status}} disabled">
-                <td></td>
+            <tr >
+                <td class="disabled" data-order="{{pool.status}}"><label class="badge {{pool.status}}">&nbsp;</label></td>
                 <td class="mailbox-name">{{pool._id}}</td>
                 <td id="td-{{pool._id}}">{{pool.count}}</td>
                 <td>
-                   <button onclick="launchAssignModal(this)" type="button" role="assign"  data-topicid="{{pool._id}}" class="btn btn-xs btn-default"><i class="fa fa-plus"></i>
+                  <div class="btn-group">
+                   <button onclick="launchAssignModal(this)" type="button" role="assign"  data-topicid="{{pool._id}}" class="btn btn-xs btn-flat btn-success"><i class="fa fa-plus"></i>
                    Assign
                     </button>
+                  </div>
+                  <div class="btn-group">
+                      <button onclick="launchDetailModal(this)" class="btn btn-xs btn-flat btn-info"><i class="fa fa-list-alt"></i> Detail</button>
+                      </div>
                 </td>
             </tr>
         {{/each}}

@@ -198,4 +198,27 @@
             </div>
         </div>
     </div>
+     <!-- Assign modal-->
+    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content box" id="detail-modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="assignModalTitle">Topic Assignment Detail</h4>
+                </div>
+
+                <div class="modal-body">
+                    <canvas id="pieChart" style="height:250px"></canvas>
+                </div>
+               
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                  <div class="overlay hide">
+                        <div class="loading-text">Detail is completing!</div>
+                        <i class="fa fa-refresh fa-spin"></i>
+                    </div>
+            </div>
+        </div>
+    </div>
 </section>
