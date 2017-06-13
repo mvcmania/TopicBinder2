@@ -12,8 +12,8 @@ var LocalStrategy = require('passport-local').Strategy;
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
 var helpers = require('./public/lib/helper');
-  
-process.env.MONGODB_URI='mongodb://heroku_bwcmzm1p:dumch6k7cjom726boh401mm5m7@ds153719.mlab.com:53719/heroku_bwcmzm1p';
+
+//process.env.MONGODB_URI='mongodb://heroku_bwcmzm1p:dumch6k7cjom726boh401mm5m7@ds153719.mlab.com:53719/heroku_bwcmzm1p';
 mongoose.connect(process.env.MONGODB_URI);
 var db = mongoose.connection;
 
@@ -26,11 +26,11 @@ var members = require('./routes/user/user');
 
 var app = express();
 
-app.engine('handlebars', exphbs({ 
+app.engine('handlebars', exphbs({
     defaultLayout: 'layout',
     layoutsDir: path.join(__dirname, "views/layouts"),
     partialsDir: path.join(__dirname, "views/partials"),
-    helpers : helpers
+    helpers: helpers
 }));
 //View Engine
 app.set('views', path.join(__dirname, 'views'));
