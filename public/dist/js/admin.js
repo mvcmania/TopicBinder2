@@ -25,9 +25,9 @@ var tpCheckBox = function() {
 }
 var summaryWidgets = function() {
     console.log('summary widge');
-    $('#notstarted-count').text($('#summary-table tr.bg-red').length);
-    $('#inprogress-count').text($('#summary-table tr.bg-yellow').length);
-    $('#completed-count').text($('#summary-table tr.bg-green').length);
+    $('#notstarted-count').text($('#summary-table td label.bg-red').length);
+    $('#inprogress-count').text($('#summary-table td label.bg-yellow').length);
+    $('#completed-count').text($('#summary-table td label.bg-green').length);
 }
 var postAssignmentSuccess = function(data) {
     $('#assign-modal-content .overlay').addClass('hide');
@@ -138,6 +138,18 @@ $(function() {
     });
     $('#detailModal').on('shown.bs.modal', function() {
         chartPrepare();
+        $.ajax({
+            url: '/admin/assignmentsummary?projectid=input.aiaA2&topicid=301',
+            type: 'POST',
+            contentType: false,
+            processData: false,
+            success: function(res){
+                console.log(res);
+            },
+            error: function(err){
+                console.log(err);
+            }
+        });
     });
     getTopicsSummary();
     searchableMake('summary-table');

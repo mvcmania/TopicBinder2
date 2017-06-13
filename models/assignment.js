@@ -39,4 +39,15 @@ module.exports.getAssignmentSummary = function(projectid,callback) {
     ],callback);
     //User.findOne(query, callback);
 }
-
+module.exports.getTopicAssignmentSummary = function(projectid, topicid, callback){
+    Assign.aggregate([
+        {$match : {"project":projectid, "topic_id":topicid}},
+        {$group:{
+            _id :"$user_id",
+            count:{$sum :1}
+        }},
+       {$lookup : {"from" :"kullanicilar","localField":"_id","foreignField":"id","as":"user"}},
+       {$unwind:"$user"},
+       {$project:{"user":"$user.name","count":"$count","_id":"$_id"}} 
+    ],callback);
+};

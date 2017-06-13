@@ -134,6 +134,20 @@ router.post('/upload', function(req, res, next) {
     //res.end();
     //res.render('dashboard',{ pools: {},users: req.users});
 });
+router.post('/assignmentsummary',function(req, res, next){
+    Assign.getTopicAssignmentSummary(req.query.projectid, req.query.topicid,
+    function(err,result){
+        var rt;
+        if(err)
+        rt = err;
+        else
+        rt = result;
+         res.send(rt, {
+                'Content-Type': 'application/json'
+                }, 200);
+        
+    });
+});
 function postProcessAssignAgg (aggResult){
     var assMap ={};
     for(var rs  in aggResult){
