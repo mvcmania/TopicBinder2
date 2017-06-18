@@ -1,12 +1,10 @@
 var launchAssignModal = function(el) {
-    $('#assignModalTitle').html('Topic Assignment for ' + el.dataset.topicid);
+    $('#assignModal [role=assign-modal-title]').html('Topic Assignment for <strong>' + el.dataset.topicid+'</strong>');
+    $('#assignModal [role=assign-modal-remain]').html(el.dataset.remain);
     $('#topic-id-hidden').val(el.dataset.topicid);
-    $('#project-id-hidden').val($('#projects').val());
+    $('#project-id-hidden').val(getProjectID());
     $('#assignModal').modal('show');
 };
-var launchDetailModal = function(el) {
-    $('#detailModal').modal('show');
-}
 var postAssignment = function() {
     var el = document.getElementById('assignment-form');
     $(el).submit();
@@ -24,23 +22,50 @@ var tpCheckBox = function() {
     });
 }
 var summaryWidgets = function() {
-    console.log('summary widge');
     $('#notstarted-count').text($('#summary-table td label.bg-red').length);
     $('#inprogress-count').text($('#summary-table td label.bg-yellow').length);
     $('#completed-count').text($('#summary-table td label.bg-green').length);
 }
 var postAssignmentSuccess = function(data) {
-    $('#assign-modal-content .overlay').addClass('hide');
+    toggleOverLay('assign-modal-content');
     $('#assignModal').modal('hide');
     getTopicsSummary();
     dataTableMake('summary-table');
 }
 var postAssignmentError = function(err) {
-    $('#assign-modal-content .overlay').addClass('hide');
+    toggleOverLay('assign-modal-content');
+}
+var pieChart;
+var pieChart2;
+var detailLoadingSuccess = function(data){
+    if(!data || data.length == 0 ){
+      var msg = prepareMessage('No Data!','There is no assignment yet!');
+      $('#assignModal div[role=detail-modal]  div[role=message]').html(
+        Handlebars.templates.warning({
+            'message': msg
+        })
+      );
+      $('#pieChart,#pieChart2').css({height:0});
+    }else{
+        $('#pieChart,#pieChart2').css({height:'auto'});
+        $('#assignModal div[role=detail-modal]  div[role=message]').html('');
+        pieChart = chartPrepare(data);
+        pieChart2 = chartPrepare2(data);
+    }
+}
+var detailLoadingError =  function(err){
+    var msg = prepareMessage('Error Occured!','Something Wrong'+JSON.stringify(err));
+    $('#assignModal div[role=detail-modal]  div[role=message]').html(
+        Handlebars.templates.error({
+            'message': msg
+        })
+    );
+    $('#pieChart').css({height:0});
+
 }
 var getTopicSummarySuccess = function(data) {
     var tp = document.getElementById('topic-summary');
-    $('#topic-summary-box .overlay').addClass('hide');
+    toggleOverLay('topic-summary-box');
     tp.innerHTML = Handlebars.templates.topicsummary({
         'pools': data
     });
@@ -48,12 +73,9 @@ var getTopicSummarySuccess = function(data) {
     dataTableMake('summary-table');
 }
 var getTopicSummaryError = function(err) {
-    var msg = {
-        'title': 'Warning',
-        'description': err.responseJSON.message
-    };
+    var msg = prepareMessage('Warning',err.responseJSON.message);
     var tp = document.getElementById('topic-summary');
-    $('#topic-summary-box .overlay').addClass('hide');
+    
     tp.innerHTML = Handlebars.templates.warning({
         'message': msg
     });
@@ -83,18 +105,25 @@ var dataTableMake = function(id) {
 }
 var searchableMake = function(id) {
         $('#search-topic-id').on('keyup click', function() {
-            console.log($(this).data('column'));
-            console.log($(this).val());
             $('#' + id).DataTable().column($(this).data('column')).search($(this).val(), false, false).draw();
         });
     }
     //Query for topics 
 
 var getTopicsSummary = function() {
-    var pjId = document.getElementById('projects');
-    $('#topic-summary-box .overlay').removeClass('hide');
+    var pjId = getProjectID();
+    //$('#topic-summary-box .overlay').removeClass('hide');
+    if(!pjId){
+        var tp = document.getElementById('topic-summary');
+        var msg =  prepareMessage('Warning','No project has been found!')
+        tp.innerHTML = Handlebars.templates.warning({
+            'message': msg
+        });
+        return;
+    }
+    toggleOverLay('topic-summary-box');
     var data = {
-        'projectid': pjId.value
+        'projectid': pjId
     };
     $.ajax({
         url: "admin/topicsummary",
@@ -104,10 +133,22 @@ var getTopicsSummary = function() {
         error: getTopicSummaryError
     });
 }
+var getProjectID = function(){
+    var pjId = document.getElementById('projects');
+    return pjId.value;
+}
+var toggleOverLay = function(id,text){
+    $('#'+id+' .overlay').toggleClass('hide');
+}
+var prepareMessage =  function(ttl,desc){
+    var msg = {title :ttl , description : desc};
+    return msg;
+}
+
 $(function() {
     $('#assignment-form').submit(function(e) {
         e.preventDefault();
-        $('#assign-modal-content .overlay').removeClass('hide');
+        toggleOverLay('assign-modal-content');
         //get the action-url of the form
         var actionurl = e.currentTarget.action;
         $.ajax({
@@ -120,7 +161,8 @@ $(function() {
     });
     $('#upload-form').submit(function(e) {
         e.preventDefault();
-        $('#upload-box .overlay').removeClass('hide');
+        //$('#upload-box .overlay').removeClass('hide');
+        toggleOverLay('upload-box');
         //get the action-url of the form
         var actionurl = e.currentTarget.action;
         var fd = new FormData();
@@ -136,21 +178,22 @@ $(function() {
             error: uploadFileError
         });
     });
-    $('#detailModal').on('shown.bs.modal', function() {
-        chartPrepare();
+    $('#assignModal').on('shown.bs.modal', function() {
+        var tp = encodeURIComponent($('#topic-id-hidden').val());
+        var pt = encodeURIComponent($('#project-id-hidden').val());
         $.ajax({
-            url: '/admin/assignmentsummary?projectid=input.aiaA2&topicid=301',
+            url: '/admin/assignmentsummary?projectid='+pt+'&topicid='+(typeof(tp) == "string" ? parseInt(tp) : tp) ,
             type: 'POST',
             contentType: false,
             processData: false,
-            success: function(res){
-                console.log(res);
-            },
-            error: function(err){
-                console.log(err);
-            }
+            success: detailLoadingSuccess,
+            error: detailLoadingError
         });
     });
+     $('#assignModal').on('hidden.bs.modal', function() {
+        if(pieChart && pieChart.destroy)pieChart.destroy();
+        if(pieChart2 && pieChart2.destroy)pieChart2.destroy();
+     });
     getTopicsSummary();
     searchableMake('summary-table');
 

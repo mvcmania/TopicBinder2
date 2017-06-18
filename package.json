@@ -17,6 +17,8 @@
   },
   "license": "ISC",
   "dependencies": {
+    "asyn": "0.0.1",
+    "dotenv": "^4.0.0",
     "bcryptjs": "*",
     "body-parser": "*",
     "busboy": "^0.2.14",
@@ -36,6 +38,7 @@
   "devDependencies": {
     "asyn": "0.0.1",
     "busboy": "^0.2.14",
+    "dotenv": "^4.0.0",
     "gulp": "^3.9.1",
     "gulp-compile-handlebars": "^0.6.1",
     "gulp-concat": "^2.6.1",

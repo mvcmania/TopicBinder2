@@ -6,6 +6,7 @@ var async = require('async');
 var Pool = require('../../models/pool');
 var User = require('../../models/user');
 var Assign = require('../../models/assignment');
+var mongoose = require('mongoose');
 
 
 router.get('/', function(req, res) {
@@ -43,7 +44,7 @@ router.get('/topicsummary', function(req, res, next) {
                     if(err)
                         next(err, null);
                     else{
-                        console.log('assing',res1);
+                        //console.log('assing',res1);
                         var assMap = postProcessAssignAgg(res1);
                         next(null, assMap);
                     }                  
@@ -52,6 +53,7 @@ router.get('/topicsummary', function(req, res, next) {
             },
             function(assMap, next){
                  Pool.getTopicsSummary(projectid, function(err, res2) {
+
                      if(assMap)
                      postProcessSummary(assMap, res2);
                      next(null, res2);
@@ -75,11 +77,12 @@ router.post('/assign', function(req, res, next) {
             Pool.getTopics(req.body.topicid, req.body.projectid, req.body.numberoftopic, function(err, res1){
                 var assignItemArr = [];
                 var tpid= [];
+                
                 for(var tp in res1){
+                    
                     var assignItem = new Assign({
-                        document_id : res1[tp].document_id,
-                        topic_id : res1[tp].topic_id,
-                        user_id : req.body.recipient,
+                        topic_id : mongoose.Types.ObjectId(res1[tp]._id),//res1[tp].topic_id,
+                        user_id : mongoose.Types.ObjectId(req.body.recipient),
                         project : res1[tp].project
                     });
                     tpid.push(res1[tp]._id);
@@ -151,17 +154,23 @@ router.post('/assignmentsummary',function(req, res, next){
 function postProcessAssignAgg (aggResult){
     var assMap ={};
     for(var rs  in aggResult){
-        assMap[aggResult[rs]._id] = aggResult[rs].count;
+        assMap[parseInt(aggResult[rs]._id)] = aggResult[rs];
     }
     return assMap;
 }
 function postProcessSummary(assMap, aggResult){
     for(var r in aggResult){
-        var item = assMap[aggResult[r]._id];
-        if(aggResult[r].count == item){
-            aggResult[r]['status'] = 'bg-green';
-        }else if(aggResult[r].count > item){
-            aggResult[r]['status'] = 'bg-yellow';
+        var item = assMap[aggResult[r].topic_id];
+        if(item){
+            aggResult[r]['remains'] = aggResult[r].count - item.count;
+            var tmpTotal = item.relatedCount + item.notRelatedCount;
+            if(aggResult[r].count == tmpTotal){
+                aggResult[r]['status'] = 'bg-green';
+            }else if(item.notStartedCount > 0){
+                aggResult[r]['status'] = 'bg-yellow';
+            }
+        }else{
+             aggResult[r]['remains'] = aggResult[r].count;
         }
     }
 }
