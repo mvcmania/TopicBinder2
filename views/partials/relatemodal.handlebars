@@ -1,0 +1,54 @@
+<div class="modal fade" id="relateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content box" id="relate-modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
+                <h4 class="modal-title" role="assign-modal-title">Update Relation</h4>
+            </div>
+            <div role="detail-modal" class="modal-body">
+                <div role="message"></div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <canvas id="pieChart" style="height:auto;"></canvas>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <canvas id="pieChart2" style="height:auto;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="/admin/assign" id="relate-form">
+                    <div class="form-group">
+                        <label for="number-of-topic" class="control-label">Remains : </label>
+                        <span role="assign-modal-remain" class="badge bg-yellow"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipient-name" class="control-label">Recipient : </label>
+                        <select required="true" class="form-control" id="recipient" name="recipient">
+                            <option value="">--none--</option>
+                            {{#each users as |us|}}
+                                <option value="{{us._id}}">{{us.name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="number-of-topic" class="control-label">How many of them? : </label>
+                        <input type="number" required="true" class="form-control" name="numberoftopic" id="number-of-topic" />
+                    </div>
+                    <input type="hidden" name="assignmentid" id="assignment-id-hidden" />
+                </form>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Update</button>
+            </div>
+            <div class="overlay hide">
+                <div class="loading-text">Assignment is updating!</div>
+                <i class="fa fa-refresh fa-spin"></i>
+            </div>
+        </div>
+    </div>
+</div>

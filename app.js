@@ -14,7 +14,6 @@ var mongoose = require('mongoose');
 var helpers = require('./public/lib/helper');
 require('dotenv').config();
 
-//process.env.MONGODB_URI='mongodb://heroku_bwcmzm1p:dumch6k7cjom726boh401mm5m7@ds153719.mlab.com:53719/heroku_bwcmzm1p';
 mongoose.connect(process.env.MONGODB_URI);
 var db = mongoose.connection;
 
@@ -78,6 +77,7 @@ app.use(flash());
 
 // Global Vars
 app.use(function(req, res, next) {
+    res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
@@ -85,17 +85,21 @@ app.use(function(req, res, next) {
     next();
 });
 
-
-app.use('/', routes);
 app.use('/users', users);
+app.use('/', routes);
 app.use('/admin', admins);
 app.use('/member', members);
 
+app.use(function(req, res, next){
+  // the status option, or res.statusCode = 404
+  // are equivalent, however with the option we
+  // get the "status" local available as well
+  res.render('404', { status: 404, url: req.url });
+});
 
 
 // Set Port
-app.set('port', (3000));
-
+app.set('port', (process.env.PORT || 5000));
 app.listen(app.get('port'), function() {
     console.log('Server started on port ' + app.get('port'));
 });

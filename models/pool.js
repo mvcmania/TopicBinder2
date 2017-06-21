@@ -42,7 +42,7 @@ var poolSchema = mongoose.Schema({
 
 var Pools = module.exports = mongoose.model('sorguHavuzu', poolSchema);
 module.exports.createPoolItems = function(poolItems, callback) {
-    poolItems.save(callback);
+    Pools.collection.insertMany(poolItems,callback);
 }
 
 module.exports.getTopics = function(topicId, projectid, nofRec,callback) {
@@ -60,10 +60,11 @@ module.exports.getTopicsSummary = function(projectid,callback) {
         {$match:{ "project" : projectid , "topic_id": {$ne: null}}},
         {$group: {
             _id: "$topic_id",
-            count: { $sum: 1 }
+            topic_id :{$first : "$_id"},
+            count: { $sum: 1 },
         }},
         {$sort : {  "_id" :1 } },
-        {$project : { "_id":"$_id", "count":"$count", "status":{ $literal: "bg-red" } }}
+        {$project : { "_id":"$topic_id","topic_id":"$_id", "count":"$count", "status":{ $literal: "bg-red" } ,"remains":{ $literal: 0 } ,"notstarted":{ $literal :0},"related":{ $literal :0},"notrelated":{$literal:0} }}
        
     ], callback);
 

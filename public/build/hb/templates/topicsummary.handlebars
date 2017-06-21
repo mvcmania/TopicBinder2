@@ -11,17 +11,17 @@
         {{#each pools as |pool|}}
             <tr >
                 <td class="disabled" data-order="{{pool.status}}"><label class="badge {{pool.status}}">&nbsp;</label></td>
-                <td class="mailbox-name">{{pool._id}}</td>
+                <td class="mailbox-name">{{pool.topic_id}}</td>
                 <td id="td-{{pool._id}}">{{pool.count}}</td>
                 <td>
                   <div class="btn-group">
-                   <button onclick="launchAssignModal(this)" type="button" role="assign"  data-topicid="{{pool._id}}" class="btn btn-xs btn-flat btn-success"><i class="fa fa-plus"></i>
+                   <button onclick="launchAssignModal(this)" type="button" role="assign"  data-remain="{{pool.remains}}" data-topicid="{{pool.topic_id}}"  class="btn btn-xs btn-flat btn-success"><i class="fa fa-plus"></i>
                    Assign
                     </button>
                   </div>
-                  <div class="btn-group">
-                      <button onclick="launchDetailModal(this)" class="btn btn-xs btn-flat btn-info"><i class="fa fa-list-alt"></i> Detail</button>
-                      </div>
+                 <!-- <div class="btn-group">
+                      <button onclick="launchDetailModal(this)" data-topicid="{{pool.topic_id}}"  class="btn btn-xs btn-flat btn-info"><i class="fa fa-list-alt"></i> Detail</button>
+                      </div>-->
                 </td>
             </tr>
         {{/each}}

@@ -1,0 +1,28 @@
+  <table id="summary-table" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>TOPIC ID</th>
+            <th>DOCUMENT</th>
+            <th>SEARCH ENGINE</th>
+            <th>SCORE</th>
+            <th>INDEX</th>
+            <th>ASSIGNED DATE</th>
+            <th>IS RELATED</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each assignments as |asg|}}
+            <tr aria-describedby="topic-row">
+                {{#each asg.topic as |as|}}
+                <td class="mailbox-name">{{as.topicid}}</td>
+                <td>{{as.document}}</td>
+                <td>{{as.searchEngine}}</td>
+                <td>{{as.score}}</td>
+                <td>{{as.index}}</td>
+                 <td>{{asg.assignedDate}}</td>
+                <td aria-describedby="{{asg.isRelated}}">{{asg.isRelated}}</td>
+                {{/each}}
+            </tr>
+        {{/each}}
+    </tbody>
+</table>

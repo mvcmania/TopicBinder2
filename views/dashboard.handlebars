@@ -32,7 +32,7 @@
             <!-- small box -->
             <div class="small-box bg-green">
                 <div class="inner">
-                    <h3 id="completed-count">53</h3>
+                    <h3 id="completed-count"></h3>
                     <p>Completed Topics</p>
                 </div>
                 <div class="icon">
@@ -46,7 +46,7 @@
             <!-- small box -->
             <div class="small-box bg-yellow">
                 <div class="inner">
-                    <h3 id="inprogress-count">44</h3>
+                    <h3 id="inprogress-count"></h3>
 
                     <p>Pending Topics</p>
                 </div>
@@ -61,7 +61,7 @@
             <!-- small box -->
             <div class="small-box bg-red">
                 <div class="inner">
-                    <h3 id="notstarted-count">65</h3>
+                    <h3 id="notstarted-count"></h3>
 
                     <p>Not Started Topics</p>
                 </div>
@@ -112,7 +112,7 @@
                         </div>
                         <!-- /.pull-right -->
                     </div>
-                    <div class="table-responsive mailbox-messages" id="topic-summary">
+                    <div class="table-responsive" id="topic-summary">
                         
                     </div>
                    
@@ -158,67 +158,12 @@
         </div>
     </div>
     <!-- Assign modal-->
-    <div class="modal fade" id="assignModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content box" id="assign-modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="assignModalTitle">Topic Assignment</h4>
-                </div>
-
-                <div class="modal-body">
-                    <form method="POST" action="/admin/assign" id="assignment-form">
-                        <div class="form-group">
-                            <label for="recipient-name" class="control-label">Recipient:</label>
-                            <select required="true" class="form-control" id="recipient" name="recipient">
-                 <option value="">--none--</option>
-                {{#each users as |us|}}
-                    <option value="{{us._id}}">{{us.name}}</option>
-                {{/each}}
-            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="number-of-topic" class="control-label">How many of them?</label>
-                            <input type="number" required="true" class="form-control" name="numberoftopic" id="number-of-topic" />
-                        </div>
-                        <input type="hidden" name="topicid" id="topic-id-hidden" />
-                        <input type="hidden" name="projectid" id="project-id-hidden" />
-                    </form>
-                   
-                </div>
-               
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" onclick="postAssignment()" class="btn btn-primary">Submit</button>
-                </div>
-                  <div class="overlay hide">
-                        <div class="loading-text">Assignment is completing!</div>
-                        <i class="fa fa-refresh fa-spin"></i>
-                    </div>
-            </div>
-        </div>
-    </div>
-     <!-- Assign modal-->
-    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content box" id="detail-modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="assignModalTitle">Topic Assignment Detail</h4>
-                </div>
-
-                <div class="modal-body">
-                    <canvas id="pieChart" style="height:250px"></canvas>
-                </div>
-               
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-                  <div class="overlay hide">
-                        <div class="loading-text">Detail is completing!</div>
-                        <i class="fa fa-refresh fa-spin"></i>
-                    </div>
-            </div>
-        </div>
-    </div>
+    {{> assignmodal}}
+     <!-- detail modal-->
 </section>
+{{#section 'script'}}
+<!-- DASHBOARD JS -->
+<script src="/dist/js/dashboardadmin.js"></script>
+<!-- CHART -->
+<script src="/dist/js/chart.js"></script>
+{{/section}}
