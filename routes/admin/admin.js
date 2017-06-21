@@ -10,13 +10,6 @@ var mongoose = require('mongoose');
 
 
 router.get('/', function(req, res) {
-    /*Pool.getTopics(function(err, pools) {
-        res.render('dashboard', { pools: pools });
-    });
-*/  /*Pool.getDistinctTopicIds(function(err,ids){
-        console.log(ids);
-    });*/
-    
     async.parallel({
         users: function(next){
             User.pullNonAdmins(function(err, res1){
@@ -196,9 +189,9 @@ function csv_parse(records,res, filename){
         if(err){
             console.log("Error occured..on bulk pool saving...",err);
             
-            res.send(400, {status: 400, data: err, message: "Error occured on bulk saving!"});
+            res.status(400).send({status: 400, data: err, message: "Error occured on bulk saving!"});
         }else{
-            res.send(200, {status: 200, data: null, message: "Redirect!"});
+            res.status(200).send({status: 200, data: null, message: "Redirect!"});
         }
       //  res.end();
     });

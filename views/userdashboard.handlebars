@@ -1,0 +1,132 @@
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        User Dashboard
+        <small>Control panel</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Dashboard</li>
+    </ol>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <!-- Small boxes (Stat box) -->
+    <div class="row">
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-aqua">
+                <div class="inner">
+                    <h3 id="total-topic-count">0</h3>
+                    <p>Topics in Project</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-clipboard"></i>
+                </div>
+                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3 id="total-related-topic-count">0</h3>
+                    <p>Related Topics</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-ios-checkmark-outline"></i>
+                </div>
+                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-yellow">
+                <div class="inner">
+                    <h3 id="total-not-started-topic-count">0</h3>
+                    <p>Not Associated Topics</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-load-a"></i>
+                </div>
+                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-red">
+                <div class="inner">
+                    <h3 id="total-not-related-topic-count">0</h3>
+
+                    <p>Not Related Topics</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-alert"></i>
+                </div>
+                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+    </div>
+    <!-- .row-->
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <div class="box box-primary" id="assignment-summary-box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Your Assignments</h3>
+
+                    <div class="box-tools pull-right">
+                        <div class="has-feedback">
+                            <input type="text" data-column="1" class="form-control input-sm" placeholder="Search Topic ID" id="search-topic-id">
+                            <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                        </div>
+                    </div>
+                    <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="mailbox-controls">
+                        <!-- Check all button -->
+                        <!--<button type="button" class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button>-->
+                        <div class="btn-group">
+                            <label for="projects">Projects : </label>
+                            <select onchange="getUserAssignmentSummary()" class="input-sm" id="projects">
+                                {{#each projects as |proj|}}
+                                    <option value="{{proj}}">{{proj}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <!-- /.btn-group -->
+                        <button type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                        <div class="pull-right">
+                           <!-- 1-50/200
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+                            </div>-->
+                            <!-- /.btn-group -->
+                        </div>
+                        <!-- /.pull-right -->
+                    </div>
+                    <div class="table-responsive" id="assignment-summary">
+                        
+                    </div>
+                   
+                    <!-- /.mail-box-messages -->
+                </div>
+                <!-- /.box-body -->
+                 <div class="overlay hide">
+                        <div class="loading-text">Project summary is loading!</div>
+                        <i class="fa fa-refresh fa-spin"></i>
+                    </div>
+            </div>
+        </div>
+    </div>
+</section>
+{{#section 'script'}}
+<!-- DASHBOARD JS -->
+<script src="/dist/js/dashboarduser.js"></script>
+{{/section}}

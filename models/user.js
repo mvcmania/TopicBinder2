@@ -20,33 +20,49 @@ var userSchema = mongoose.Schema({
         default: false
     }
 
-}, { collection: "kullanicilar" });
+}, {
+    collection: "kullanicilar"
+});
 
 var User = module.exports = mongoose.model('kullanicilar', userSchema);
 
-module.exports.createUser = function(newUser, callback) {
-    bcrypt.genSalt(10, function(err, salt) {
-        bcrypt.hash(newUser.password, salt, function(err, hash) {
+module.exports.createUser = function (newUser, callback) {
+    bcrypt.genSalt(10, function (err, salt) {
+        bcrypt.hash(newUser.password, salt, function (err, hash) {
             newUser.password = hash;
             newUser.save(callback);
         });
     });
 }
+module.exports.resetPassword = function (id, newPassword, callback) {
+    User.findById(id, function (err, result) {
+        bcrypt.genSalt(10, function (err, salt) {
+            bcrypt.hash(newPassword, salt, function (err, hash) {
+                result.password = hash;
+                result.update(callback);
+            });
+        });
+    });
 
-module.exports.getUserByUserName = function(username, callback) {
-    var query = { username: username };
+}
+module.exports.getUserByUserName = function (username, callback) {
+    var query = {
+        username: username
+    };
     User.findOne(query, callback);
 }
-module.exports.getUserById = function(id, callback) {
+module.exports.getUserById = function (id, callback) {
     User.findById(id, callback);
 }
-module.exports.comparePassword = function(candidatePassword, hash, callback) {
-    bcrypt.compare(candidatePassword, hash, function(err, isMatch) {
+module.exports.comparePassword = function (candidatePassword, hash, callback) {
+    bcrypt.compare(candidatePassword, hash, function (err, isMatch) {
         if (err) throw err;
         callback(null, isMatch);
     });
 }
-module.exports.pullNonAdmins = function(callback) {
-      var query = { isadmin: false };
-      User.find(query, callback);
+module.exports.pullNonAdmins = function (callback) {
+    var query = {
+        isadmin: false
+    };
+    User.find(query, callback);
 }

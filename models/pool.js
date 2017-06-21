@@ -42,7 +42,7 @@ var poolSchema = mongoose.Schema({
 
 var Pools = module.exports = mongoose.model('sorguHavuzu', poolSchema);
 module.exports.createPoolItems = function(poolItems, callback) {
-    poolItems.save(callback);
+    Pools.collection.insertMany(poolItems,callback);
 }
 
 module.exports.getTopics = function(topicId, projectid, nofRec,callback) {

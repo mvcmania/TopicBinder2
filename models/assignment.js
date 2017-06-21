@@ -32,6 +32,9 @@ var Assign = module.exports = mongoose.model('atamalar', assignSchema);
 module.exports.createAssignments = function (assignments, callback) {
     Assign.collection.insertMany(assignments, callback);
 }
+module.exports.getDistinctValues =  function(userid, distinctCol, callback){
+    Assign.distinct(distinctCol,{"user_id":mongoose.Types.ObjectId(userid)},callback);
+}
 module.exports.getAssignmentSummary = function (projectid, callback) {
     Assign.aggregate([{
             $match: {
@@ -157,3 +160,32 @@ module.exports.getTopicAssignmentSummary = function (projectid, topicid, callbac
         }
     ], callback);
 };
+module.exports.getSpecificUserAssignmentSummary = function(userid, projectid, callback){
+    Assign.aggregate([
+        {
+            $match :{"project":projectid,"user_id":mongoose.Types.ObjectId(userid)}
+        },
+        {
+            $lookup:{
+                "from":"sorguHavuzu",
+                "localField":"topic_id",
+                "foreignField":"_id",
+                "as":"topic"
+            }
+        },
+        {
+            $project:{
+                "topic":{
+                    "_id":"$topic_id",
+                    "topicid":"$topic.topic_id",
+                    "document":"$topic.document_id",
+                    "searchEngine":"$topic.search_engine_id",
+                    "score":"$topic.score",
+                    "index":"$topic.index"
+                },
+                "isRelated":"$is_related",
+                "assignedDate":{$dateToString : { format:"%m/%d/%yyyy", date:"$assigned_date"}}
+            }
+        }
+    ],callback);
+}
