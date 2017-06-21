@@ -12,6 +12,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
 var helpers = require('./public/lib/helper');
+require('dotenv').config();
 
 //process.env.MONGODB_URI='mongodb://heroku_bwcmzm1p:dumch6k7cjom726boh401mm5m7@ds153719.mlab.com:53719/heroku_bwcmzm1p';
 mongoose.connect(process.env.MONGODB_URI);

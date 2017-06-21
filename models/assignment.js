@@ -1,4 +1,6 @@
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId;
 var assignSchema = mongoose.Schema({
     "document_id": {
         type: String,
@@ -15,13 +17,13 @@ var assignSchema = mongoose.Schema({
         required: true
     },
     "user_id": {
-        type: String,
+        type: ObjectId,
         default: null,
         required: true
     },
-    "project":{
+    "project": {
         type: String,
-        default:null,
+        default: null,
         required: true
     }
 }, { collection: "atamalar" });
@@ -29,14 +31,15 @@ var Assign = module.exports = mongoose.model('atamalar', assignSchema);
 module.exports.createAssignments = function(assignments, callback) {
     Assign.collection.insertMany(assignments, callback);
 }
-module.exports.getAssignmentSummary = function(projectid,callback) {
+module.exports.getAssignmentSummary = function(projectid, callback) {
     Assign.aggregate([
-        {$match:{ "project" : projectid }},
-        {$group: {
-            _id: "$topic_id",
-            count: { $sum: 1 }
-        }}
-    ],callback);
+        { $match: { "project": projectid } },
+        {
+            $group: {
+                _id: "$topic_id",
+                count: { $sum: 1 }
+            }
+        }
+    ], callback);
     //User.findOne(query, callback);
 }
-
