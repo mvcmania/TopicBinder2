@@ -140,7 +140,9 @@ $(function() {
         var actionurl = e.currentTarget.action;
         var fd = new FormData();
         var fileInput = document.getElementById('topic-file');
+        var fileType = document.querySelector('input[name=fileType]:checked').value;
         fd.append('file', fileInput.files[0]);
+        fd.append('fileType', fileType.replace(/'/g,''));
         $.ajax({
             url: actionurl,
             type: 'POST',

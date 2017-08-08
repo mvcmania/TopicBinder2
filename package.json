@@ -1,53 +1,54 @@
 {
-    "name": "topicbinder",
-    "version": "1.0.0",
-    "description": "bind topic to the docs",
-    "main": "app.js",
-    "engines": {
-        "npm": "3.10.10",
-        "node": "6.9.5"
-    },
-    "scripts": {
-        "start": "node app.js"
-    },
-    "author": "",
-    "repository": {
-        "type": "git",
-        "url": "git@github.com:mvcmania/topicbinder.git"
-    },
-    "license": "ISC",
-    "dependencies": {
-        "asyn": "0.0.1",
-        "bcryptjs": "*",
-        "body-parser": "*",
-        "busboy": "^0.2.14",
-        "connect-flash": "*",
-        "cookie-parser": "^1.4.1",
-        "dotenv": "^4.0.0",
-        "express": "*",
-        "express-handlebars": "*",
-        "express-messages": "*",
-        "express-session": "*",
-        "express-validator": "*",
-        "handlebars-dateformat": "^1.0.1",
-        "mongodb": "*",
-        "mongoose": "*",
-        "passport": "*",
-        "passport-http": "*",
-        "passport-local": "*",
-        "sendgrid": "^5.1.1"
-    },
-    "devDependencies": {
-        "asyn": "0.0.1",
-        "busboy": "^0.2.14",
-        "dotenv": "^4.0.0",
-        "gulp": "^3.9.1",
-        "gulp-compile-handlebars": "^0.6.1",
-        "gulp-concat": "^2.6.1",
-        "gulp-declare": "^0.3.0",
-        "gulp-define-module": "^0.1.5",
-        "gulp-handlebars": "^4.0.0",
-        "gulp-rename": "^1.2.2",
-        "gulp-wrap": "^0.13.0"
-    }
+  "name": "topicbinder",
+  "version": "1.0.0",
+  "description": "bind topic to the docs",
+  "main": "app.js",
+  "engines": {
+    "npm": "3.10.10",
+    "node": "6.9.5"
+  },
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mvcmania/topicbinder.git"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "asyn": "0.0.1",
+    "bcryptjs": "*",
+    "body-parser": "*",
+    "busboy": "^0.2.14",
+    "connect-flash": "*",
+    "cookie-parser": "^1.4.1",
+    "dotenv": "^4.0.0",
+    "express": "*",
+    "express-handlebars": "*",
+    "express-messages": "*",
+    "express-session": "*",
+    "express-validator": "*",
+    "fs": "0.0.1-security",
+    "handlebars-dateformat": "^1.0.1",
+    "mongodb": "*",
+    "mongoose": "*",
+    "passport": "*",
+    "passport-http": "*",
+    "passport-local": "*",
+    "sendgrid": "^5.1.1"
+  },
+  "devDependencies": {
+    "asyn": "0.0.1",
+    "busboy": "^0.2.14",
+    "dotenv": "^4.0.0",
+    "gulp": "^3.9.1",
+    "gulp-compile-handlebars": "^0.6.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-declare": "^0.3.0",
+    "gulp-define-module": "^0.1.5",
+    "gulp-handlebars": "^4.0.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-wrap": "^0.13.0"
+  }
 }

@@ -2,12 +2,14 @@ var express = require('express');
 var exphbs = require('express-handlebars');
 var router = express.Router();
 var Busboy = require('busboy');
+var inspect = require('util').inspect;
 var async = require('async');
 var Pool = require('../../models/pool');
+var Topic = require('../../models/topic');
 var User = require('../../models/user');
 var Assign = require('../../models/assignment');
 var mongoose = require('mongoose');
-
+var fs = require('fs');
 
 router.get('/', function(req, res) {
     async.parallel({
@@ -66,64 +68,98 @@ router.get('/topicsummary', function(req, res, next) {
 });
 router.post('/assign', function(req, res, next) {
     async.waterfall([
-        function(next) {
+        function(cb){
+            Topic.validateTopic(req.body.topicid, function(err, doc){
+                if(!err && doc){
+                    cb(null);
+                }else{
+                    cb({"message":"Topic not found"}, null);
+                }
+            });
+        },
+        function(cb) {
             Pool.getTopics(req.body.topicid, req.body.projectid, req.body.numberoftopic, function(err, res1) {
                 var assignItemArr = [];
-                var tpid = [];
-
-                for (var tp in res1) {
-
-                    var assignItem = new Assign({
-                        topic_id: mongoose.Types.ObjectId(res1[tp]._id), //res1[tp].topic_id,
-                        user_id: mongoose.Types.ObjectId(req.body.recipient),
-                        project: res1[tp].project
-                    });
-                    tpid.push(res1[tp]._id);
-                    assignItemArr.push(assignItem);
+                var uniqueidSet = [];
+                if(!err && res1 && res1.length > 0){
+                        res1.forEach(function(element) {
+                            var assignItem = new Assign({
+                            topic_id: mongoose.Types.ObjectId(element._id), //res1[tp].topic_id,
+                            user_id: mongoose.Types.ObjectId(req.body.recipient),
+                            project: req.body.projectid
+                        });
+                        uniqueidSet.push(element.uniqueid);
+                        assignItemArr.push(assignItem);
+                    }, this);
+                }else{
+                    cb({"message":"Error while getting topics to assign"}, null);
                 }
-                next(null, assignItemArr, tpid);
+                cb(null, assignItemArr, uniqueidSet);
             });
         },
-        function(assignItemArr, tpid, next) {
+        function(assignItemArr, uniqueidSet, cb) {
+            console.log('Assignment err',assignItemArr);
             Assign.createAssignments(assignItemArr, function(err, res2) {
-                next(null, tpid);
+
+                if(err){
+                    cb(err,null);
+                }else{
+                    cb(null, uniqueidSet);
+                }
             });
         },
-        function(tpid, next) {
-            Pool.updateTopicsByNumber(tpid, true, function(err, res3) {
+        function(uniqueidSet,cb) {
+            Pool.updateTopicsByUniqueId(uniqueidSet, true, function(err, res3) {
                 var resultMain = { "topic_id": req.body.topicid, "result": res3 };
-                next(null, resultMain);
+                cb(null, resultMain);
             });
         }
-    ], function(err, resMain) {
-        res.send(resMain, {
-            'Content-Type': 'application/json'
-        }, 200);
+    ], function(err, results) {
+        if(err){
+            res.status(400).send({ status: 400, data: err, message: err.message });
+        }else{
+            res.status(200).send({ status: 200, data: null, message: "Assigned Successfully!" });
+        }
     });
 
 });
 router.post('/upload', function(req, res, next) {
     var resMsj = 'File has been posted!';
-    //res.setHeader('Content-Type','text/plain');
-    //res.write(resMsj);
     var context = req || this,
         busboy = new Busboy({ headers: context.headers });
+
+    var fileType = '';
+    var rows = '';
+    var flName = '';
     //var busboy = new Busboy({ headers: req.headers });
     busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
         console.log('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
-        var all_rows = '';
         file.on('data', function(data) {
-            all_rows += data;
+            rows += data;
         });
         file.on('end', function(data) {
             console.log('Finished with read data : file name :' + filename);
+            flName = filename;
             //res.write('Finished with read data : file name :'+filename);
-            csv_parse(all_rows, res, filename);
         });
+    });
+     busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
+      /* console.log('Field [' + fieldname + ']: value: ' , inspect(val));
+      console.log('fieldnameTruncated [' + fieldnameTruncated + ']');
+       console.log('valTruncated [' + valTruncated + ']');
+       console.log('encoding [' + encoding + ']'); */
+       fileType = inspect(val) ? inspect(val).replace(/'/g,'') : inspect(val);
     });
     busboy.on('finish', function() {
         console.log('Done parsing form!');
-        //res.write('Done parsing form!');
+        console.log('fileType' + fileType);
+        if(fileType == 'inputFile')
+            uploadInputFile(rows, res, flName);
+        else if(fileType == 'topicFile')
+            uploadTopicFile(rows, res);
+        else{
+            res.status(400).send({ status: 400, data: null, message: "No file type selected" });
+        }
     });
 
     req.pipe(busboy);
@@ -170,7 +206,7 @@ function postProcessSummary(assMap, aggResult) {
     }
 }
 
-function csv_parse(records, res, filename) {
+function uploadInputFile(records, res, filename) {
     //Split with new line
     var arr = records.split("\n");
     var pool_array = [];
@@ -182,23 +218,50 @@ function csv_parse(records, res, filename) {
             "index": parseInt(splitted[3]),
             "score": parseInt(splitted[4]),
             "search_engine_id": splitted[5],
+            "unique_id":splitted[0]+'_'+splitted[2],
             "is_assigned": false,
             "project": filename
         });
         pool_array.push(plItem);
     });
     if (pool_array.length > 0) {
-        Pool.collection.insertMany(pool_array, function(err, docs) {
+        Pool.createPoolItems(pool_array, function(err, docs){
             if (err) {
-                console.log("Error occured..on bulk pool saving...", err);
+                console.log("Error occured..on bulk pool saving...",err);
 
                 res.status(400).send({ status: 400, data: err, message: "Error occured on bulk saving!" });
             } else {
                 res.status(200).send({ status: 200, data: null, message: "Redirect!" });
             }
-            //  res.end();
-        });
+        }); 
     }
+}
+function uploadTopicFile (data, res){
+        var reg = new RegExp(/<top>\n\n<num>((?:[^\\<])+)<title>((?:[^\\<])+)<desc>((?:[^\\<])+)<narr>((?:[^\\<])+)/g);
+        let m;
+        var topics = [];
+        while ((m = reg.exec(data)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === reg.lastIndex) {
+            reg.lastIndex++;
+            }
+            
+            var topicItem = Topic.mapRegex(m);
+            topics.push(topicItem);
+            //console.log(m[4]);
+        }
+        if(topics.length >0 ){
+            Topic.createTopics(topics, function(err, tps) {
+                if (err) {
+                    console.log("Error occured while uploading topicss...", err);
+
+                    res.status(400).send({ status: 400, data: err, message: "Error occured on bulk saving!" });
+                } else {
+                    res.status(200).send({ status: 200, data: null, message: "Redirect!" });
+                }
+                //  res.end();
+            });
+        }
 }
 
 module.exports = router;

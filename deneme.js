@@ -1,4 +1,4 @@
-require('dotenv').config();
+/*require('dotenv').config();
 var sendgrid = require("sendgrid");
 var helper = sendgrid.mail;
 var fromEmail = new helper.Email("support@topicbinder.com");
@@ -27,7 +27,8 @@ sg.API(request, function(error, response) {
     console.log(response.statusCode);
     console.log(response.body);
     console.log(response.headers);
-});
+});*/
+
 /*var mongoose = require('mongoose');
 require('dotenv').config();
 mongoose.connect(process.env.MONGODB_URI);
