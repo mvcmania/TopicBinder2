@@ -7,6 +7,11 @@ var assignSchema = mongoose.Schema({
         default: 0 //0 :not started, 1: related, 2: not related
     },
     "topic_id": {
+        type: Number,
+        default: null,
+        required: true
+    },
+     "pool_id": {
         type: ObjectId,
         default: null,
         required: true
@@ -35,23 +40,24 @@ module.exports.createAssignments = function(assignments, callback) {
 module.exports.getDistinctValues = function(userid, distinctCol, callback) {
     Assign.distinct(distinctCol, { "user_id": mongoose.Types.ObjectId(userid) }, callback);
 }
-module.exports.getAssignmentSummary = function(projectid, callback) {
+module.exports.getAssignmentSummary = function(tpids, callback) {
+
     Assign.aggregate([{
             $match: {
-                "project": projectid
+                "topic_id" :{$in :tpids}
             }
         },
         {
             $lookup: {
                 "from": "sorguHavuzu",
-                "localField": "topic_id",
+                "localField": "pool_id",
                 "foreignField": "_id",
-                "as": "topic"
+                "as": "pool"
             }
         },
         {
             $project: {
-                "topicid": "$topic.topic_id",
+                "topicid": "$pool.topic_id",
                 "isRelated": "$is_related"
             }
         },
@@ -92,20 +98,15 @@ module.exports.getTopicAssignmentSummary = function(projectid, topicid, callback
     console.log(typeof(topicid));
     Assign.aggregate([{
             $match: {
-                "project": projectid
+                "topic_id": parseInt(topicid)
             }
         },
         {
             $lookup: {
                 "from": "sorguHavuzu",
-                "localField": "topic_id",
+                "localField": "pool_id",
                 "foreignField": "_id",
-                "as": "topic"
-            }
-        },
-        {
-            $match: {
-                "topic.topic_id": parseInt(topicid),
+                "as": "pool"
             }
         },
         {
@@ -163,29 +164,29 @@ module.exports.getTopicAssignmentSummary = function(projectid, topicid, callback
 };
 module.exports.getSpecificUserAssignmentSummary = function(userid, projectid, callback) {
     Assign.aggregate([{
-            $match: { "project": projectid, "user_id": mongoose.Types.ObjectId(userid) }
+            $match: { "user_id": mongoose.Types.ObjectId(userid) }
         },
         {
             $lookup: {
                 "from": "sorguHavuzu",
-                "localField": "topic_id",
+                "localField": "pool_id",
                 "foreignField": "_id",
-                "as": "topic"
+                "as": "pool"
             }
         },
-        { $sort: { "topic.index": 1 } },
+        { $sort: { "pool.index": 1 } },
         {
             $project: {
                 "topic": {
                     "_id": "$topic_id",
-                    "topicid": "$topic.topic_id",
-                    "document": "$topic.document_id",
-                    "searchEngine": "$topic.search_engine_id",
-                    "score": "$topic.score",
-                    "index": "$topic.index"
+                    "topicid": "$pool.topic_id",
+                    "document": "$pool.document_id",
+                    "searchEngine": "$pool.search_engine_id",
+                    "score": "$pool.score",
+                    "index": "$pool.index"
                 },
                 "isRelated": "$is_related",
-                "assignedDate": { $dateToString: { format: "%d/%M/%Y %H:%M", date: "$assigned_date" } }
+                "assignedDate": { $dateToString: { format: "%d/%m/%Y %H:%M", date: "$assigned_date" } }
             }
         }
     ], callback);

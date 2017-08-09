@@ -35,7 +35,13 @@ router.get('/topicsummary', function(req, res, next) {
         async.waterfall([
             function(next) {
 
-                Assign.getAssignmentSummary(projectid, function(err, res1) {
+                Pool.find({"project": projectid,"topic_id":{$ne:null}}).distinct("topic_id",function(err, docs){
+                    next(null, docs);
+                });
+            },
+            function(docs, next) {
+
+                Assign.getAssignmentSummary(docs, function(err, res1) {
                     if (err)
                         next(err, null);
                     else {
@@ -84,15 +90,17 @@ router.post('/assign', function(req, res, next) {
                 if(!err && res1 && res1.length > 0){
                         res1.forEach(function(element) {
                             var assignItem = new Assign({
-                            topic_id: mongoose.Types.ObjectId(element._id), //res1[tp].topic_id,
+                            pool_id: mongoose.Types.ObjectId(element._id), //res1[tp].topic_id,
                             user_id: mongoose.Types.ObjectId(req.body.recipient),
-                            project: req.body.projectid
+                            project: req.body.projectid,
+                            topic_id : req.body.topicid
+
                         });
                         uniqueidSet.push(element.uniqueid);
                         assignItemArr.push(assignItem);
                     }, this);
                 }else{
-                    cb({"message":"Error while getting topics to assign"}, null);
+                    cb({"message":"Error while getting topics to assign","data":err}, null);
                 }
                 cb(null, assignItemArr, uniqueidSet);
             });
@@ -116,7 +124,7 @@ router.post('/assign', function(req, res, next) {
         }
     ], function(err, results) {
         if(err){
-            res.status(400).send({ status: 400, data: err, message: err.message });
+            res.status(400).send({ status: 400, data: err.data, message: err.message });
         }else{
             res.status(200).send({ status: 200, data: null, message: "Assigned Successfully!" });
         }
