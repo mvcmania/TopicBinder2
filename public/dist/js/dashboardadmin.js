@@ -92,7 +92,15 @@ var uploadFileSuccess = function(data) {
 }
 var uploadFileError = function(err) {
         $('#upload-box .overlay').addClass('hide');
-    }
+        console.error('err',err);
+        var msg = document.querySelector('#upload-box .box-footer');
+        msg.innerHTML = Handlebars.templates.error({
+            'message':{
+                'title' : 'Error!',
+                'description' : err.responseJSON.data.errmsg
+            }
+        });
+}
     //Query for topics 
 
 var getTopicsSummary = function() {

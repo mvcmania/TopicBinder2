@@ -32,6 +32,9 @@ module.exports.createTopics = function(topicItems, callback) {
 module.exports.validateTopic = function(topicid, callback){
     Topics.findOne({topic_id : topicid},{ topic_id :1 }, callback);
 }
+module.exports.getTopicDetail = function(topicid , callback){
+    Topics.findOne({topic_id : topicid}, callback);
+}
 module.exports.mapRegex =  function(m){
     var rpl = new RegExp();
      var topicItem = new Topics({

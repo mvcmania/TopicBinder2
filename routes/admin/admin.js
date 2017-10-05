@@ -96,7 +96,7 @@ router.post('/assign', function(req, res, next) {
                             topic_id : req.body.topicid
 
                         });
-                        uniqueidSet.push(element.uniqueid);
+                        uniqueidSet.push(element._id);
                         assignItemArr.push(assignItem);
                     }, this);
                 }else{
@@ -106,7 +106,7 @@ router.post('/assign', function(req, res, next) {
             });
         },
         function(assignItemArr, uniqueidSet, cb) {
-            console.log('Assignment err',assignItemArr);
+            //console.log('Assignment err',assignItemArr);
             Assign.createAssignments(assignItemArr, function(err, res2) {
 
                 if(err){
@@ -226,7 +226,7 @@ function uploadInputFile(records, res, filename) {
             "index": parseInt(splitted[3]),
             "score": parseInt(splitted[4]),
             "search_engine_id": splitted[5],
-            "unique_id":splitted[0]+'_'+splitted[2],
+            //"unique_id":splitted[0]+'_'+splitted[2],
             "is_assigned": false,
             "project": filename
         });
@@ -234,7 +234,8 @@ function uploadInputFile(records, res, filename) {
     });
     if (pool_array.length > 0) {
         Pool.createPoolItems(pool_array, function(err, docs){
-            if (err) {
+            //Error code : 11000 (duplicate error no need to send 400)
+            if (err && err.code !=11000) {
                 console.log("Error occured..on bulk pool saving...",err);
 
                 res.status(400).send({ status: 400, data: err, message: "Error occured on bulk saving!" });

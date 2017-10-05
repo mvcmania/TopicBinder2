@@ -8,6 +8,7 @@
             <th>INDEX</th>
             <th>ASSIGNED DATE</th>
             <th>IS RELATED</th>
+            <td></td>
         </tr>
     </thead>
     <tbody>
@@ -19,7 +20,22 @@
                 <td>{{#each asg.topic.score as |score|}}{{score}}{{/each}}</td>
                 <td>{{#each asg.topic.index as |ind|}}{{ind}}{{/each}}</td>
                  <td>{{asg.assignedDate}}</td>
-                <td aria-describedby="{{asg.isRelated}}">{{asg.isRelated}}</td>
+                <td aria-describedby="{{asg.isRelated}}">
+                    {{#if_eq asg.isRelated 2}}
+                        <label class="badge bg-red">&nbsp;</label>                    
+                    {{/if_eq}}
+                    {{#if_eq asg.isRelated 1}}
+                        <label class="badge bg-green">&nbsp;</label>                     
+                    {{/if_eq}}
+                    {{#if_eq asg.isRelated 0}} 
+                        <label class="badge bg-yellow">&nbsp;</label>                    
+                    {{/if_eq}}
+                </td>
+                <td>
+                    <button  type="button" role="modal" data-index="{{@index}}" data-target="#relateModal" data-toggle="modal" data-document="{{#each asg.topic.document as |doc|}}{{doc}}{{/each}}"  data-topicid="{{#each asg.topic.topicid as |tpid|}}{{tpid}}{{/each}}"  class="btn btn-xs btn-flat btn-success"><i class="fa fa-plus"></i>
+                   Action
+                    </button>
+                </td>
             </tr>
         {{/each}}
     </tbody>

@@ -33,10 +33,6 @@ var poolSchema = mongoose.Schema({
         default: false,
         required: true
     },
-    "unique_id":{
-        type : String,
-        default : this.topic_id+'_'+this.document_id
-    },
     "createddate":{
         type:Date,
         default : Date.now
@@ -45,20 +41,20 @@ var poolSchema = mongoose.Schema({
 
 var Pools = module.exports = mongoose.model('sorguHavuzu', poolSchema);
 module.exports.createPoolItems = function(poolItems, callback) {
-    Pools.collection.insertMany(poolItems,callback);
+        Pools.collection.insertMany(poolItems,{ordered:false},callback);
 }
 module.exports.findByQuery =  function(query, callback){
      Pools.collection.find(query,callback);
 }
 module.exports.getTopics = function(topicId, projectid, nofRec,callback) {
-    /* var query = {"topic_id":topicId,"is_assigned":false,'project':projectid};
-    Pools.find(query,{},{limit:parseInt(nofRec)},callback); */
-    Pools.aggregate([
+    var query = {"topic_id":topicId,"is_assigned":false};
+    Pools.find(query,{},{limit:parseInt(nofRec)},callback);
+    /* Pools.aggregate([
         { $match : { "topic_id" : parseInt(topicId), "is_assigned" : false} },
-        { $group : { _id : "$unique_id", topicid : { $first : "$_id"}, count :{ $sum :1 }   } },
+        { $group : { _id : "$topic_id", topicid : { $first : "$_id"}, count :{ $sum :1 }   } },
         { $limit : parseInt(nofRec)},
         { $project : { "_id" :"$topicid" , "uniqueid" : "$_id" , "count" : "$count"}}
-    ],callback);
+    ],callback); */
 }
 /*
 not started  - bg-teal
@@ -73,11 +69,10 @@ module.exports.getTopicsSummary = function(projectid,callback) {
             {$group: {
                 _id: "$topic_id",
                 topic_id :{ $first : "$_id"},
-                count: { $sum: 1 },
-                uniqueSet : { $addToSet : "$unique_id"}
+                count: { $sum: 1 }
             }},
             {$sort : {  "_id" :1 } },
-            {$project : { "_id":"$topic_id","topic_id":"$_id", "count": { $size : "$uniqueSet" }, "status":{ $literal: "bg-red" } ,"remains":{ $literal: 0 } ,"notstarted":{ $literal :0},"related":{ $literal :0},"notrelated":{$literal:0} }}
+            {$project : { "_id":"$topic_id","topic_id":"$_id", "count": "$count" ,"status":{ $literal: "bg-red" } ,"remains":{ $literal: 0 } ,"notstarted":{ $literal :0},"related":{ $literal :0},"notrelated":{$literal:0} }}
         
         ], callback);
     });
@@ -93,7 +88,7 @@ module.exports.getTopicByNumber =  function(topicid,callback){
     Pools.findOne(query,callback);
 }
 module.exports.updateTopicsByUniqueId = function(idArray, isaAssigned, callback){
-    var query = { "unique_id" : { $in: idArray}};
+    var query = { "_id" : { $in: idArray}};
     var upt =  { $set : {"is_assigned": (isaAssigned ? isaAssigned : false)} };
     var opt = {multi : true};
     Pools.update(query , upt, opt, callback);
