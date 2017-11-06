@@ -36,7 +36,8 @@
     "passport": "*",
     "passport-http": "*",
     "passport-local": "*",
-    "sendgrid": "^5.1.1"
+    "sendgrid": "^5.1.1",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "asyn": "0.0.1",

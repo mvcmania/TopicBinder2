@@ -1,14 +1,14 @@
   <table id="summary-table" class="table table-bordered table-hover">
     <thead>
         <tr>
-            <th>TOPIC ID</th>
-            <th>DOCUMENT</th>
-            <th>SEARCH ENGINE</th>
-            <th>SCORE</th>
-            <th>INDEX</th>
-            <th>ASSIGNED DATE</th>
-            <th>IS RELATED</th>
-            <td></td>
+            <th class="no-sort">TOPIC ID</th>
+            <th class="no-sort">DOCUMENT</th>
+            <th class="no-sort">SEARCH ENGINE</th>
+            <th class="no-sort">SCORE</th>
+            <th class="no-sort">INDEX</th>
+            <th class="no-sort">ASSIGNED DATE</th>
+            <th class="no-sort">IS RELATED</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -19,7 +19,7 @@
                 <td>{{#each asg.topic.searchEngine as |sengine|}}{{sengine}}{{/each}}</td>
                 <td>{{#each asg.topic.score as |score|}}{{score}}{{/each}}</td>
                 <td>{{#each asg.topic.index as |ind|}}{{ind}}{{/each}}</td>
-                 <td>{{asg.assignedDate}}</td>
+                <td>{{asg.assignedDate}}</td>
                 <td aria-describedby="{{asg.isRelated}}">
                     {{#if_eq asg.isRelated 2}}
                         <label class="badge bg-red">&nbsp;</label>                    
@@ -32,7 +32,7 @@
                     {{/if_eq}}
                 </td>
                 <td>
-                    <button  type="button" role="modal" data-index="{{@index}}" data-target="#relateModal" data-toggle="modal" data-document="{{#each asg.topic.document as |doc|}}{{doc}}{{/each}}"  data-topicid="{{#each asg.topic.topicid as |tpid|}}{{tpid}}{{/each}}"  class="btn btn-xs btn-flat btn-success"><i class="fa fa-plus"></i>
+                    <button  type="button" role="modal" data-index="{{@index}}" data-target="#relate-modal" data-toggle="modal" data-documentid="{{#each asg.topic.document as |doc|}}{{doc}}{{/each}}" data-assignmentid="{{asg._id}}" data-topicid="{{#each asg.topic.topicid as |tpid|}}{{tpid}}{{/each}}"  class="btn btn-xs btn-flat btn-success"><i class="fa fa-plus"></i>
                    Action
                     </button>
                 </td>

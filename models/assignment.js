@@ -186,8 +186,78 @@ module.exports.getSpecificUserAssignmentSummary = function(userid, projectid, ca
                     "index": "$pool.index"
                 },
                 "isRelated": "$is_related",
-                "assignedDate": { $dateToString: { format: "%d/%m/%Y %H:%M", date: "$assigned_date" } }
+                "assignedDate": { $dateToString: { format: "%d/%m/%Y %H:%M", date: "$assigned_date" } },
+                "_id":"$_id"
             }
         }
     ], callback);
+}
+module.exports.getAssignmentById = function(assignment_id, callback) {
+    Assign.aggregate([{
+            $match: { "_id": mongoose.Types.ObjectId(assignment_id) }
+        },
+        {
+            $lookup:{
+                "from": "sorguHavuzu",
+                "localField": "pool_id",
+                "foreignField": "_id",
+                "as": "pool"
+            }
+        },
+        {
+            $lookup: {
+                "from": "dokumanlar",
+                "localField": "pool.document_id",
+                "foreignField": "document_no",
+                "as": "doc"
+            }
+        },
+        { 
+            "$unwind": {
+                "path" : "$doc",
+                "includeArrayIndex" :"0"
+            }
+        },
+        {
+            $lookup: {
+                "from": "sorgular",
+                "localField": "topic_id",
+                "foreignField": "topic_id",
+                "as": "topic"
+            }
+        },
+        {
+            "$unwind": {
+                "path" : "$topic",
+                "includeArrayIndex" :"0"
+            }
+        },
+        {
+            $project: {
+                "topic": {
+                    "_id": "$topic._id",
+                    "topic_id": "$topic.topic_id",
+                    "title": "$topic.title",
+                    "description": "$topic.description",
+                    "narrative": "$topic.narrative"
+                },
+                "document": {
+                    "_id": "$doc._id",
+                    "document_id": "$doc.document_id",
+                    "document_no": "$doc.document_no",
+                    "document_file": "$doc.document_file"
+                },
+                "assignment":{
+                    "_id":"$_id",
+                    "is_related": "$is_related",
+                    "assignedDate": { $dateToString: { format: "%d/%m/%Y %H:%M", date: "$assigned_date" } }
+
+                }
+                
+            }
+        }
+    ], callback);
+}
+module.exports.updateRelation = function(assignment_id, relation, callback){
+    Assign.collection.update({ "_id" : mongoose.Types.ObjectId(assignment_id) },{ $set : { "is_related" : parseInt(relation)} }, callback)
 }

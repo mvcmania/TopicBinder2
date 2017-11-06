@@ -3,7 +3,11 @@ var prepareMessage = function(ttl, desc) {
     return msg;
 }
 var toggleOverLay = function(id, text) {
+    if(text){
+        $('#' + id + ' .overlay .loading-text').text(text);
+    }
     $('#' + id + ' .overlay').toggleClass('hide');
+
 }
 var dataTableMake = function(id) {
     if (!$.fn.dataTable.isDataTable('#' + id)) {
