@@ -30,16 +30,11 @@ gulp.task('server', function() {
  * description: start the development environment
  */
 gulp.task('default', function() {
-  gulp.run('templates');
-  gulp.run('server');
+  /* gulp.run('templates');*/
+  gulp.start('server');
 
-  gulp.watch(['./app.js', './models/*.js','./routes/**/*.js','./routes/*.js'], function() {
-    //gulp.run('templates');
-    //gulp.run('server');
-  });
-  gulp.watch(['public/build/hb/templates/*.handlebars'], function() {
-    gulp.run('templates');
-  });
+  gulp.watch(['./app.js', './models/*.js','./routes/**/*.js','./routes/*.js'],['templates','server']);
+  gulp.watch(['public/build/hb/templates/*.handlebars'], ['templates']);
   // Need to watch for sass changes too? Just add another watch call!
   // no more messing around with grunt-concurrent or the like. Gulp is
   // async by default.
@@ -47,7 +42,9 @@ gulp.task('default', function() {
 /*** PRECOMPILE TEMPLATE */
 gulp.task('templates', function(){
   exec('handlebars -m public/build/hb/templates/ -f public/build/hb/templates/templates.js',function(err, stdout, stderr){
-      console.log(err);
+    if(err){
+      console.log('error',err);
+    }
   });
   /*gulp.src('public/vendor/hb/templates/*.handlebars')
     .pipe(handlebars())

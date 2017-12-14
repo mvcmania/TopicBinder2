@@ -14,8 +14,11 @@ var mongoose = require('mongoose');
 var helpers = require('./public/lib/helper');
 require('dotenv').config();
 
-mongoose.connect(process.env.MONGODB_URI);
-var db = mongoose.connection;
+var db = mongoose.connect(process.env.MONGODB_URI,{
+    useMongoClient : true,
+    promiseLibrary: require('bluebird')
+});
+
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -47,7 +50,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Express session
 app.use(session({
     secret: 'secret',
-    saveUninitalized: true,
+    saveUninitialized: true,
     resave: true
 }));
 
