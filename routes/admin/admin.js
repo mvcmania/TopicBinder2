@@ -139,6 +139,7 @@ router.post('/upload', function(req, res, next) {
     var fileType = '';
     var rows = '';
     var flName = '';
+    var props = [];
     //var busboy = new Busboy({ headers: req.headers });
     busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
         console.log('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
@@ -156,7 +157,14 @@ router.post('/upload', function(req, res, next) {
       console.log('fieldnameTruncated [' + fieldnameTruncated + ']');
        console.log('valTruncated [' + valTruncated + ']');
        console.log('encoding [' + encoding + ']'); */
-       fileType = inspect(val) ? inspect(val).replace(/'/g,'') : inspect(val);
+       if(fieldname == 'fileType'){
+           fileType = inspect(val) ? inspect(val).replace(/'/g,'') : inspect(val);
+       }
+       if(fieldname == 'prop'){
+           prop = inspect(val) ? inspect(val).replace(/'/g,'').split(',') : inspect(val).prop(',');
+       }
+      /*  console.log('FieldName' , fieldname);
+       console.log('inspect(val)' , inspect(val)); */
     });
     busboy.on('finish', function() {
         console.log('Done parsing form!');
@@ -164,8 +172,9 @@ router.post('/upload', function(req, res, next) {
         if(fileType == 'inputFile')
             uploadInputFile(rows, res, flName);
         else if(fileType == 'topicFile')
-            uploadTopicFile(rows, res);
+            uploadTopicFile(rows, res, prop);
         else{
+            buildRegex(prop);
             res.status(400).send({ status: 400, data: null, message: "No file type selected" });
         }
     });
@@ -245,21 +254,25 @@ function uploadInputFile(records, res, filename) {
         }); 
     }
 }
-function uploadTopicFile (data, res){
-        var reg = new RegExp(/<top>\n\n<num>((?:[^\\<])+)<title>((?:[^\\<])+)<desc>((?:[^\\<])+)<narr>((?:[^\\<])+)/g);
+function uploadTopicFile (data, res, prop){
+        //new RegExp(/<top>\n\n<num>((?:[^\\<])+)<title>((?:[^\\<])+)<desc>((?:[^\\<])+)<narr>((?:[^\\<])+)/g);
         let m;
         var topics = [];
-        while ((m = reg.exec(data)) !== null) {
+        var indexMap = getIndexMap(prop);
+        var newDatadata = normalizeXml(data);
+        console.log('index map',indexMap);
+        var reg = buildRegex(prop);
+        while ((m = reg.exec(newDatadata)) !== null) {
             // This is necessary to avoid infinite loops with zero-width matches
             if (m.index === reg.lastIndex) {
             reg.lastIndex++;
             }
             
-            var topicItem = Topic.mapRegex(m);
+            var topicItem = Topic.mapRegex(m, indexMap);
             topics.push(topicItem);
             //console.log(m[4]);
         }
-        if(topics.length >0 ){
+         if(topics.length >0 ){
             Topic.createTopics(topics, function(err, tps) {
                 if (err) {
                     console.log("Error occured while uploading topicss...", err);
@@ -270,7 +283,40 @@ function uploadTopicFile (data, res){
                 }
                 //  res.end();
             });
+        } else{
+            res.status(400).send({ status: 400, data: null, message: "File could be empty or in different format! Please specify the correct properties!" });
         }
 }
+ function buildRegex(prop){
+     if(prop.length == 0){
+         return  new RegExp(/<top>\n\n<num>((?:[^\\<])+)<title>((?:[^\\<])+)<desc>((?:[^\\<])+)<narr>((?:[^\\<])+)/g);
+    }else{
+        var tempRegex = '';
+        prop.forEach((element,index) => {
+            tempRegex += '<'+element+'>';
+            /*if(index == 0){
+                tempRegex +='\\n\\n';
+            }else{ */
+                tempRegex += '((?:[^\\<])+)';
+            //}
+        });
+        console.log('REGEX ==',tempRegex);
+        return new RegExp(tempRegex,'g');
+    }
+ }
+ function getIndexMap (prop){
+    var indexMap = {};
+    var requiredFields = ['num','title','desc','narr'];
+    requiredFields.forEach(element => {
+        indexMap[element] = prop.indexOf(element)+1;
+    });
+    return indexMap;
+ }
+ function normalizeXml(data){
+    var nm = new RegExp(/<fac>(.*)(\s\s.*)+(.*)<\/fac>/g);
 
+    var newData = data.replace(nm,'<fac> Factory');
+    console.log('New data ==',newData);
+    return newData;
+ }
 module.exports = router;
