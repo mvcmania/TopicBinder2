@@ -48,15 +48,29 @@ module.exports.validateTopic = function(topicid, callback){
 module.exports.getTopicDetail = function(topicid , callback){
     Topics.findOne({topic_id : topicid}, callback);
 }
-module.exports.mapRegex =  function(m, indexMap){
-   
-    var rpl = new RegExp();
-    //console.log('topic_id',m[3]);
-     var topicItem = new Topics({
-            "topic_id": m[indexMap['num']] ? m[indexMap['num']].replace(/Number:/g,'').trim() : m[indexMap['num']],
-            "title": m[indexMap['title']] ? m[indexMap['title']].trim() : m[indexMap['title']],
-            "description":  m[indexMap['desc']] ? m[indexMap['desc']].replace(/Description:/g,'').trim() : m[indexMap['desc']],
-            "narrative":  m[indexMap['narr']] ? m[indexMap['narr']].replace(/Narrative:/g,'').trim() : m[indexMap['narr']]
-        });
-    return topicItem;
+module.exports.mapRegex =  function(m, field, tpc){
+    
+    if(field =='num')    
+        console.log(field,'=',m[1]);
+    
+        if(typeof(tpc) == "undefined"){
+            tpc = new Topics();
+        }
+        switch (field) {
+            case 'num':
+                tpc.topic_id = m[1] ? m[1].replace(/Number:/g,'').trim() : m[1];
+                return tpc;
+            case 'title':
+                tpc.title = m[1] ? m[1].trim() : m[1];
+                return tpc;
+            case 'desc':
+                tpc.description = m[1] ? m[1].replace(/Description:/g,'').trim() : m[1];
+                return tpc;
+            case 'narr':
+                tpc.narrative = m[1] ? m[1].replace(/Narrative:/g,'').trim() : m[1];
+                return tpc;
+            default:;
+        }
+        
+        return tpc;
 }

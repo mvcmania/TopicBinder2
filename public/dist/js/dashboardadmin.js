@@ -101,23 +101,6 @@ var uploadFileError = function(err) {
             }
         });
 }
-var togglePropInput= function(){
-    var radios = $('input[type=radio]');
-    console.log('Radios =',radios);
-    /* radios.each(function(element){
-        $(element) */radios.change(function(){
-            var fileType = document.querySelector('input[name=fileType]:checked').value;
-            var propList = document.getElementById('prop-list').parentElement;
-            console.log('File Type = '+fileType);
-            console.log('propList = ',propList);
-            if(fileType == 'topicFile'){
-                $(propList).fadeIn();
-            }else{
-                $(propList).fadeOut();
-            }
-        });
-    //});
-}
     //Query for topics 
 
 var getTopicsSummary = function() {
@@ -166,10 +149,8 @@ $(function() {
         var fd = new FormData();
         var fileInput = document.getElementById('topic-file');
         var fileType = document.querySelector('input[name=fileType]:checked').value;
-        var prop = document.getElementById('prop-list').value;
         fd.append('file', fileInput.files[0]);
         fd.append('fileType', fileType.replace(/'/g,''));
-        fd.append('prop', prop.replace(/'/g,''));
         $.ajax({
             url: actionurl,
             type: 'POST',
@@ -198,5 +179,4 @@ $(function() {
     });
     getTopicsSummary();
     searchableMake('summary-table', 'search-topic-id');
-    togglePropInput();
 });
