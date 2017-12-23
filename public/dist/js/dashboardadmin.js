@@ -1,6 +1,7 @@
 var launchAssignModal = function(el) {
     $('#assignModal [role=assign-modal-title]').html('Topic Assignment for <strong>' + el.dataset.topicid + '</strong>');
     $('#assignModal [role=assign-modal-remain]').html(el.dataset.remain);
+    $('#assignModal #number-of-topic').attr('max',el.dataset.remain);
     $('#topic-id-hidden').val(el.dataset.topicid);
     $('#project-id-hidden').val(getProjectID());
     $('#assignModal').modal('show');
@@ -34,6 +35,13 @@ var postAssignmentSuccess = function(data) {
 }
 var postAssignmentError = function(err) {
     toggleOverLay('assign-modal-content');
+    console.log(err);
+    var msg = prepareMessage('Error!', err.responseJSON.message);
+    $('#assignModal div[role=detail-modal]  div[role=message]').html(
+        Handlebars.templates.error({
+            'message': msg
+        })
+    );
 }
 var pieChart;
 var pieChart2;
@@ -126,6 +134,14 @@ var getTopicsSummary = function() {
         error: getTopicSummaryError
     });
 }
+var selectFolder = function(e) {
+   /*  for (var i = 0; i < e.target.files.length; i++) {
+       var s = e.target.files[i].name + '\n';
+       s += e.target.files[i].size + ' Bytes\n';
+       s += e.target.files[i].type;
+       //alert(s);
+    } */
+ }
 $(function() {
     $('#assignment-form').submit(function(e) {
         e.preventDefault();
@@ -147,10 +163,21 @@ $(function() {
         //get the action-url of the form
         var actionurl = e.currentTarget.action;
         var fd = new FormData();
-        var fileInput = document.getElementById('topic-file');
-        var fileType = document.querySelector('input[name=fileType]:checked').value;
-        fd.append('file', fileInput.files[0]);
-        fd.append('fileType', fileType.replace(/'/g,''));
+        var values = {};
+        $.each($('#upload-form').serializeArray(), function(i, field) {
+            fd.append(field.name, field.value);
+        });
+        
+        var projectFile = document.getElementById('project-file');
+        var topicFile = document.getElementById('topic-file');
+        var inputFile = document.getElementById('input-file');
+        console.log('files=',typeof(projectFile.files));
+        fd.append('projectFile', projectFile.files[0]);
+        fd.append('topicFile', topicFile.files[0]);
+        $.each(inputFile.files,function(index,elem){
+            fd.append('inputFile_'+index, elem);
+        });
+        
         $.ajax({
             url: actionurl,
             type: 'POST',

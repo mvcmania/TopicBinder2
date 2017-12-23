@@ -14,12 +14,13 @@
 <section class="content">
     <!-- Small boxes (Stat box) -->
     <div class="row">
+        {{#each summary as |summ|}}
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
             <div class="small-box bg-aqua">
                 <div class="inner">
-                    <h3 id="total-topic-count">0</h3>
-                    <p>Topics in Project</p>
+                    <h3 id="total-topic-count">{{summ.count}}</h3>
+                    <p>Topic Count in  Project</p>
                 </div>
                 <div class="icon">
                     <i class="ion ion-clipboard"></i>
@@ -32,7 +33,7 @@
             <!-- small box -->
             <div class="small-box bg-green">
                 <div class="inner">
-                    <h3 id="total-related-topic-count">0</h3>
+                    <h3 id="total-related-topic-count">{{summ.relatedCount}}</h3>
                     <p>Related Topics</p>
                 </div>
                 <div class="icon">
@@ -46,7 +47,7 @@
             <!-- small box -->
             <div class="small-box bg-yellow">
                 <div class="inner">
-                    <h3 id="total-not-started-topic-count">0</h3>
+                    <h3 id="total-not-started-topic-count">{{summ.notStartedCount}}</h3>
                     <p>Not Associated Topics</p>
                 </div>
                 <div class="icon">
@@ -60,8 +61,7 @@
             <!-- small box -->
             <div class="small-box bg-red">
                 <div class="inner">
-                    <h3 id="total-not-related-topic-count">0</h3>
-
+                    <h3 id="total-not-related-topic-count">{{summ.notRelatedCount}}</h3>
                     <p>Not Related Topics</p>
                 </div>
                 <div class="icon">
@@ -70,6 +70,7 @@
                 <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
+        {{/each}}
     </div>
     <!-- .row-->
     <div class="row">
@@ -92,10 +93,18 @@
                         <!-- Check all button -->
                         <!--<button type="button" class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button>-->
                         <div class="btn-group">
-                            <label for="projects">Projects : </label>
+                            <label for="projects">Filter By Projects : </label>
                             <select onchange="getUserAssignmentSummary()" class="input-sm" id="projects">
                                 {{#each projects as |proj|}}
                                     <option value="{{proj}}">{{proj}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="btn-group">
+                            <label for="filter">Filter By Relation : </label>
+                            <select onchange="getUserAssignmentSummary()" class="input-sm" id="relations">
+                                {{#each relations as |rel|}}
+                                    <option value="{{rel}}">{{rel}}</option>
                                 {{/each}}
                             </select>
                         </div>

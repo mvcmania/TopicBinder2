@@ -15,7 +15,7 @@ var poolSchema = mongoose.Schema({
         default: null
     },
     "score": {
-        type: Number,
+        type: mongoose.Schema.Types.Decimal128,
         default: null
     },
     "search_engine_id": {
@@ -29,19 +29,31 @@ var poolSchema = mongoose.Schema({
         required: false
     },
     "project":{
-        type:String,
-        default: false,
-        required: true
+        type : String,
+        trim : true,
+        default : null,
+        required :true
+    },
+    "unique_id":{
+        type: String,
+        default: null,
+        unique : true
     },
     "createddate":{
         type:Date,
         default : Date.now
     }
 }, { collection: "sorguHavuzu" });
-
+/* poolSchema.path('score').get(function(num) {
+    return 
+});
+poolSchema.path('score').set(function(num) {
+    return (num * 100);
+}); */
 var Pools = module.exports = mongoose.model('sorguHavuzu', poolSchema);
 module.exports.createPoolItems = function(poolItems, callback) {
-        Pools.collection.insertMany(poolItems,{ordered:false},callback);
+        populateUniqueId(poolItems);
+        Pools.collection.insertMany(poolItems,{ordered:false},callback);      
 }
 module.exports.findByQuery =  function(query, callback){
      Pools.collection.find(query,callback);
@@ -92,4 +104,11 @@ module.exports.updateTopicsByUniqueId = function(idArray, isaAssigned, callback)
     var upt =  { $set : {"is_assigned": (isaAssigned ? isaAssigned : false)} };
     var opt = {multi : true};
     Pools.update(query , upt, opt, callback);
+}
+function populateUniqueId (poolItems){
+    if(poolItems.length > 0){
+        poolItems.forEach(element => {
+            element.unique_id = element.project+'_'+element.topic_id+'_'+element.document_id
+        });
+    }
 }

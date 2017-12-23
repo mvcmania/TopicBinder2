@@ -162,9 +162,10 @@ module.exports.getTopicAssignmentSummary = function(projectid, topicid, callback
         }
     ], callback);
 };
-module.exports.getSpecificUserAssignmentSummary = function(userid, projectid, callback) {
+module.exports.getSpecificUserAssignmentSummary = function(userid, projectid, relation, callback) {
+    var relationParam = parseInt(relation);
     Assign.aggregate([{
-            $match: { "user_id": mongoose.Types.ObjectId(userid) }
+            $match: { "user_id": mongoose.Types.ObjectId(userid), "project": projectid, "is_related" : relationParam}
         },
         {
             $lookup: {
@@ -212,10 +213,11 @@ module.exports.getAssignmentById = function(assignment_id, callback) {
                 "as": "doc"
             }
         },
-        { 
-            "$unwind": {
-                "path" : "$doc",
-                "includeArrayIndex" :"0"
+         { 
+            $unwind: {
+                path : "$doc",
+                includeArrayIndex :"0",
+                preserveNullAndEmptyArrays : true
             }
         },
         {
@@ -227,11 +229,12 @@ module.exports.getAssignmentById = function(assignment_id, callback) {
             }
         },
         {
-            "$unwind": {
-                "path" : "$topic",
-                "includeArrayIndex" :"0"
+            $unwind: {
+                path : "$topic",
+                includeArrayIndex :"0",
+                preserveNullAndEmptyArrays : true
             }
-        },
+        }, 
         {
             $project: {
                 "topic": {
@@ -243,13 +246,14 @@ module.exports.getAssignmentById = function(assignment_id, callback) {
                 },
                 "document": {
                     "_id": "$doc._id",
-                    "document_id": "$doc.document_id",
                     "document_no": "$doc.document_no",
                     "document_file": "$doc.document_file"
                 },
                 "assignment":{
                     "_id":"$_id",
                     "is_related": "$is_related",
+                    "document_no" :"$pool.docuemnt_id",
+                    "index" : "$pool.index",
                     "assignedDate": { $dateToString: { format: "%d/%m/%Y %H:%M", date: "$assigned_date" } }
 
                 }
@@ -261,3 +265,51 @@ module.exports.getAssignmentById = function(assignment_id, callback) {
 module.exports.updateRelation = function(assignment_id, relation, callback){
     Assign.collection.update({ "_id" : mongoose.Types.ObjectId(assignment_id) },{ $set : { "is_related" : parseInt(relation)} }, callback)
 }
+module.exports.getUserAssignmentSummary = function(userid, projectid, callback) {
+    console.log(userid);
+    Assign.aggregate([{
+            $match: { "user_id": mongoose.Types.ObjectId(userid), "project" :projectid}
+        },
+        {
+            $group: {
+                _id: "$project",
+                topicSet: { $addToSet: '$topic_id'},
+                count: {
+                    $sum: 1
+                },
+                notStartedCount: {
+                    $sum: {
+                        $cond: [{
+                            $eq: ['$is_related', 0]
+                        }, 1, 0]
+                    }
+                },
+                relatedCount: {
+                    $sum: {
+                        $cond: [{
+                            $eq: ['$is_related', 1]
+                        }, 1, 0]
+                    }
+                },
+                notRelatedCount: {
+                    $sum: {
+                        $cond: [{
+                            $eq: ['$is_related', 2]
+                        }, 1, 0]
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                "count": {
+                    $size : "$topicSet"
+                },
+                "_id": "$project",
+                "notStartedCount": "$notStartedCount",
+                "relatedCount": "$relatedCount",
+                "notRelatedCount": "$notRelatedCount"
+            }
+        }
+    ], callback);
+};

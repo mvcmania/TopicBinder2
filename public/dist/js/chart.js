@@ -2,7 +2,8 @@ var chartPrepare = function(data) {
     
     if(data.length  == 0 )
     return;
-
+    
+    showChartDiv
     //-------------
     //- PIE CHART -
     //-------------
@@ -52,7 +53,7 @@ var chartPrepare2 = function(data) {
     
     if(data.length  == 0 )
     return;
-
+    showChartDiv();
     //-------------
     //- PIE CHART -
     //-------------
@@ -96,4 +97,7 @@ var chartPrepare2 = function(data) {
     //Create pie or douhnut chart
     // You can switch between pie and douhnut using the method below.
     //pieChart.Doughnut(PieData, pieOptions);
+}
+var showChartDiv = function(){
+    $('#chart-div').removeClass('hide');
 }

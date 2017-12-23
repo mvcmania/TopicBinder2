@@ -16,6 +16,7 @@ var postForm = function(){
     $('#relate-modal-form').submit(function(e) {
         
         e.preventDefault();
+        debugger;
         var btn = $('#relate-modal-form button[type=submit][clicked=true]');
         //$('#upload-box .overlay').removeClass('hide');
         toggleOverLay('relate-modal','Assignment is being updated!');
@@ -47,6 +48,7 @@ var launchRelatedModal = function(el){
 }
 var getUserAssignmentSummary = function() {
     var pjId = getProjectID();
+    var relation = $('#relations').val();
     //$('#topic-summary-box .overlay').removeClass('hide');
     if (pjId=='') {
         var tp = document.getElementById('assignment-summary');
@@ -58,7 +60,8 @@ var getUserAssignmentSummary = function() {
     }
     toggleOverLay('assignment-summary-box');
     var data = {
-        'projectid': pjId
+        'projectid': pjId,
+        'relation' :relation
     };
     $.ajax({
         url: "member/assignmentsummary",
@@ -75,6 +78,9 @@ var relateModalOnShown = function(){
         var currentIndex = parseInt($(el).parent().closest("tr").index()+1);
         setIndex(currentIndex + 1, currentIndex - 1);
         getAssignmentDetail(el.dataset.assignmentid);
+    });
+    $('#relate-modal').on('hidden.bs.modal', function(ev) {
+        getUserAssignmentSummary();
     });
 }
 var setRelatedSelectBox =  function(){
@@ -98,15 +104,33 @@ var getAssignmentDetail = function(assignmentid){
         error: getTopicError
     });
 }
-
+var getSummary = function(){
+    $.ajax({
+        url: "/",
+        type: "GET",
+        contentType: false,
+        processData: false,/*
+        beforeSend: function(req){
+            toggleOverLay('relate-modal','Assignment detail is loading!');
+        },*/
+        success: function(resp){
+           console.log('Success summary',resp);
+            
+        },
+        error: function(err){
+            console.log('Errır summary', err);
+        }
+    });
+}
 var getTopicSuccess = function(resp,assignmentid){
     console.log('Get Topic Data = ',resp);
     var tp = document.querySelector('#relate-modal .box-body');
-
+    var noDocMessage = {'title':'Warning!','description':'Document info has not been found! Please contact admin!'}
     tp.innerHTML = Handlebars.templates.topicdetail({
         'topic': resp.data.topic,
         'document': resp.data.document,
-        'assign': resp.data.assign
+        'assign': resp.data.assign,
+        'message':(resp.data.document && resp.data.document.DOCNO ? null : noDocMessage)
     });
     setRelatedSelectBox();
     toggleOverLay('relate-modal');
@@ -135,7 +159,7 @@ var getUserAssignmentSummaryError = function(err) {
 }
 var afterGetUserAssignmentSummary = function() {
     toggleOverLay('assignment-summary-box');
-    summaryWidgets();
+    /* summaryWidgets(); */
     dataTableMake('summary-table');
     searchableMake('summary-table', 'search-global');
 }
@@ -171,4 +195,5 @@ $(function() {
     relateModalOnShown();
     postForm();
     submitClick();
+    Handlebars.registerPartial('warning',Handlebars.templates.warning);
 });

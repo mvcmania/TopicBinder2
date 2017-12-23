@@ -1,5 +1,23 @@
-/*require('dotenv').config();
-var sendgrid = require("sendgrid");
+require('dotenv').config();
+var mongoose = require('mongoose');
+/* var db = mongoose.connect(process.env.MONGODB_URI,{
+    useMongoClient : true,
+    promiseLibrary: require('bluebird')
+});
+var Pool = require('./models/pool');
+ var p = new Pool({
+        topic_id :400,
+        project:'test',
+        document_id :'ABCDE'
+    });
+Pool.createPoolItems([p], function(err,doc){
+    console.log('err',err);
+    console.log('doc',doc);
+}); */
+console.log(mongoose.Types.Decimal128.fromString("3.11758474136544"));
+
+return 0; 
+/*var sendgrid = require("sendgrid");
 var helper = sendgrid.mail;
 var fromEmail = new helper.Email("support@topicbinder.com");
 var toEmail = new helper.Email("erkncpl@gmail.com");

@@ -8,8 +8,14 @@ var parser = new xml2js.Parser({
 });
 var async = require('async');
 require('dotenv').config();
+// print process.argv
+var args = process.argv.slice(2);
 
-var root = '/resources/extract/FBIS';
+if(typeof(args[0]) == "undefined"){
+    return console.log('Please provide the sub folder');
+}
+var root = '/resources/extract/'+args[0];
+var unparsed ='/unparsed';
 mongoose.connect(process.env.MONGODB_URI);
 var db = mongoose.connection;
 
@@ -20,10 +26,11 @@ function buildRegex(prop){
 }
 var bulk;
 // Loop through all the files in the temp directory
-fs.readdir( __dirname + root, function( err, files ) {
+fs.readdir( __dirname + root + unparsed, function( err, files ) {
 files.forEach(function(file, index){
     console.log('File =',file);
-fs.readFile(__dirname + root +'/'+file, function (err, data) {
+fs.readFile(__dirname + root + unparsed +'/'+file, function (err, data) {
+    
     //parser.parseString(data, function (err, result) {
             //console.dir(result);
             //console.log('File =',file);
@@ -42,7 +49,7 @@ fs.readFile(__dirname + root +'/'+file, function (err, data) {
                         count++;
                         var docItem = tempfiles[count];
                         docItem = Docs.mapRegex(m, pel, docItem);
-                        docItem.document_file = 'FBIS/'+file
+                        docItem.document_file = args[0]+'/'+file
                         //bulk.insert(docItem);
                         tempfiles[count]=docItem;
                     }
@@ -65,6 +72,9 @@ fs.readFile(__dirname + root +'/'+file, function (err, data) {
                         console.log('tempFiles = ',tempfiles);
                          Docs.collection.insertMany(tempfiles, function (err2, doc2) {
                             if (doc2) {
+                                fs.rename(__dirname + root +'/unparsed/'+file ,__dirname + root +'/parsed/'+file, function(){
+                                    console.log('File Moved');
+                                });
                                 console.log('Mongo call back =',doc2);
                             }
                             if (err2) {

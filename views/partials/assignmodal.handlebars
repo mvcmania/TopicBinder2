@@ -8,7 +8,7 @@
             </div>
             <div role="detail-modal" class="modal-body">
                 <div role="message"></div>
-                <div class="row">
+                <div class="row hide" id="chart-div">
                     <div class="col-sm-12 col-md-6">
                         <canvas id="pieChart" style="height:auto;"></canvas>
                     </div>
@@ -34,7 +34,7 @@
                     </div>
                     <div class="form-group">
                         <label for="number-of-topic" class="control-label">How many of them? : </label>
-                        <input type="number" required="true" class="form-control" name="numberoftopic" id="number-of-topic" />
+                        <input type="number"  max="0" min="1" required="true" class="form-control" name="numberoftopic" id="number-of-topic" />
                     </div>
                     <input type="hidden" name="topicid" id="topic-id-hidden" />
                     <input type="hidden" name="projectid" id="project-id-hidden" />

@@ -130,15 +130,14 @@
             <!-- general form elements -->
             <div class="box box-primary" id="upload-box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Upload Project</h3>
+                    <h3 class="box-title">Create Project</h3>
                 </div>
                 <!-- /.box-header -->
                 <!-- form start -->
                 
                     <div class="box-body">
                         <form role="form" id="upload-form" action="/admin/upload" enctype="multipart/form-data" method="post">
-                        <h4>Choose Type of File</h4>
-                            <div class="form-group">
+                            {{!-- <div class="form-group">
                                 <div class="radio">
                                     <label>
                                     <input id="type-of-file1" type="radio" name="fileType" value="inputFile" checked="true"/>
@@ -152,18 +151,41 @@
                                     </label>
                                 </div>
                                 
-                            </div>
+                            </div> --}}
                             {{!-- <div class="form-group" style="display: none">
                                 <label for="prop-list">Properties</label>
                                 <input class="form-control" id="prop-list" type="text" name="prop-list" placeholder="Default : top,num,narr,description"/>
                                 <p class="help-block">Specify the properties and separate them with comma from top to bottom. </p>
                             </div> --}}
                             <div class="form-group">
-                                <label for="topic-file">File input</label>
-                                <input id="topic-file" type="file" name="topic-file">
-                                <p class="help-block">Every file will be a standalone project so you will be able to see on the dropdown options.</p>
+                                <label for="project-name">Project Name</label>
+                                <input class="form-control" type="text" id="project-name" name="project-name" required="true"/>
                             </div>
-                            <button type="submit" class="btn btn-primary">Upload</button>
+                            <div class="form-group">
+                                <label for="project-file">Project Zip File</label>
+                                <input type="file" class="form-control" name="project-file" id="project-file" accept=".zip" />
+                                <p class="help-block">Zip all the files on your project and provide the zip file.</p>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="input-file">Input File</label>
+                                        <input class="form-control" multiple="true" id="input-file" type="file" name="input-file">
+                                    </div>
+                                </div>
+                                 <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="input-file">Row Count</label>
+                                        <input class="form-control" id="row-count" type="number" name="row-count" value="50"/>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div class="form-group">
+                                <label for="topic-file">Topic File input</label>
+                                <input class="form-control" id="topic-file"  type="file" name="topic-file" id="topic_file">
+                            </div>
+                            <button class="form-control btn-primary" type="submit" class="btn btn-primary">Create Project</button>
                         </form>
                     </div>
                      <div class="overlay hide">

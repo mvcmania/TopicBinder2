@@ -17,7 +17,7 @@
                 <td class="mailbox-name">{{#each asg.topic.topicid as |tpid|}}{{tpid}}{{/each}}</td>
                 <td>{{#each asg.topic.document as |doc|}}{{doc}}{{/each}}</td>
                 <td>{{#each asg.topic.searchEngine as |sengine|}}{{sengine}}{{/each}}</td>
-                <td>{{#each asg.topic.score as |score|}}{{score}}{{/each}}</td>
+                <td>{{#each asg.topic.score as |score|}}{{score.$numberDecimal}}{{/each}}</td>
                 <td>{{#each asg.topic.index as |ind|}}{{ind}}{{/each}}</td>
                 <td>{{asg.assignedDate}}</td>
                 <td aria-describedby="{{asg.isRelated}}">

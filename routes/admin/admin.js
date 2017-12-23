@@ -137,43 +137,75 @@ router.post('/upload', function(req, res, next) {
         busboy = new Busboy({ headers: context.headers });
 
     var fileType = '';
-    var rows = '';
-    var flName = '';
+    var inputFileRows = [];
+    
+    var topicFileRows = '';
+    var projectName = '';
+    var rowCount = 0;
     var prop = ['num','title','desc','narr'];
     //var busboy = new Busboy({ headers: req.headers });
     busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
         console.log('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
+        var inputFileTempsRows ='';
         file.on('data', function(data) {
-            rows += data;
+            if(fieldname == 'topicFile'){
+                topicFileRows +=data;
+            }
+            if(fieldname.startsWith('inputFile')){
+                inputFileTempsRows += data;
+            }
+            //console.log('Data with read data : file name :' + fieldname);
         });
-        file.on('end', function(data) {
-            console.log('Finished with read data : file name :' + filename);
-            flName = filename;
+        file.on('end', function() {
+            console.log('End with read data : file name :' + fieldname);
+            if(fieldname.startsWith('inputFile')){
+                inputFileRows.push(inputFileTempsRows);
+                inputFileTempsRows ='';
+            }
             //res.write('Finished with read data : file name :'+filename);
-        });
+        }); 
     });
      busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
 
-       if(fieldname == 'fileType'){
-           fileType = inspect(val) ? inspect(val).replace(/'/g,'') : inspect(val);
-       }
-      /*  console.log('FieldName' , fieldname);
-       console.log('inspect(val)' , inspect(val)); */
+       if(fieldname == 'project-name'){
+         projectName = inspect(val) ? inspect(val).replace(/'/g,'') : inspect(val);
+       } 
+       if(fieldname == 'row-count'){
+         rowCount = inspect(val) ? inspect(val).replace(/'/g,'') : 50;
+       } 
+       console.log('FieldName' , fieldname);
+       console.log('inspect(val)' , inspect(val));
     });
     busboy.on('finish', function() {
         console.log('Done parsing form!');
-        console.log('fileType' + fileType);
-        if(fileType == 'inputFile')
-            uploadInputFile(rows, res, flName);
-        else if(fileType == 'topicFile')
-            uploadTopicFile(rows, res, prop);
-        else{
-            buildRegex(prop);
-            res.status(400).send({ status: 400, data: null, message: "No file type selected" });
-        }
+        async.waterfall([
+          function(cb){
+            uploadInputFile(inputFileRows, res, projectName, rowCount, cb);
+          },
+          function(cb){
+            uploadTopicFile(topicFileRows, res, prop, cb);
+          }
+        ],
+        function(err, result) {
+            if (err) {
+                console.log("Error occured..on bulk pool saving...",err);
+                res.status(400).send({ status: 400, data: err, message: "Error occured on bulk saving!" });
+            } else {
+                fs.mkdir('projects/'+projectName,function(err){
+                    if (err) {
+                       console.error(err);
+                    }else{
+                        console.log("Directory created successfully!");
+                    }
+                 });
+                res.status(200).send({ status: 200, data: null, message: "Redirect!" });
+            }
+        });
+        
     });
 
     req.pipe(busboy);
+
     //res.end();
     //res.render('dashboard',{ pools: {},users: req.users});
 });
@@ -217,38 +249,50 @@ function postProcessSummary(assMap, aggResult) {
     }
 }
 
-function uploadInputFile(records, res, filename) {
+function uploadInputFile(recordsArray, res, projectName, rowCount, cb) {
     //Split with new line
-    var arr = records.split("\n");
     var pool_array = [];
-    arr.map(function(val) {
-        var splitted = val.split("\t");
-        var plItem = new Pool({
-            "topic_id": splitted[0],
-            "document_id": splitted[2],
-            "index": parseInt(splitted[3]),
-            "score": parseInt(splitted[4]),
-            "search_engine_id": splitted[5],
-            //"unique_id":splitted[0]+'_'+splitted[2],
-            "is_assigned": false,
-            "project": filename
-        });
-        pool_array.push(plItem);
+    recordsArray.forEach(el => {
+        var arr = el.split("\n");
+        console.log('Row Count', rowCount);
+        
+        for (let index = 0; index < (arr.length >= rowCount ? rowCount : arr.length); index++) {
+            const element = arr[index];
+
+            var splitted = element.split("\t");
+            
+            var plItem = new Pool({
+                "topic_id": splitted[0],
+                "document_id": splitted[2],
+                "index": parseInt(splitted[3]),
+                "score": mongoose.Types.Decimal128.fromString(splitted[4]),
+                "search_engine_id": splitted[5],
+                "is_assigned": false,
+                "project": projectName
+            });
+            
+
+            pool_array.push(plItem);
+        }
     });
+    
+        
     if (pool_array.length > 0) {
         Pool.createPoolItems(pool_array, function(err, docs){
             //Error code : 11000 (duplicate error no need to send 400)
             if (err && err.code !=11000) {
                 console.log("Error occured..on bulk pool saving...",err);
 
-                res.status(400).send({ status: 400, data: err, message: "Error occured on bulk saving!" });
+                cb({"message":"Error occured on bulk saving!"});
             } else {
-                res.status(200).send({ status: 200, data: null, message: "Redirect!" });
+                cb(null);
             }
         }); 
+    }else{
+        cb(null);
     }
 }
-function uploadTopicFile (data, res, prop){
+function uploadTopicFile (data, res, prop, cb){
         let m;
         var topics = [];
         
@@ -270,20 +314,22 @@ function uploadTopicFile (data, res, prop){
           if(topics.length >0 ){
             Topic.createTopics(topics, function(err, tps) {
                 if (err) {
-                    console.log("Error occured while uploading topicss...", err);
-
-                    res.status(400).send({ status: 400, data: err, message: "Error occured on bulk saving!" });
+                    console.log("Error occured..on bulk topic saving...",err);
+    
+                    cb({"message":"Error occured on bulk topic saving!"});
                 } else {
-                    res.status(200).send({ status: 200, data: null, message: "Redirect!" });
+                    cb(null);
                 }
                 //  res.end();
             });
-        } else {
-            res.status(400).send({ status: 400, data: null, message: "File could be empty or in different format! Please specify the correct properties!" });
-        }
+        }  else {
+            cb(null);
+            //res.status(400).send({ status: 400, data: null, message: "File could be empty or in different format! Please specify the correct properties!" });
+        } 
 }
- function buildRegex(prop){
+
+function buildRegex(prop){
     var tempRegex = '<'+prop+'>([\\s\\S]*?)<';
     return new RegExp(tempRegex,'g');
- }
+}
 module.exports = router;
