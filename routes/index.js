@@ -21,7 +21,16 @@ router.get('/', ensureAuthenticated, function(req, res,next){
   req.routeStrategy = req.user.isadmin ? AdminRouteStrategy : UserRouteStrategy
   req.routeStrategy.home(req,res,next);
 });
+router.get(/^\/(admin|member)\/.+$/, ensureAuthenticated, function(req, res,next){
+  req.routeStrategy = req.user.isadmin ? AdminRouteStrategy : UserRouteStrategy
+  req.routeStrategy.home(req,res,next);
+});
 router.post('/', ensureAuthenticated, function(req, res,next){
+  req.routeStrategy = req.user.isadmin ? AdminRouteStrategy : UserRouteStrategy
+  req.routeStrategy.home(req,res,next);
+});
+router.post(/^\/(admin|member)\/.+$/, ensureAuthenticated, function(req, res,next){
+  console.log(req.url);
   req.routeStrategy = req.user.isadmin ? AdminRouteStrategy : UserRouteStrategy
   req.routeStrategy.home(req,res,next);
 });
@@ -34,10 +43,11 @@ router.get('/users/login', function(req, res,next){
   }
 });
 function ensureAuthenticated (req, res, next){
+  console.log(req.url);
   if(req.isAuthenticated()){
     return next();
   }else{
-  //  req.flash('error_msg','You are not logged in!');
+   // req.flash('error_msg','You are not logged in!');
     res.redirect('/users/login');
   }
 }

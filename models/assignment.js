@@ -1,4 +1,6 @@
 var mongoose = require('mongoose');
+var mail = require('./mail');
+var User = require('./user');
 var Schema = mongoose.Schema,
     ObjectId = Schema.Types.ObjectId;
 var assignSchema = mongoose.Schema({
@@ -35,7 +37,30 @@ var assignSchema = mongoose.Schema({
 });
 var Assign = module.exports = mongoose.model('atamalar', assignSchema);
 module.exports.createAssignments = function(assignments, callback) {
-    Assign.collection.insertMany(assignments, callback);
+    Assign.collection.insertMany(assignments, function(err, docs){
+        if(err){
+            
+        }else{
+            let assignment = assignments[0];
+            var data = {
+                user : null,
+                count: docs.insertedCount,
+                project: assignment.project,
+                topic : assignment.topic_id,
+            }
+            console.log('mail docs', docs);
+            User.getUserById(assignment.user_id, function(err, userRecord){
+                if(err){
+                    console.log('Error on user query');
+                }else{
+                    data.user = userRecord;
+                    mail.sendAssignmentNotification(userRecord.email, data, 'assignmentnotification', callback);
+                }
+            });
+            
+           
+        }
+    });
 }
 module.exports.getDistinctValues = function(userid, distinctCol, callback) {
     Assign.distinct(distinctCol, { "user_id": mongoose.Types.ObjectId(userid) }, callback);

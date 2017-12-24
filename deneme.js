@@ -1,5 +1,43 @@
-require('dotenv').config();
+/* require('dotenv').config();
+var path = require('path');
+//var app = require('express');
 var mongoose = require('mongoose');
+var nodemailer = require('nodemailer');
+//var exphbs = require('express-handlebars');
+var hbs = require('nodemailer-express-handlebars');
+
+
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+            user: process.env.GMAIL_USERNAME,
+            pass: process.env.GMAIL_PASS
+        }
+});
+transporter.use('compile', hbs({
+    viewEngine : 'handlebars',
+    viewPath : path.join(__dirname, "views/notification"),
+    extName : '.handlebars'
+}));
+
+var mail = {
+    from: 'noreply@topicbinder.com',
+    to: 'erkancipil@yandex.com',
+    subject: 'Test Notification',
+    template: 'assignmentnotification',
+    context: {
+        user: {
+            name :"Erkan Cipil"
+        }
+    }
+}
+
+transporter.sendMail(mail, function (err, info) {
+    if(err)
+      console.log(err)
+    else
+      console.log(info);
+ }); */
 /* var db = mongoose.connect(process.env.MONGODB_URI,{
     useMongoClient : true,
     promiseLibrary: require('bluebird')
@@ -14,9 +52,9 @@ Pool.createPoolItems([p], function(err,doc){
     console.log('err',err);
     console.log('doc',doc);
 }); */
-console.log(mongoose.Types.Decimal128.fromString("3.11758474136544"));
-
-return 0; 
+/* console.log(mongoose.Types.Decimal128.fromString("3.11758474136544"));
+mongoose.Types.Decimal128.
+return 0;  */
 /*var sendgrid = require("sendgrid");
 var helper = sendgrid.mail;
 var fromEmail = new helper.Email("support@topicbinder.com");

@@ -26,6 +26,7 @@ var topicSchema = mongoose.Schema({
 }, { collection: "sorgular" });
 
 var Topics = module.exports = mongoose.model('sorgular', topicSchema);
+
 module.exports.createTopics = function(topicItems, callback) {
 
     var topicids = [];
