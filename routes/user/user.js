@@ -10,50 +10,55 @@ var fs = require('fs'),
     xml2js = require('xml2js');
 var path = require('path');
 
-router.get('/', function (req, res) {
+router.get('/member', function (req, res) {
     async.waterfall([
     function (next) {
         Assign.getDistinctValues(req.user._id, 'project', function (err, res2) {
-            next(null, res2);
-        });
-    },
-    function(projects, next){
-        var projectid = projects.length > 0 ? projects[0] : "";
-        Assign.getUserAssignmentSummary(req.user._id, projectid, function(err, res3){
             var result ={
-                projects: projects,
-                relations : [0,1,2],
-                summary : res3
+                projects: res2,
+                relations : [0,1,2]
             };
             next(null, result);
         });
     }], 
     function (err, result) {
-        console.log('summary', result.summary);
+        //C.logger.info('summary', result.summary);
         res.render('userdashboard', result);
     });
 
 });
-router.get('/assignmentsummary', function (req, res, next) {
-    console.log('user assignment', req.user._id);
+router.get('/member/assignmentsummary', function (req, res, next) {
+    C.logger.info('user assignment', req.user._id);
     var projectid = req.query.projectid;
     var relation = req.query.relation ? req.query.relation : 0;
     if (projectid) {
-        Assign.getSpecificUserAssignmentSummary(req.user._id, projectid, relation, function (err, result) {
-            res.send(result, {
-                'Content-Type': 'application/json'
-            }, 200);
+        async.waterfall([
+            function(next){
+                var returnResult ={'assignments':null,'summary':null};
+                Assign.getSpecificUserAssignmentSummary(req.user._id, projectid, relation, function (err, res1) {
+                    returnResult.assignments = res1;
+                    next(null, returnResult);
+                });
+            },
+            function(returnResult, next){
+                Assign.getUserAssignmentSummary(req.user._id, projectid, function(err, res2){
+                    returnResult.summary = res2;
+                    next(null, returnResult);
+                });
+            }
+        ], function(err, res3){
+            res.status(200).send(res3);
         });
     } else {
-        res.send(400, {
-            status: 400,
+        res.status(400).send({
             data: null,
             message: "Projectid can not be blank and so on!"
         });
     }
+    
 });
-router.get('/topic', function (req, res, next) {
-    console.log(req.query.assignmentid);
+router.get('/member/topic', function (req, res, next) {
+    C.logger.info(req.query.assignmentid);
     Assign.getAssignmentById(req.query.assignmentid, function(err, doc){
         if(err){
             res.status(400).send({
@@ -62,7 +67,7 @@ router.get('/topic', function (req, res, next) {
                 message: "Error while retriving!"
             });
         }else{
-            console.log('document id= ',doc);
+            C.logger.info('document id= ',doc);
             var returnData = {
                 "document": null,
                 "topic": doc[0].topic,
@@ -70,10 +75,10 @@ router.get('/topic', function (req, res, next) {
             };
             if (doc[0].document && doc[0].document.document_file) {
                 var tempDoc = getDocumentDetail(doc[0].document, doc[0].assignment);
-                console.log('Temp Obj = ', tempDoc);
+                C.logger.info('Temp Obj = ', tempDoc);
                 returnData['document'] = tempDoc;
             }
-            console.log(returnData);
+            C.logger.info(returnData);
             res.status(200).send({
                 status: 200,
                 data: returnData,
@@ -82,9 +87,9 @@ router.get('/topic', function (req, res, next) {
         }
     });
 });
-router.post('/update', function(req, res, next){
-    console.log('BODY');
-    console.log(req.body);
+router.post('/member/update', function(req, res, next){
+    C.logger.info('BODY');
+    C.logger.info(req.body);
     var status = 200, data =null, message ='';
     
     if(req.body.assignment_id){
@@ -129,55 +134,28 @@ var  getDocumentDetail = function(doc, assignItem) {
     });
     var tempDoc = {};
     var split = doc.document_file.split('/');
-    console.log('Doc= ', path.join(__dirname, '../../resources/extract/' +split[0]+ '/parsed/' + split[1]));
-    var data = fs.readFileSync(path.join(__dirname, '../../resources/extract/' +split[0]+ '/parsed/'+ split[1]));
-    if (data) {
-        /* var newData ='<ROOT>'+data+'</ROOT>';
-        console.log('DATAA'+newData); */
-        tempDoc['TEXT'] = '';
-        tempDoc['DOCNO'] = assignItem.document_no.length > 0 ? assignItem.document_no[0] : '';
-            var reg = buildRegex(doc.document_no);
-            while ((m = reg.exec(data)) !== null) {
-                // This is necessary to avoid infinite loops with zero-width matches
-                if (m.index === reg.lastIndex) {
-                reg.lastIndex++;
-                }
-                tempDoc['TEXT'] = m[2];
-                //tempDoc['DOCNO'] = m[1];
-            }
-        /* parser.parseString(newData, function (err, result) {
-            //console.log('result.ROOT'+result);
-            console.dir(err);
-            if (result.hasOwnProperty('ROOT')) {
-                for (var k in result.ROOT.DOC) {
-
-                    if (result.ROOT.DOC[k].DOCNO == doc.document_no) {
-
-                        tempDoc['DOCNO']=result.ROOT.DOC[k].DOCNO;
-
-                        if(result.ROOT.DOC[k].hasOwnProperty('TEXT')){
-
-                            result.ROOT.DOC[k]['TEXT'].forEach(function(txt){
-                                
-                                if (txt.hasOwnProperty('P')) {
-                                    tempDoc['TEXT'] = [];
-                                    txt['P'].forEach(function(txtItem) {
-                                        tempDoc['TEXT'].push(txtItem);
-                                    }, this);
-                                } else {
-                                    //console.log(m, '=', typeof(result.ROOT.DOC[0][m][indx]));
-                                    tempDoc['TEXT'] = txt;  
-                                }
-                            }, this);
-                            //console.log(m, '=', typeof(result.ROOT.DOC[0][m][indx]));
-                            
-                            
-                        }
+    C.logger.info('Doc= ', path.join(__dirname, '../../projects/' +assignItem.project+'/'+split[0]+ '/parsed/' + split[1]));
+    try{
+        var data = fs.readFileSync(path.join(__dirname, '../../projects/' +assignItem.project+'/'+split[0]+ '/parsed/'+ split[1]));
+        if (data) {
+            /* var newData ='<ROOT>'+data+'</ROOT>';
+            C.logger.info('DATAA'+newData); */
+            tempDoc['TEXT'] = '';
+            tempDoc['DOCNO'] = assignItem.document_no.length > 0 ? assignItem.document_no[0] : '';
+                var reg = buildRegex(doc.document_no);
+                while ((m = reg.exec(data)) !== null) {
+                    // This is necessary to avoid infinite loops with zero-width matches
+                    if (m.index === reg.lastIndex) {
+                    reg.lastIndex++;
                     }
+                    tempDoc['TEXT'] = m[2];
+                    //tempDoc['DOCNO'] = m[1];
                 }
-            }
-        }); */
-    }else{
+            return tempDoc;
+        }else{
+            return {};
+        }
+    }catch(err){
         return {};
     }
     return tempDoc;

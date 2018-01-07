@@ -75,19 +75,110 @@ success : bg-green
 */
 module.exports.getTopicsSummary = function(projectid,callback) {
     // Get the unique topic numbers
-    Pools.find({"project": projectid,"topic_id":{$ne:null}}).distinct("topic_id",function(err, docs){
+    //Pools.find({"project": projectid,"topic_id":{$ne:null}}).distinct("topic_id",function(err, docs){
          Pools.aggregate([
-            {$match : {"topic_id":{$in :docs}}},
-            {$group: {
-                _id: "$topic_id",
-                topic_id :{ $first : "$_id"},
-                count: { $sum: 1 }
-            }},
-            {$sort : {  "_id" :1 } },
-            {$project : { "_id":"$topic_id","topic_id":"$_id", "count": "$count" ,"status":{ $literal: "bg-red" } ,"remains":{ $literal: 0 } ,"notstarted":{ $literal :0},"related":{ $literal :0},"notrelated":{$literal:0} }}
+            {
+                $match:{
+                    "project":projectid
+                }
+            },
+            {
+                $group: {
+                    _id :"$topic_id",
+                    projects: {
+                        $addToSet : "$project"
+                    }
+                }
+            },
+            {
+                $lookup : {
+                    from: "atamalar",
+                    localField: "_id",
+                    foreignField: "topic_id",
+                    as: "assigns"
+                } 
+            },
+            {
+                $unwind : {
+                    path : "$assigns",
+                    preserveNullAndEmptyArrays : true
+                }
+            },
+            {
+                $group:{
+                    _id :"$_id",
+                    project :{
+                        $first : "$assigns.project"
+                    },
+                    count:{
+                        $sum:1
+                    },
+                    relatedCount :{
+                        $sum: {
+                         $cond: [{
+                            $eq: ['$assigns.is_related', 1]
+                         }, 1, 0]
+                      }
+                    },
+                     notRelatedCount :{
+                        $sum: {
+                         $cond: [{
+                            $eq: ['$assigns.is_related', 0]
+                         }, 1, 0]
+                      }
+                    },
+                    notStartedCount :{
+                        $sum: {
+                         $cond: [{
+                            $eq: ['$assigns.is_related', 2]
+                         }, 1, 0]
+                      }
+                    }
+                }
+            },
+            {
+                $project:{
+                    topic :"$_id",
+                    project :"$project",
+                    count :"$count",
+                    remains : {
+                      $subtract :[
+                       { $add : ["$relatedCount","$notRelatedCount","$notStartedCount"]},"$count"
+                      ]
+                    },
+                    inProgressCount : {
+                        $add : ["$relatedCount","$notRelatedCount"]
+                    },
+                    relatedCount : "$relatedCount",
+                    notRelatedCount : "$notRelatedCount",
+                    notStartedCount :"$notStartedCount"
+                }
+            },
+            {
+                $project:{
+                    topic :"$topic",
+                    project :"$project",
+                    count :"$count",
+                    remains :"$remains",
+                    relatedCount :"$relatedCount",
+                    notRelatedCount :"$notRelatedCount",      
+                    notStartedCount :"$notStartedCount",    
+                    status :{
+                     $cond:[{$eq:["$inProgressCount","$count"]},
+                         "bg-green",
+                          {
+                            $cond:[{ $eq:["$notStartedCount","$count"]},
+                              "bg-red",
+                              "bg-yellow"
+                           ]
+                          }
+                     ]
+                    }     
+                 }
+            }
         
         ], callback);
-    });
+    //});
    
 
     //User.findOne(query, callback);

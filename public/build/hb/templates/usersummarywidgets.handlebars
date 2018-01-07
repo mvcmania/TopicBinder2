@@ -1,0 +1,57 @@
+{{#each summary as |summ|}}
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-aqua">
+                <div class="inner">
+                    <h3 id="total-topic-count">{{summ.count}}</h3>
+                    <p>Topic Count in  Project</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-clipboard"></i>
+                </div>
+                <a href="/" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3 id="total-related-topic-count">{{summ.relatedCount}}</h3>
+                    <p>Related Topics</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-ios-checkmark-outline"></i>
+                </div>
+                <a href="/" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-yellow">
+                <div class="inner">
+                    <h3 id="total-not-started-topic-count">{{summ.notStartedCount}}</h3>
+                    <p>Not Associated Topics</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-load-a"></i>
+                </div>
+                <a href="/" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-red">
+                <div class="inner">
+                    <h3 id="total-not-related-topic-count">{{summ.notRelatedCount}}</h3>
+                    <p>Not Related Topics</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-alert"></i>
+                </div>
+                <a href="/" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        {{/each}}

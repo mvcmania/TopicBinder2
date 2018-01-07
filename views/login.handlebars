@@ -1,10 +1,13 @@
  <div class="login-box">
   <div class="login-logo">
-    <a href="../../index2.html"><b>Topic</b>Binder</a>
+    <a href="/login"><b>Topic</b>Binder</a>
   </div>
   <!-- /.login-logo -->
   <div class="login-box-body">
     <p class="login-box-msg">Sign in to TP</p>
+    {{#if success}}
+            <div class="alert alert-success">{{success}}</div>
+          {{/if}}
        {{#if success_msg}}
             <div class="alert alert-success">{{success_msg}}</div>
           {{/if}}
@@ -27,11 +30,7 @@
       </div>
       <div class="row">
         <div class="col-xs-8">
-          <div class="checkbox icheck">
-            <label>
-              <input type="checkbox"> Remember Me
-            </label>
-          </div>
+          <a href="forgot" class="text-center">Forgot Password</a>
         </div>
         <!-- /.col -->
         <div class="col-xs-4">

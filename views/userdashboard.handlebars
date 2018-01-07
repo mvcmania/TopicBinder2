@@ -1,3 +1,7 @@
+{{#section 'css'}}
+<!-- CSS USER -->
+<link rel="stylesheet" href="/dist/css/user.css"/>
+{{/section}}
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1>
@@ -5,7 +9,7 @@
         <small>Control panel</small>
     </h1>
     <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="userdashboard"><i class="fa fa-dashboard"></i> Home</a></li>
         <li class="active">Dashboard</li>
     </ol>
 </section>
@@ -13,64 +17,8 @@
 <!-- Main content -->
 <section class="content">
     <!-- Small boxes (Stat box) -->
-    <div class="row">
-        {{#each summary as |summ|}}
-        <div class="col-lg-3 col-xs-6">
-            <!-- small box -->
-            <div class="small-box bg-aqua">
-                <div class="inner">
-                    <h3 id="total-topic-count">{{summ.count}}</h3>
-                    <p>Topic Count in  Project</p>
-                </div>
-                <div class="icon">
-                    <i class="ion ion-clipboard"></i>
-                </div>
-                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-            </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-3 col-xs-6">
-            <!-- small box -->
-            <div class="small-box bg-green">
-                <div class="inner">
-                    <h3 id="total-related-topic-count">{{summ.relatedCount}}</h3>
-                    <p>Related Topics</p>
-                </div>
-                <div class="icon">
-                    <i class="ion ion-ios-checkmark-outline"></i>
-                </div>
-                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-            </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-3 col-xs-6">
-            <!-- small box -->
-            <div class="small-box bg-yellow">
-                <div class="inner">
-                    <h3 id="total-not-started-topic-count">{{summ.notStartedCount}}</h3>
-                    <p>Not Associated Topics</p>
-                </div>
-                <div class="icon">
-                    <i class="ion ion-load-a"></i>
-                </div>
-                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-            </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-3 col-xs-6">
-            <!-- small box -->
-            <div class="small-box bg-red">
-                <div class="inner">
-                    <h3 id="total-not-related-topic-count">{{summ.notRelatedCount}}</h3>
-                    <p>Not Related Topics</p>
-                </div>
-                <div class="icon">
-                    <i class="ion ion-alert"></i>
-                </div>
-                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-            </div>
-        </div>
-        {{/each}}
+    <div class="row" id="user-summary-widgets">
+        
     </div>
     <!-- .row-->
     <div class="row">
@@ -93,7 +41,7 @@
                         <!-- Check all button -->
                         <!--<button type="button" class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button>-->
                         <div class="btn-group">
-                            <label for="projects">Filter By Projects : </label>
+                            <label for="projects">Filter By Tracks : </label>
                             <select onchange="getUserAssignmentSummary()" class="input-sm" id="projects">
                                 {{#each projects as |proj|}}
                                     <option value="{{proj}}">{{proj}}</option>
@@ -128,7 +76,7 @@
                 </div>
                 <!-- /.box-body -->
                  <div class="overlay hide">
-                        <div class="loading-text">Project summary is loading!</div>
+                        <div class="loading-text">Track summary is loading!</div>
                         <i class="fa fa-refresh fa-spin"></i>
                     </div>
             </div>

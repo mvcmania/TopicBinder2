@@ -5,60 +5,60 @@ var Busboy = require('busboy');
 var inspect = require('util').inspect;
 var async = require('async');
 var Pool = require('../../models/pool');
+var Project = require('../../models/project');
 var Topic = require('../../models/topic');
 var User = require('../../models/user');
 var Assign = require('../../models/assignment');
 var mongoose = require('mongoose');
-var fs = require('fs');
-
+var json2csv = require('json2csv');
+var dateFormat =  require('dateformat');
+var fse = require('fs-extra');
+var api = require('../fileManager/routes');
+var helpers = require('../../public/lib/helper');
+/* var path = require('path');
+var hbs =exphbs.create({
+    layout:false,
+    layoutsDir: path.join(__dirname, "../../views/layouts"),
+    partialsDir: path.join(__dirname, "../../views/partials"),
+    helpers: helpers
+}); */
+/* 
+router.get('/admin/api(*)', function(req, resp, next){
+    C.logger.info('Admin api get', req.url);
+    api(req,resp,next);
+});
+router.post('/admin/api(*)', function(req, resp, next){
+    C.logger.info('Admin api post');
+    api(req,resp,next);
+});
+router.delete('/admin/api(*)', function(req, resp, next){
+    C.logger.info('Admin api delete');
+    api(req,resp,next);
+}); */
+router.all('/admin/api(*)', function(req, resp, next){
+    C.logger.info('Admin api put');
+    api(req,resp,next);
+});
 router.get('/', function(req, res) {
     async.parallel({
         users: function(next) {
-            User.pullNonAdmins(function(err, res1) {
-                //console.log('users',result);
-                next(null, res1);
-            });
+            User.pullNonAdmins(next);
         },
         projects: function(next) {
-            Pool.getDistinctValues('project', function(err, res2) {
-                next(null, res2);
-            })
+            Project.find().distinct('name',next);
         }
     }, function(err, results) {
         res.render('dashboard', { pools: {}, users: results['users'], projects: results['projects'] });
     });
 
 });
-router.get('/topicsummary', function(req, res, next) {
+router.get('/admin/topicsummary', function(req, res, next) {
+    C.logger.info('Topic Summary', req.url);
     var projectid = req.query.projectid;
     if (projectid) {
         async.waterfall([
             function(next) {
-
-                Pool.find({"project": projectid,"topic_id":{$ne:null}}).distinct("topic_id",function(err, docs){
-                    next(null, docs);
-                });
-            },
-            function(docs, next) {
-
-                Assign.getAssignmentSummary(docs, function(err, res1) {
-                    if (err)
-                        next(err, null);
-                    else {
-                        //console.log('assing',res1);
-                        var assMap = postProcessAssignAgg(res1);
-                        next(null, assMap);
-                    }
-
-                });
-            },
-            function(assMap, next) {
-                Pool.getTopicsSummary(projectid, function(err, res2) {
-
-                    if (assMap)
-                        postProcessSummary(assMap, res2);
-                    next(null, res2);
-                });
+                Pool.getTopicsSummary(projectid, next);
             }
         ], function(err, result) {
             res.send(result, {
@@ -72,7 +72,7 @@ router.get('/topicsummary', function(req, res, next) {
     }
 
 });
-router.post('/assign', function(req, res, next) {
+router.post('/admin/assign', function(req, res, next) {
     async.waterfall([
         function(cb){
             Topic.validateTopic(req.body.topicid, function(err, doc){
@@ -106,14 +106,9 @@ router.post('/assign', function(req, res, next) {
             });
         },
         function(assignItemArr, uniqueidSet, cb) {
-            //console.log('Assignment err',assignItemArr);
+            //C.logger.info('Assignment err',assignItemArr);
             Assign.createAssignments(assignItemArr, function(err, res2) {
-
-                if(err){
-                    cb(err,null);
-                }else{
-                    cb(null, uniqueidSet);
-                }
+                 cb(err,uniqueidSet);
             });
         },
         function(uniqueidSet,cb) {
@@ -131,8 +126,8 @@ router.post('/assign', function(req, res, next) {
     });
 
 });
-router.post('/upload', function(req, res, next) {
-    var resMsj = 'File has been posted!';
+router.post('/admin/upload', function(req, res, next) {
+
     var context = req || this,
         busboy = new Busboy({ headers: context.headers });
 
@@ -145,23 +140,23 @@ router.post('/upload', function(req, res, next) {
     var prop = ['num','title','desc','narr'];
     //var busboy = new Busboy({ headers: req.headers });
     busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-        console.log('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
+        C.logger.info('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
         var inputFileTempsRows ='';
         file.on('data', function(data) {
             if(fieldname == 'topicFile'){
                 topicFileRows +=data;
             }
-            if(fieldname.startsWith('inputFile')){
+            /* if(fieldname.startsWith('inputFile')){
                 inputFileTempsRows += data;
-            }
-            //console.log('Data with read data : file name :' + fieldname);
+            } */
+            //C.logger.info('Data with read data : file name :' + fieldname);
         });
         file.on('end', function() {
-            console.log('End with read data : file name :' + fieldname);
-            if(fieldname.startsWith('inputFile')){
+            C.logger.info('End with read data : file name :' + fieldname);
+            /* if(fieldname.startsWith('inputFile')){
                 inputFileRows.push(inputFileTempsRows);
                 inputFileTempsRows ='';
-            }
+            } */
             //res.write('Finished with read data : file name :'+filename);
         }); 
     });
@@ -170,34 +165,35 @@ router.post('/upload', function(req, res, next) {
        if(fieldname == 'project-name'){
          projectName = inspect(val) ? inspect(val).replace(/'/g,'') : inspect(val);
        } 
-       if(fieldname == 'row-count'){
+       /* if(fieldname == 'row-count'){
          rowCount = inspect(val) ? inspect(val).replace(/'/g,'') : 50;
-       } 
-       console.log('FieldName' , fieldname);
-       console.log('inspect(val)' , inspect(val));
+       }  */
+       C.logger.info('FieldName' , fieldname);
+       C.logger.info('inspect(val)' , inspect(val));
     });
     busboy.on('finish', function() {
-        console.log('Done parsing form!');
+        C.logger.info('Done parsing form!');
         async.waterfall([
-          function(cb){
-            uploadInputFile(inputFileRows, res, projectName, rowCount, cb);
+           function(cb){
+            Project.create({"name":projectName},function(err, res){
+                cb(err);
+            });
+            //uploadInputFile(inputFileRows, res, projectName, rowCount, cb);
           },
           function(cb){
             uploadTopicFile(topicFileRows, res, prop, cb);
+          },
+          function(cb){
+            var projectPath ='projects/'+projectName+'/run';
+            fse.ensureDir(projectPath,cb);
           }
         ],
-        function(err, result) {
+        function(err) {
             if (err) {
-                console.log("Error occured..on bulk pool saving...",err);
+                C.logger.info("Error occured..on bulk pool saving...",err);
                 res.status(400).send({ status: 400, data: err, message: "Error occured on bulk saving!" });
             } else {
-                fs.mkdir('projects/'+projectName,function(err){
-                    if (err) {
-                       console.error(err);
-                    }else{
-                        console.log("Directory created successfully!");
-                    }
-                 });
+                
                 res.status(200).send({ status: 200, data: null, message: "Redirect!" });
             }
         });
@@ -209,7 +205,7 @@ router.post('/upload', function(req, res, next) {
     //res.end();
     //res.render('dashboard',{ pools: {},users: req.users});
 });
-router.post('/assignmentsummary', function(req, res, next) {
+router.post('/admin/assignmentsummary', function(req, res, next) {
     Assign.getTopicAssignmentSummary(req.query.projectid, req.query.topicid,
         function(err, result) {
             var rt;
@@ -223,7 +219,29 @@ router.post('/assignmentsummary', function(req, res, next) {
 
         });
 });
-
+router.post('/admin/createpool', function(req, res, next){
+    //res.status(200).send(hbs.handlebars.compile('<p>ECHO: {{message}}</p>'));
+    C.logger.info('Req',req.body);
+    req.body['layout']= false;
+    res.render('partials/createpool',req.body);
+});
+router.get('/admin/exportqrel', function(req, res, next){
+    var project = req.query.project;
+    Assign.exportQrel(project, function(err, docs){
+        var myData=[];
+        if(err){
+            myData.push({"Error":"Error Occured while generating qrel!"});
+        }else{
+            myData = docs;
+        }
+        var now = new Date();
+        var formatDate = dateFormat(now, "ddmmyyyy_HH:MM:ss");
+        csv = json2csv({ data: myData, del :' ', quotes:'' , hasCSVColumnTitle: false });
+        res.setHeader('Content-disposition', 'attachment; filename=qrel.'+project+'_'+formatDate);
+        res.setHeader('Content-type', 'text/plain');    
+        res.end(csv); 
+    });
+});
 function postProcessAssignAgg(aggResult) {
     var assMap = {};
     for (var rs in aggResult) {
@@ -254,8 +272,7 @@ function uploadInputFile(recordsArray, res, projectName, rowCount, cb) {
     var pool_array = [];
     recordsArray.forEach(el => {
         var arr = el.split("\n");
-        console.log('Row Count', rowCount);
-        
+        C.logger.info('Row Count', rowCount);
         for (let index = 0; index < (arr.length >= rowCount ? rowCount : arr.length); index++) {
             const element = arr[index];
 
@@ -281,8 +298,7 @@ function uploadInputFile(recordsArray, res, projectName, rowCount, cb) {
         Pool.createPoolItems(pool_array, function(err, docs){
             //Error code : 11000 (duplicate error no need to send 400)
             if (err && err.code !=11000) {
-                console.log("Error occured..on bulk pool saving...",err);
-
+                C.logger.info("Error occured..on bulk pool saving...",err);
                 cb({"message":"Error occured on bulk saving!"});
             } else {
                 cb(null);
@@ -307,15 +323,14 @@ function uploadTopicFile (data, res, prop, cb){
                 count++;
                 var topicItem = topics[count];
                 topicItem = Topic.mapRegex(m, pel, topicItem);
-                //console.log('topicItem=',topicItem);
                 topics[count] = topicItem;
             }
         });
           if(topics.length >0 ){
             Topic.createTopics(topics, function(err, tps) {
                 if (err) {
-                    console.log("Error occured..on bulk topic saving...",err);
-    
+                    C.logger.info("Error occured..on bulk topic saving...",err);
+                    
                     cb({"message":"Error occured on bulk topic saving!"});
                 } else {
                     cb(null);

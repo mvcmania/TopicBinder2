@@ -73,7 +73,7 @@ var chartPrepare2 = function(data) {
     var dataMap = {"Not Started":0,"Related":0,"Not Related":0}, dataArr=[], bckColor = ["rgba(221, 75, 57, 1)","rgba(243, 156, 18, 1)","rgba(0, 166, 90, 1)"];
 
     for(var k in data){
-        console.log(data);
+        C.logger.info(data);
         dataMap["Not Started"] += (data[k].notStartedCount);
         dataMap["Related"] += (data[k].relatedCount);
         dataMap["Not Related"] += (data[k].notRelatedCount);

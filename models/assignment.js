@@ -6,7 +6,7 @@ var Schema = mongoose.Schema,
 var assignSchema = mongoose.Schema({
     "is_related": {
         type: Number,
-        default: 0 //0 :not started, 1: related, 2: not related
+        default: 2 //2 :not started, 1: related, 0: not related
     },
     "topic_id": {
         type: Number,
@@ -48,13 +48,13 @@ module.exports.createAssignments = function(assignments, callback) {
                 project: assignment.project,
                 topic : assignment.topic_id,
             }
-            console.log('mail docs', docs);
+            C.logger.info('mail docs', docs);
             User.getUserById(assignment.user_id, function(err, userRecord){
                 if(err){
-                    console.log('Error on user query');
+                    C.logger.info('Error on user query');
                 }else{
                     data.user = userRecord;
-                    mail.sendAssignmentNotification(userRecord.email, data, 'assignmentnotification', callback);
+                    mail.sendEmail(userRecord.email, data, 'TopicBinder : Topics assigned!', 'assignmentnotification', callback);
                 }
             });
             
@@ -119,8 +119,8 @@ module.exports.getAssignmentSummary = function(tpids, callback) {
     //User.findOne(query, callback);
 }
 module.exports.getTopicAssignmentSummary = function(projectid, topicid, callback) {
-    console.log(projectid);
-    console.log(typeof(topicid));
+    C.logger.info(projectid);
+    C.logger.info(typeof(topicid));
     Assign.aggregate([{
             $match: {
                 "topic_id": parseInt(topicid)
@@ -143,7 +143,7 @@ module.exports.getTopicAssignmentSummary = function(projectid, topicid, callback
                 notStartedCount: {
                     $sum: {
                         $cond: [{
-                            $eq: ['$is_related', 0]
+                            $eq: ['$is_related', 2]
                         }, 1, 0]
                     }
                 },
@@ -157,7 +157,7 @@ module.exports.getTopicAssignmentSummary = function(projectid, topicid, callback
                 notRelatedCount: {
                     $sum: {
                         $cond: [{
-                            $eq: ['$is_related', 2]
+                            $eq: ['$is_related', 0]
                         }, 1, 0]
                     }
                 }
@@ -191,6 +191,9 @@ module.exports.getSpecificUserAssignmentSummary = function(userid, projectid, re
     var relationParam = parseInt(relation);
     Assign.aggregate([{
             $match: { "user_id": mongoose.Types.ObjectId(userid), "project": projectid, "is_related" : relationParam}
+        },
+        {
+            $limit:20
         },
         {
             $lookup: {
@@ -277,7 +280,8 @@ module.exports.getAssignmentById = function(assignment_id, callback) {
                 "assignment":{
                     "_id":"$_id",
                     "is_related": "$is_related",
-                    "document_no" :"$pool.docuemnt_id",
+                    "document_no" :"$pool.document_id",
+                    "project": "$pool.project",
                     "index" : "$pool.index",
                     "assignedDate": { $dateToString: { format: "%d/%m/%Y %H:%M", date: "$assigned_date" } }
 
@@ -291,7 +295,7 @@ module.exports.updateRelation = function(assignment_id, relation, callback){
     Assign.collection.update({ "_id" : mongoose.Types.ObjectId(assignment_id) },{ $set : { "is_related" : parseInt(relation)} }, callback)
 }
 module.exports.getUserAssignmentSummary = function(userid, projectid, callback) {
-    console.log(userid);
+    C.logger.info(userid);
     Assign.aggregate([{
             $match: { "user_id": mongoose.Types.ObjectId(userid), "project" :projectid}
         },
@@ -305,7 +309,7 @@ module.exports.getUserAssignmentSummary = function(userid, projectid, callback) 
                 notStartedCount: {
                     $sum: {
                         $cond: [{
-                            $eq: ['$is_related', 0]
+                            $eq: ['$is_related', 2]
                         }, 1, 0]
                     }
                 },
@@ -319,7 +323,7 @@ module.exports.getUserAssignmentSummary = function(userid, projectid, callback) 
                 notRelatedCount: {
                     $sum: {
                         $cond: [{
-                            $eq: ['$is_related', 2]
+                            $eq: ['$is_related', 0]
                         }, 1, 0]
                     }
                 }
@@ -338,3 +342,37 @@ module.exports.getUserAssignmentSummary = function(userid, projectid, callback) 
         }
     ], callback);
 };
+module.exports.exportQrel = function(projectid, callback){
+    Assign.aggregate([
+        {
+            $match :{
+                "project":projectid,
+                $or:[
+                    {"is_related":1},
+                    {"is_related":0}
+                ]
+            }
+        },
+        {
+            $lookup:{
+                from: "sorguHavuzu",
+                localField: "pool_id",
+                foreignField: "_id",
+                as: "pools"
+            }
+        },
+        {
+            $unwind :{
+                path: "$pools"
+            }
+        },
+        {
+            $project:{
+                _id : "$pools.topic_id",
+                searchEngine : "$pools.search_engine_id",
+                document_id: "$pools.document_id",
+                isrelated : "$is_related"
+            }
+        }
+    ],callback);
+}

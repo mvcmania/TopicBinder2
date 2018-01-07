@@ -23,19 +23,39 @@ transporter.use('compile', hbs({
 
 /* function (err, info) {
     if(err)
-      console.log(err)
+      C.logger.info(err)
     else
-      console.log(info);
+      C.logger.info(info);
  } */
 
 
- module.exports.sendAssignmentNotification = function(to, data, template, cb){
+ module.exports.sendEmail = function(to, data, subject, template, cb){
     var mail = {
         from: 'noreply@topicbinder.com',
         to: to,
-        subject: 'TopicBinder : Topics assigned!',
+        subject: subject,//'TopicBinder : Topics assigned!',
         template: template,
         context: data
     }
     transporter.sendMail(mail, cb);
  }
+/*  module.exports.sendResetPassword = function(to, data, template, cb){
+    var mail = {
+        from: 'noreply@topicbinder.com',
+        to: to,
+        subject: 'TopicBinder Password Reset',
+        template: template,
+        context: data
+    }
+    transporter.sendMail(mail, cb);
+ }
+ module.exports.sendPasswordConfirmation = function(to, data, template, cb){
+    var mail = {
+        from: 'noreply@topicbinder.com',
+        to: to,
+        subject: 'Your password has been changed',
+        template: template,
+        context: data
+    }
+    transporter.sendMail(mail, cb);
+ } */

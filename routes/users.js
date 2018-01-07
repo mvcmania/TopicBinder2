@@ -3,17 +3,89 @@ var router = express.Router();
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var User = require('../models/user');
+var async = require('async');
+/* var bcrypt = require('bcryptjs'); */
+var crypto = require("crypto");
+var mail = require('../models/mail');
 
-// Get Homepage
+router.get('/', function(req, res,next){
+    
+    res.redirect('/users/login');
+});
+// Get register
 router.get('/register', function(req, res) {
     res.render('register', { islogin: true , layout: "loginlayout"});
 });
 
-// Get Homepage
+// Get login
 router.get('/login', function(req, res) {
-    res.render('login', { islogin: true, layout: "loginlayout" });
+    C.logger.info('users get',req.isAuthenticated());
+    if(req.isAuthenticated()){
+        res.redirect('/');
+    }else{
+        res.render('login', { islogin: true, layout: "loginlayout" });
+    }
 });
-
+router.get('/logout', function(req, res) {
+    req.logout();
+    req.flash('success_msg', 'You are logged out!');
+    res.redirect('/users/login');
+});
+// Get forgot
+router.get('/forgot', function(req, res,next){
+    res.render('forgot', { islogin: true, layout: "loginlayout" })
+});
+//Password reset
+router.get('/reset/:token', function(req, res) {
+    User.findOne({ reset_password_token: req.params.token, reset_password_expires: { $gt: Date.now() } }, function(err, user) {
+      if (!user) {
+        req.flash('error', 'Password reset token is invalid or has expired.');
+        return res.redirect('/users/forgot');
+      }
+      res.render('resetpassword', {islogin: true, layout: "loginlayout", token: req.params.token});
+    });
+});
+router.post('/reset/:token', function(req, res) {
+    C.logger.info('Password', req.body.password);
+    async.waterfall([
+      function(done) {
+        User.findOne({ reset_password_token: req.params.token, reset_password_expires: { $gt: Date.now() } }, function(err, userReturn) {
+          if (!userReturn) {
+            req.flash('error', 'Password reset token is invalid or has expired.');
+            return res.redirect('back');
+          }
+          if(req.body.password === req.body.confirm) {
+              C.logger.info('User', userReturn);
+              userReturn.password = req.body.password;
+              userReturn.reset_password_token = undefined;
+              userReturn.reset_password_expires = undefined;
+              User.createUser( userReturn, function(err, usr){
+                  req.logIn(usr, function(err) {
+                    done(err, usr);
+                  });
+              });
+              
+          } else {
+              req.flash("error", "Passwords do not match.");
+              return res.redirect('back');
+          }
+        });
+      },
+      function(user, done) {
+         mail.sendEmail(user.email, user, 'Your password has been changed', 'passwordchange', function(err){
+            req.flash('success', 'Success! Your password has been changed.');
+            done(err);
+         });
+      }
+    ], function(err) {
+        C.logger.info('err',err);
+     if(err){
+         req.flash('error',err);
+         res.redirect('/users/forgot');
+     }
+     res.redirect('/users/login');
+    });
+  });
 // Get Homepage
 router.post('/register', function(req, res) {
     var name = req.body.name;
@@ -45,9 +117,9 @@ router.post('/register', function(req, res) {
         });
         User.createUser(newUser, function(err, msg) {
             if (err) throw err;
-            //console.log(User);
+            //C.logger.info(User);
             req.flash('success_msg', 'You are registered and can now login.');
-            res.redirect('login');
+            res.redirect('/users/login');
         });
 
     }
@@ -85,9 +157,42 @@ router.post('/login',
     function(req, res) {
         res.redirect('/');
     });
-router.get('/logout', function(req, res) {
-    req.logout();
-    req.flash('success_msg', 'You are logged out!');
-    res.redirect('/users/login');
+router.post('/forgot', function(req, res, next){
+    async.waterfall([
+        function(done){    
+            crypto.randomBytes(20, function(err, buf){
+                var token = buf.toString('hex');
+                done(err, token);
+            })
+        },
+        function(token, done){
+            User.findOne({ email: req.body.email }, function(err, user) {
+                if(!user){
+                    req.flash('error','No user with that email address exists!');
+                    return res.redirect('/users/forgot');
+                }
+                user.reset_password_token = token;
+                user.reset_password_expires = Date.now() + 3600000; // 1 hour
+                user.save(function(err) {
+                    done(err, token, user);
+                });
+
+                
+            });
+        },
+        function(token, user, done){
+            var data = {link:'http://' + req.headers.host + '/users/reset/' + token};
+            mail.sendEmail(user.email, data, 'TopicBinder Password Reset', 'passwordreset', function(err){
+                C.logger.info('mail sent');
+                req.flash('success', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+                //return res.redirect('/users/forgot');
+                done(err, 'done');
+            })
+        }
+    ], 
+    function(err){
+        if (err) return next(err);
+        return res.redirect('/users/login');
+    });
 });
 module.exports = router;

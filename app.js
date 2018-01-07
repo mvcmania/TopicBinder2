@@ -18,12 +18,15 @@ var db = mongoose.connect(process.env.MONGODB_URI,{
     useMongoClient : true,
     promiseLibrary: require('bluebird')
 });
-
+global.C = {
+    logger: require('tracer').console({level: 'info'})
+};
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var admins = require('./routes/admin/admin');
 var members = require('./routes/user/user');
+var files = require('./routes/fileManager/routes');
 
 //Init app js
 
@@ -49,9 +52,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Express session
 app.use(session({
-    secret: 'secret',
+    secret: process.env.SESSION_SECRET,
     saveUninitialized: true,
-    resave: true
+    cookie :{maxAge:1800000},
+    resave: false
 }));
 
 // Passport init
@@ -81,6 +85,7 @@ app.use(flash());
 // Global Vars
 app.use(function(req, res, next) {
     res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+    res.locals.success = req.flash('success');
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
@@ -90,8 +95,8 @@ app.use(function(req, res, next) {
 
 app.use('/users', users);
 app.use('/', routes);
-app.use('/admin', admins);
-app.use('/member', members);
+/* app.use('/admin', admins);
+app.use('/member', members);*/
 
 app.use(function(req, res, next){
   // the status option, or res.statusCode = 404
@@ -104,5 +109,5 @@ app.use(function(req, res, next){
 // Set Port
 app.set('port', (process.env.PORT || 5000));
 app.listen(app.get('port'), function() {
-    console.log('Server started on port ' + app.get('port'));
+    C.logger.info('Server started on port ' + app.get('port'));
 });

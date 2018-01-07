@@ -36,7 +36,7 @@ module.exports.createTopics = function(topicItems, callback) {
     
     Topics.collection.remove({ topic_id :{ $in : topicids}}, function(err, docs){
         if(err){
-            console.log('Error while deleting topics');
+            C.logger.info('Error while deleting topics');
         }else{
             Topics.collection.insertMany(topicItems,callback);
         }
@@ -52,7 +52,7 @@ module.exports.getTopicDetail = function(topicid , callback){
 module.exports.mapRegex =  function(m, field, tpc){
     
     if(field =='num')    
-        console.log(field,'=',m[1]);
+        C.logger.info(field,'=',m[1]);
     
         if(typeof(tpc) == "undefined"){
             tpc = new Topics();

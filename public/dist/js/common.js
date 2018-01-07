@@ -1,3 +1,8 @@
+var modalOptions = {
+    keyboard: false,
+    backdrop: false,
+    show: true
+}
 var prepareMessage = function(ttl, desc) {
     var msg = { title: ttl, description: desc };
     return msg;
@@ -37,3 +42,6 @@ var searchableMake = function(id, inputid) {
             $('#' + id).DataTable().search($(this).val(), false, false).draw();
     });
 }
+$(document).on("click", ".popover .cancel" , function(){
+    $(this).parents(".popover").popover('hide');
+});

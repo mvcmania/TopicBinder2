@@ -8,3 +8,6 @@
 #assignment-summary .dataTables_filter {
     display: none;
 }
+.sortable {
+    cursor: pointer;
+  }

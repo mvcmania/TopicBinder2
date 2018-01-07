@@ -1,10 +1,26 @@
+var confirm = function(el){
+    
+    $(el).popover('toggle');
+}
+var launchCreatePoolModal = function(el){
+    $('#createPoolModal #project-home').text(getProjectID());
+    $('#createPoolModal').modal(modalOptions);
+    var content = Handlebars.templates.createpoolconfirm({});
+    $('#create-pool').popover({
+        placement :'top',
+        html: true,
+        title:'Please confirm <a href="#" class="close cancel" data-dismiss="alert">&times',
+        content: content,
+        trigger: 'manual'
+    });
+}
 var launchAssignModal = function(el) {
     $('#assignModal [role=assign-modal-title]').html('Topic Assignment for <strong>' + el.dataset.topicid + '</strong>');
     $('#assignModal [role=assign-modal-remain]').html(el.dataset.remain);
     $('#assignModal #number-of-topic').attr('max',el.dataset.remain);
     $('#topic-id-hidden').val(el.dataset.topicid);
     $('#project-id-hidden').val(getProjectID());
-    $('#assignModal').modal('show');
+    $('#assignModal').modal(modalOptions);
 };
 var postAssignment = function() {
     var el = document.getElementById('assignment-form');
@@ -35,7 +51,7 @@ var postAssignmentSuccess = function(data) {
 }
 var postAssignmentError = function(err) {
     toggleOverLay('assign-modal-content');
-    console.log(err);
+    C.logger.info(err);
     var msg = prepareMessage('Error!', err.responseJSON.message);
     $('#assignModal div[role=detail-modal]  div[role=message]').html(
         Handlebars.templates.error({
@@ -85,7 +101,10 @@ var getTopicSummarySuccess = function(data) {
     });
     summaryWidgets();
     dataTableMake('summary-table');
+    makeExportVisible();
+    triggerFileManager();
 }
+
 var getTopicSummaryError = function(err) {
     var msg = prepareMessage('Warning', err.responseJSON.message);
     var tp = document.getElementById('topic-summary');
@@ -93,6 +112,28 @@ var getTopicSummaryError = function(err) {
     tp.innerHTML = Handlebars.templates.warning({
         'message': msg
     });
+}
+var triggerFileManager = function(){
+    var ang = angular.element(document.getElementById('file-manager-controller'));
+    ang.scope().triggerHashChange();
+}
+var makeExportVisible = function(){
+    var makeVisible = $('#summary-table td[data-order=bg-red],#summary-table td[data-order=bg-yellow]').length > 0 ? false : true;
+    var poolVisible = $('#summary-table td[data-order]').length > 0 ? false : true;
+    var projectid = getProjectID();
+    if(makeVisible && !poolVisible){
+        $('#export-form').show();
+        $('#project-to-export').val(projectid);
+    }else{
+        $('#export-form').hide();
+        $('#project-to-export').val('');
+    }
+    if(makeVisible){
+        $('#pool-form').show();
+    }else{
+        $('#pool-form').hide();
+    }
+    
 }
 var uploadFileSuccess = function(data) {
     $('#upload-box .overlay .loading-text').text('You are redirecting. Please wait!');
@@ -116,7 +157,7 @@ var getTopicsSummary = function() {
     //$('#topic-summary-box .overlay').removeClass('hide');
     if (!pjId) {
         var tp = document.getElementById('topic-summary');
-        var msg = prepareMessage('Warning', 'No project has been found!')
+        var msg = prepareMessage('Warning', 'No track has been found!')
         tp.innerHTML = Handlebars.templates.warning({
             'message': msg
         });
@@ -168,15 +209,15 @@ $(function() {
             fd.append(field.name, field.value);
         });
         
-        var projectFile = document.getElementById('project-file');
+        //var projectFile = document.getElementById('project-file');
         var topicFile = document.getElementById('topic-file');
-        var inputFile = document.getElementById('input-file');
-        console.log('files=',typeof(projectFile.files));
-        fd.append('projectFile', projectFile.files[0]);
+        //var inputFile = document.getElementById('input-file');
+        //C.logger.info('files=',typeof(projectFile.files));
+        //fd.append('projectFile', projectFile.files[0]);
         fd.append('topicFile', topicFile.files[0]);
-        $.each(inputFile.files,function(index,elem){
+        /* $.each(inputFile.files,function(index,elem){
             fd.append('inputFile_'+index, elem);
-        });
+        }); */
         
         $.ajax({
             url: actionurl,
@@ -203,6 +244,9 @@ $(function() {
     $('#assignModal').on('hidden.bs.modal', function() {
         if (pieChart && pieChart.destroy) pieChart.destroy();
         if (pieChart2 && pieChart2.destroy) pieChart2.destroy();
+    });
+     $('button[role=pool]').click(function(){
+        launchCreatePoolModal();
     });
     getTopicsSummary();
     searchableMake('summary-table', 'search-topic-id');
