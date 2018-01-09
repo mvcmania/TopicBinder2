@@ -1,5 +1,24 @@
-var confirm = function(el){
+var createPoolSuccess = function(result){
+    toggleOverLay('createpool-modal-content');
+    //var msg = prepareMessage('Error Occured!', 'Something Wrong' + JSON.stringify(err));
+    $('#createPoolModal  div[role=message]').html(
+        Handlebars.templates.success({
+            'message': result
+        })
+    );
     
+}
+var createPoolError = function(err){
+    toggleOverLay('createpool-modal-content');
+    var msg = prepareMessage('Error Occured!', 'Something Wrong' + JSON.stringify(err.responseText));
+    $('#createPoolModal  div[role=message]').html(
+        Handlebars.templates.error({
+            'message': msg
+        })
+    );
+    
+}
+var confirm = function(el){
     $(el).popover('toggle');
 }
 var launchCreatePoolModal = function(el){
@@ -248,6 +267,21 @@ $(function() {
      $('button[role=pool]').click(function(){
         launchCreatePoolModal();
     });
+    $('#create-pool-form').submit(function(e){
+        e.preventDefault();
+        toggleOverLay('createpool-modal-content');
+        var projectid = getProjectID();
+        var fd =  $(e.currentTarget).serializeArray();
+        fd.push({ name :'project' , value: projectid});
+        console.log('fd',fd);
+        $.ajax({
+            url: e.currentTarget.action,
+            type: 'POST',
+            data: fd,
+            success: createPoolSuccess,
+            error: createPoolError
+        });
+    })
     getTopicsSummary();
     searchableMake('summary-table', 'search-topic-id');
 });

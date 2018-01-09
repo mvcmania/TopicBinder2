@@ -1,5 +1,6 @@
 var fs = require('fs');
 var FilePath = require('./fileMap').filePath;
+var path = require('path');
 
 module.exports = {
   realIp: function * (next) {
@@ -54,6 +55,15 @@ module.exports = {
             next();
         }
     })
+  },
+  checkTrackIdExists: function(req, res, next){
+    console.log('Tool project exist',req.body);
+    if(req.body.project){
+      res.locals.runRoot = '../../projects/'+ req.body.project+'/run';
+      next();
+    }else{
+      res.status(404).send('Track id not exist!'); 
+    }
   }
 
 };

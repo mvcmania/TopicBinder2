@@ -1,3 +1,30 @@
+var tab='t';
+console.log(unescape(tab));
+var newTab = unescape(tab);
+var csv = require('fast-csv');
+var fs = require('fs');
+var fileStream = fs.createReadStream('../projects/turkishtrack/run/input.wdf1t10q');
+var inputFileTempsRows =[];
+var csvStream = csv({delimiter:unescape('\\')+tab});
+fileStream.pipe(csvStream);
+var onData =function(row){
+    inputFileTempsRows.push(row);
+    if(inputFileTempsRows.length == 30){
+        csvStream.emit('doneParsing');
+    }
+}
+    csvStream.on("data", onData);
+    csvStream.on("end", function(){
+        console.log("done");
+        console.log("Done Size = "+ inputFileTempsRows.length);
+    });
+    csvStream.on("doneParsing", function(){
+      
+        fileStream.close();
+        csvStream.removeListener('data', onData);
+        console.log('got 30 rows', inputFileTempsRows);
+    }); 
+
 //var mongoose = require('mongoose');
 /* var bcrypt = require('bcryptjs');
 bcrypt.genSalt(10, function (err, salt) {
@@ -5,7 +32,7 @@ bcrypt.genSalt(10, function (err, salt) {
         C.logger.info(hash);
     });
 }); */
-var path = require('path');
+/* var path = require('path');
 var async = require('async');
 var fse = require('fs-extra');
 var srcMap= {
@@ -26,7 +53,7 @@ function(file, key, cb){
 }, function(err, result){
   C.logger.info('Result =',result);
   C.logger.info('err =',err);
-});
+}); */
 /* var fs = require('fs');
 if(fs.existsSync('projects/fub04')){
     C.logger.info('Directory exists');

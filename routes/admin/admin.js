@@ -14,8 +14,10 @@ var json2csv = require('json2csv');
 var dateFormat =  require('dateformat');
 var fse = require('fs-extra');
 var api = require('../fileManager/routes');
-var helpers = require('../../public/lib/helper');
-/* var path = require('path');
+var Tools = require('../fileManager/tools');
+var path = require('path');
+var csv = require('fast-csv');
+/* var helpers = require('../../public/lib/helper'); 
 var hbs =exphbs.create({
     layout:false,
     layoutsDir: path.join(__dirname, "../../views/layouts"),
@@ -53,6 +55,7 @@ router.get('/', function(req, res) {
 
 });
 router.get('/admin/topicsummary', function(req, res, next) {
+
     C.logger.info('Topic Summary', req.url);
     var projectid = req.query.projectid;
     if (projectid) {
@@ -132,32 +135,23 @@ router.post('/admin/upload', function(req, res, next) {
         busboy = new Busboy({ headers: context.headers });
 
     var fileType = '';
-    var inputFileRows = [];
     
     var topicFileRows = '';
     var projectName = '';
     var rowCount = 0;
     var prop = ['num','title','desc','narr'];
-    //var busboy = new Busboy({ headers: req.headers });
     busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
         C.logger.info('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
-        var inputFileTempsRows ='';
+        
         file.on('data', function(data) {
             if(fieldname == 'topicFile'){
                 topicFileRows +=data;
             }
-            /* if(fieldname.startsWith('inputFile')){
-                inputFileTempsRows += data;
-            } */
-            //C.logger.info('Data with read data : file name :' + fieldname);
+            C.logger.info('Data with read data : file name :' + fieldname);
         });
         file.on('end', function() {
             C.logger.info('End with read data : file name :' + fieldname);
-            /* if(fieldname.startsWith('inputFile')){
-                inputFileRows.push(inputFileTempsRows);
-                inputFileTempsRows ='';
-            } */
-            //res.write('Finished with read data : file name :'+filename);
+
         }); 
     });
      busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
@@ -165,9 +159,6 @@ router.post('/admin/upload', function(req, res, next) {
        if(fieldname == 'project-name'){
          projectName = inspect(val) ? inspect(val).replace(/'/g,'') : inspect(val);
        } 
-       /* if(fieldname == 'row-count'){
-         rowCount = inspect(val) ? inspect(val).replace(/'/g,'') : 50;
-       }  */
        C.logger.info('FieldName' , fieldname);
        C.logger.info('inspect(val)' , inspect(val));
     });
@@ -178,7 +169,6 @@ router.post('/admin/upload', function(req, res, next) {
             Project.create({"name":projectName},function(err, res){
                 cb(err);
             });
-            //uploadInputFile(inputFileRows, res, projectName, rowCount, cb);
           },
           function(cb){
             uploadTopicFile(topicFileRows, res, prop, cb);
@@ -201,9 +191,6 @@ router.post('/admin/upload', function(req, res, next) {
     });
 
     req.pipe(busboy);
-
-    //res.end();
-    //res.render('dashboard',{ pools: {},users: req.users});
 });
 router.post('/admin/assignmentsummary', function(req, res, next) {
     Assign.getTopicAssignmentSummary(req.query.projectid, req.query.topicid,
@@ -219,11 +206,63 @@ router.post('/admin/assignmentsummary', function(req, res, next) {
 
         });
 });
-router.post('/admin/createpool', function(req, res, next){
+router.post('/admin/createpool', Tools.checkTrackIdExists, function(req, res, next){
     //res.status(200).send(hbs.handlebars.compile('<p>ECHO: {{message}}</p>'));
-    C.logger.info('Req',req.body);
+    C.logger.info('Admin create pool =',req.body);
+    res.locals.runRoot = path.join(__dirname,res.locals.runRoot);
+    async.waterfall([
+        function(cb){
+            fse.readdir(res.locals.runRoot, cb);
+        },
+        function(files, cb){
+            var paths = files.map(function(file){ return path.join(res.locals.runRoot,file)});
+            async.eachSeries(paths, function(path, callback){
+                fse.stat(path, function (err, stats) {
+                    if(!stats.isDirectory()){
+                        var inputFileTempsRows =[];
+                        var fileStream = fse.createReadStream(path,'UTF-8');
+                        C.logger.info('Delimiter',unescape(req.body.delimiter));
+                        var csvStream = csv({delimiter:'\t'});
+                        fileStream.pipe(csvStream);
+
+                        var onData =function(row){
+                            inputFileTempsRows.push(row);
+                            if(inputFileTempsRows.length == req.body.rowCount){
+                                csvStream.emit('doneParsing');
+                            }
+                        }
+                        
+                        csvStream.on("data", onData);
+                        csvStream.on("end", function(){
+                            console.log("done");
+                            
+                        })
+                        csvStream.on('error', cb);
+                        //custom event
+                        csvStream.on('doneParsing', function(){
+                            fileStream.close();
+                            csvStream.removeListener('data', onData);
+                            C.logger.info('got '+req.body.rowcount+' rows', inputFileTempsRows);
+                            uploadInputFile(inputFileTempsRows, req.body.project, cb);
+                        });
+                    }
+                });
+                
+            });
+        }
+    ],function(err){
+        if(err){
+            C.logger.error('Error creating pool',err);
+            res.status(400).send('Error occured while creating pools!');
+        }else{
+            res.status(200).send('Pool created success!');
+        }
+        
+    });
+    /* var readableStream = fse.createReadStream();
+    var DATA_ROOT = path.join(__dirname,'../../projects/'+req.body.project)
     req.body['layout']= false;
-    res.render('partials/createpool',req.body);
+    res.render('partials/createpool',req.body); */
 });
 router.get('/admin/exportqrel', function(req, res, next){
     var project = req.query.project;
@@ -267,30 +306,24 @@ function postProcessSummary(assMap, aggResult) {
     }
 }
 
-function uploadInputFile(recordsArray, res, projectName, rowCount, cb) {
+function uploadInputFile(recordsArray, projectName, cb) {
     //Split with new line
     var pool_array = [];
     recordsArray.forEach(el => {
-        var arr = el.split("\n");
-        C.logger.info('Row Count', rowCount);
-        for (let index = 0; index < (arr.length >= rowCount ? rowCount : arr.length); index++) {
-            const element = arr[index];
-
-            var splitted = element.split("\t");
-            
+        
+        C.logger.info('projectName', projectName);
             var plItem = new Pool({
-                "topic_id": splitted[0],
-                "document_id": splitted[2],
-                "index": parseInt(splitted[3]),
-                "score": mongoose.Types.Decimal128.fromString(splitted[4]),
-                "search_engine_id": splitted[5],
+                "topic_id": el[0],
+                "document_id": el[2],
+                "index": parseInt(el[3]),
+                "score": mongoose.Types.Decimal128.fromString(el[4]),
+                "search_engine_id": el[5],
                 "is_assigned": false,
                 "project": projectName
             });
             
 
             pool_array.push(plItem);
-        }
     });
     
         
