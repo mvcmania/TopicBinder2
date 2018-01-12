@@ -43,10 +43,10 @@
     "passport-local": "*",
     "path": "^0.12.7",
     "tracer": "^0.8.11",
-    "xml2js": "^0.4.19"
+    "xml2js": "^0.4.19",
+    "fast-csv": "^2.4.1"
   },
   "devDependencies": {
-    "fast-csv": "^2.4.1",
     "gulp": "^3.9.1",
     "gulp-compile-handlebars": "^0.6.1",
     "gulp-concat": "^2.6.1",
