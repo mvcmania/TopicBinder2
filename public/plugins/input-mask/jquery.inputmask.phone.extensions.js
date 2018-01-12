@@ -11,7 +11,7 @@ When using this extension make sure you specify the correct url to get the masks
  $(selector).inputmask("phone", {
                 url: "Scripts/jquery.inputmask/phone-codes/phone-codes.json", 
                 onKeyValidation: function () { //show some metadata in the console
-                    C.logger.info($(this).inputmask("getmetadata")["name_en"]);
+                    console.info($(this).inputmask("getmetadata")["name_en"]);
                 } 
   });
 

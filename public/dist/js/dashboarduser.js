@@ -1,12 +1,12 @@
 var submitClick = function(){
     $('#relate-modal-form button[type=submit]').click(function(ev){
-        C.logger.info(ev);
+        console.info(ev);
         setClickAttr(ev.target);
     })
 }
 var setClickAttr = function(el){
     var sbmt = document.querySelectorAll('#relate-modal-form button[type=submit]');
-    C.logger.info(sbmt);
+    console.info(sbmt);
     sbmt.forEach(function(btn){
         $(btn).attr('clicked', false);
     });
@@ -74,7 +74,7 @@ var getUserAssignmentSummary = function() {
 var relateModalOnShown = function(){
     $('#relate-modal').on('shown.bs.modal', function(ev) {
         var el = ev.relatedTarget;
-        C.logger.info('index',$(el).parent().closest("tr").index());
+        console.info('index',$(el).parent().closest("tr").index());
         var currentIndex = parseInt($(el).parent().closest("tr").index()+1);
         setIndex(currentIndex + 1, currentIndex - 1);
         getAssignmentDetail(el.dataset.assignmentid);
@@ -116,16 +116,16 @@ var getSummary = function(){
             toggleOverLay('relate-modal','Assignment detail is loading!');
         },*/
         success: function(resp){
-           C.logger.info('Success summary',resp);
+           console.info('Success summary',resp);
             
         },
         error: function(err){
-            C.logger.info('Errır summary', err);
+            console.info('Errır summary', err);
         }
     });
 }
 var getTopicSuccess = function(resp,assignmentid){
-    C.logger.info('Get Topic Data = ',resp);
+    console.info('Get Topic Data = ',resp);
     var tp = document.querySelector('#relate-modal .box-body');
     var noDocMessage = {'title':'Warning!','description':'Document info has not been found! Please contact admin!'}
     tp.innerHTML = Handlebars.templates.topicdetail({
@@ -138,12 +138,12 @@ var getTopicSuccess = function(resp,assignmentid){
     toggleOverLay('relate-modal');
 }
 var getTopicError = function(err){
-    C.logger.info('Get Topic Data err = ',err);
+    console.info('Get Topic Data err = ',err);
     toggleOverLay('relate-modal');
 }
 var getUserAssignmentSummarySuccess = function(data) {
     var tp = document.getElementById('assignment-summary');
-    C.logger.info('Assignment summary',data);
+    console.info('Assignment summary',data);
     tp.innerHTML = Handlebars.templates.assignsummary({
         'assignments': data.assignments
     });
@@ -173,11 +173,11 @@ var summaryWidgets = function(data) {
 }
 var jumpTo = function(el){
     var indx = $(el).attr('index');
-    C.logger.info('#summary-table tr:eq('+indx+') td:last button');
+    console.info('#summary-table tr:eq('+indx+') td:last button');
     var nextAction = $('#summary-table tr:eq('+indx+') td:last button');
 
     if(nextAction.length > 0){
-        C.logger.info(nextAction);
+        console.info(nextAction);
         //nextAction.click();
         var index = parseInt(indx);
         setIndex(index + 1, index - 1);
@@ -194,14 +194,14 @@ var keyDownListener = function(event){
    
     var plist = document.getElementById('is-related');
     if(event.keyCode == 89) {//y
-        C.logger.info('y was pressed');
+        console.info('y was pressed');
         plist.value = 1;
     }
     else if(event.keyCode == 78) {//n
-        C.logger.info('n was pressed');
-        plist.value = 2;
+        console.info('n was pressed');
+        plist.value = 0;
     }else if(event.keyCode == 13){//enter pressed
-        C.logger.info('Enter pressed');
+        console.info('Enter pressed');
         var btn = document.querySelector('button[type=submit].next')
         btn.click();
     }

@@ -1,11 +1,15 @@
 var createPoolSuccess = function(result){
     toggleOverLay('createpool-modal-content');
+
+    $('#create-pool').popover('destroy');
+    $('#createPoolModal').modal('hide');
     //var msg = prepareMessage('Error Occured!', 'Something Wrong' + JSON.stringify(err));
     $('#createPoolModal  div[role=message]').html(
         Handlebars.templates.success({
-            'message': result
+            'message': {title:'Success', description:result}
         })
     );
+    getTopicsSummary();
     
 }
 var createPoolError = function(err){
@@ -269,6 +273,7 @@ $(function() {
     });
     $('#create-pool-form').submit(function(e){
         e.preventDefault();
+        $('#create-pool').popover('hide');
         toggleOverLay('createpool-modal-content');
         var projectid = getProjectID();
         var fd =  $(e.currentTarget).serializeArray();

@@ -43,7 +43,7 @@ gulp.task('default', function() {
 gulp.task('templates', function(){
   exec('handlebars -m public/build/hb/templates/ -f public/build/hb/templates/templates.js',function(err, stdout, stderr){
     if(err){
-      C.logger.info('error',err);
+      console.info('error',err);
     }
   });
   /*gulp.src('public/vendor/hb/templates/*.handlebars')

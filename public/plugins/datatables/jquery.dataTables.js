@@ -5079,8 +5079,8 @@
 				type( settings, tn, msg );
 			}
 		}
-		else if ( window.console && C.logger.info ) {
-			C.logger.info( msg );
+		else if ( window.console && console.info ) {
+			console.info( msg );
 		}
 	}
 	

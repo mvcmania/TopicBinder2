@@ -21,15 +21,15 @@
                 <td>{{#each asg.topic.index as |ind|}}{{ind}}{{/each}}</td>
                 <td>{{asg.assignedDate}}</td>
                 <td aria-describedby="{{asg.isRelated}}">
-                    {{#if_eq asg.isRelated 2}}
+                    {{#eq asg.isRelated 2}}
                         <label class="badge bg-red">&nbsp;</label>                    
-                    {{/if_eq}}
-                    {{#if_eq asg.isRelated 1}}
+                    {{/eq}}
+                    {{#eq asg.isRelated 1}}
                         <label class="badge bg-green">&nbsp;</label>                     
-                    {{/if_eq}}
-                    {{#if_eq asg.isRelated 0}} 
+                    {{/eq}}
+                    {{#eq asg.isRelated 0}} 
                         <label class="badge bg-yellow">&nbsp;</label>                    
-                    {{/if_eq}}
+                    {{/eq}}
                 </td>
                 <td>
                     <button  type="button" role="modal" data-index="{{@index}}" data-target="#relate-modal" data-toggle="modal" data-documentid="{{#each asg.topic.document as |doc|}}{{doc}}{{/each}}" data-assignmentid="{{asg._id}}" data-topicid="{{#each asg.topic.topicid as |tpid|}}{{tpid}}{{/each}}"  class="btn btn-xs btn-flat btn-success"><i class="fa fa-plus"></i>

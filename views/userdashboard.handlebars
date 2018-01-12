@@ -52,7 +52,11 @@
                             <label for="filter">Filter By Relation : </label>
                             <select onchange="getUserAssignmentSummary()" class="input-sm" id="relations">
                                 {{#each relations as |rel|}}
-                                    <option value="{{rel}}">{{rel}}</option>
+                                    {{#if rel.selected}}
+                                        <option selected="true" value="{{rel.value}}">{{rel.label}}</option>
+                                    {{else}}
+                                        <option value="{{rel.value}}">{{rel.label}}</option>
+                                    {{/if}}
                                 {{/each}}
                             </select>
                         </div>

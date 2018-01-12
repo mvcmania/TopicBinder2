@@ -107,7 +107,7 @@
                         <!-- /.btn-group -->
                         <button type="button" onclick="getTopicsSummary()" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
                         <div class="pull-right">
-                           {{!-- {{#if_eq pool.status "bg-green"}} --}}
+                           
                             <form action="/admin/exportqrel" method="GET" >
                             <input type="hidden" name="project" id="project-to-export" value="{{pool.project}}"/>
                                 <div class="btn-group" id="export-form" style="display:none;">
@@ -121,7 +121,7 @@
                                     </button>
                                 </div>
                                 </form>
-                            {{!-- {{/if_eq}} --}}
+                            
                         </div>
                         <!-- /.pull-right -->
                     </div>

@@ -324,7 +324,7 @@
                                         setBufferElement(masksets[rslt["activeMasksetIndex"]]["buffer"], lowestPos, c, true);
                                         masksets[rslt["activeMasksetIndex"]]["lastValidPosition"] = lowestPos;
                                     }
-                                    //C.logger.info("ndx " + rslt["activeMasksetIndex"] + " validate " + masksets[rslt["activeMasksetIndex"]]["buffer"].join('') + " lv " + masksets[rslt["activeMasksetIndex"]]['lastValidPosition']);
+                                    //console.info("ndx " + rslt["activeMasksetIndex"] + " validate " + masksets[rslt["activeMasksetIndex"]]["buffer"].join('') + " lv " + masksets[rslt["activeMasksetIndex"]]['lastValidPosition']);
                                     return rslt;
                                 }
                             }
@@ -377,7 +377,7 @@
                                         break;
                                 }
                                 maskForwards.push(activeMasksetIndex);
-                                //C.logger.info('maskforward ' + activeMasksetIndex + " pos " + pos + " maskPos " + maskPos);
+                                //console.info('maskforward ' + activeMasksetIndex + " pos " + pos + " maskPos " + maskPos);
                             }
                         }
 
@@ -392,7 +392,7 @@
                                     if (getActiveMaskSet()['lastValidPosition'] < newValidPosition)
                                         getActiveMaskSet()['lastValidPosition'] = newValidPosition; //set new position from isValid
                                 }
-                                //C.logger.info("pos " + pos + " ndx " + activeMasksetIndex + " validate " + getActiveBuffer().join('') + " lv " + getActiveMaskSet()['lastValidPosition']);
+                                //console.info("pos " + pos + " ndx " + activeMasksetIndex + " validate " + getActiveBuffer().join('') + " lv " + getActiveMaskSet()['lastValidPosition']);
                                 results.push({ "activeMasksetIndex": index, "result": result });
                             }
                         }

@@ -1,11 +1,12 @@
-var tab='t';
-console.log(unescape(tab));
-var newTab = unescape(tab);
+var tab='\u0009';
+
+console.log(tab);
+
 var csv = require('fast-csv');
 var fs = require('fs');
 var fileStream = fs.createReadStream('../projects/turkishtrack/run/input.wdf1t10q');
 var inputFileTempsRows =[];
-var csvStream = csv({delimiter:unescape('\\')+tab});
+var csvStream = csv({delimiter:tab});
 fileStream.pipe(csvStream);
 var onData =function(row){
     inputFileTempsRows.push(row);

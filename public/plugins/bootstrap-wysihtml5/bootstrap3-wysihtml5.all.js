@@ -179,7 +179,7 @@ var wysihtml5 = {
 
     function consoleLog(msg) {
         if (isHostObject(window, "console") && isHostMethod(window.console, "log")) {
-            window.C.logger.info(msg);
+            window.console.info(msg);
         }
     }
 
@@ -7846,7 +7846,7 @@ wysihtml5.dom.isLoadedImage = function (node) {
                     this.rectify();
                 } else {
                     if (window.console) {
-                        C.logger.info('Do not know how to merge allready merged cells.');
+                        console.info('Do not know how to merge allready merged cells.');
                     }
                 }
             }
@@ -14663,11 +14663,11 @@ function program17(depth0,data) {
             url: this.config.parserRules,
             context: this,
             error: function (jqXHR, textStatus, errorThrown) {
-              C.logger.info(errorThrown);
+              console.info(errorThrown);
             },
             success: function (parserRules) {
               this.config.parserRules = parserRules;
-              C.logger.info('parserrules loaded');
+              console.info('parserrules loaded');
             }
           });
         }
@@ -14678,7 +14678,7 @@ function program17(depth0,data) {
             url: this.config.pasteParserRulesets,
             context: this,
             error: function (jqXHR, textStatus, errorThrown) {
-              C.logger.info(errorThrown);
+              console.info(errorThrown);
             },
             success: function (pasteParserRulesets) {
               this.config.pasteParserRulesets = pasteParserRulesets;

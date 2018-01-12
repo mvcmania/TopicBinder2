@@ -10,13 +10,17 @@ var fs = require('fs'),
     xml2js = require('xml2js');
 var path = require('path');
 
-router.get('/member', function (req, res) {
+router.get('/', function (req, res) {
     async.waterfall([
     function (next) {
         Assign.getDistinctValues(req.user._id, 'project', function (err, res2) {
             var result ={
                 projects: res2,
-                relations : [0,1,2]
+                relations : [
+                    {label:"Not Related",value:0,selected:false},
+                    {label:"Related",value:1,selected:false},
+                    {label:"Not Started",value:2,selected:true}
+                ]
             };
             next(null, result);
         });

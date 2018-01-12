@@ -85,6 +85,9 @@ module.exports.getTopicsSummary = function(projectid,callback) {
             {
                 $group: {
                     _id :"$topic_id",
+                    actualCount:{
+                        $sum:1
+                    },
                     projects: {
                         $addToSet : "$project"
                     }
@@ -105,46 +108,49 @@ module.exports.getTopicsSummary = function(projectid,callback) {
                 }
             },
             {
-                $group:{
-                    _id :"$_id",
-                    project :{
-                        $first : "$assigns.project"
-                    },
-                    count:{
-                        $sum:1
-                    },
-                    relatedCount :{
-                        $sum: {
-                         $cond: [{
-                            $eq: ['$assigns.is_related', 1]
-                         }, 1, 0]
-                      }
-                    },
-                     notRelatedCount :{
-                        $sum: {
-                         $cond: [{
-                            $eq: ['$assigns.is_related', 0]
-                         }, 1, 0]
-                      }
-                    },
-                    notStartedCount :{
-                        $sum: {
-                         $cond: [{
-                            $eq: ['$assigns.is_related', 2]
-                         }, 1, 0]
-                      }
+                    $group:{
+                        _id :"$_id",
+                        project :{
+                            $first : "$assigns.project"
+                        },
+                        count:{
+                            $max: "$actualCount"
+                        },
+                        relatedCount :{
+                            $sum: {
+                            $cond: [{
+                                $eq: ['$assigns.is_related', 1]
+                            }, 1, 0]
+                        }
+                        },
+                        notRelatedCount :{
+                            $sum: {
+                            $cond: [{
+                                $eq: ['$assigns.is_related', 0]
+                            }, 1, 0]
+                        }
+                        },
+                        notStartedCount :{
+                            $sum: {
+                            $cond: [{
+                                $eq: ['$assigns.is_related', 2]
+                            }, 1, 0]
+                        }
+                        }
                     }
-                }
             },
             {
                 $project:{
                     topic :"$_id",
                     project :"$project",
-                    count :"$count",
+                    count:"$count",
                     remains : {
-                      $subtract :[
-                       { $add : ["$relatedCount","$notRelatedCount","$notStartedCount"]},"$count"
-                      ]
+                      /* $cond:[{$eq :["$assignCount",0]},
+                        0,
+                        { */$subtract :[
+                            "$count",{ $add : ["$relatedCount","$notRelatedCount","$notStartedCount"]}
+                        ]/* }
+                      ] */
                     },
                     inProgressCount : {
                         $add : ["$relatedCount","$notRelatedCount"]
@@ -167,7 +173,7 @@ module.exports.getTopicsSummary = function(projectid,callback) {
                      $cond:[{$eq:["$inProgressCount","$count"]},
                          "bg-green",
                           {
-                            $cond:[{ $eq:["$notStartedCount","$count"]},
+                            $cond:[{ $or:[{$eq:["$notStartedCount","$count"]},{$eq:["$remains","$count"]}]},
                               "bg-red",
                               "bg-yellow"
                            ]

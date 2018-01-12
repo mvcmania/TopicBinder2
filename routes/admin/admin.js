@@ -210,45 +210,61 @@ router.post('/admin/createpool', Tools.checkTrackIdExists, function(req, res, ne
     //res.status(200).send(hbs.handlebars.compile('<p>ECHO: {{message}}</p>'));
     C.logger.info('Admin create pool =',req.body);
     res.locals.runRoot = path.join(__dirname,res.locals.runRoot);
+    var inputFileTempsRows =[];
+    var csvStream = csv({delimiter:"\t"});
+    
     async.waterfall([
         function(cb){
             fse.readdir(res.locals.runRoot, cb);
         },
         function(files, cb){
+            
             var paths = files.map(function(file){ return path.join(res.locals.runRoot,file)});
-            async.eachSeries(paths, function(path, callback){
-                fse.stat(path, function (err, stats) {
-                    if(!stats.isDirectory()){
-                        var inputFileTempsRows =[];
-                        var fileStream = fse.createReadStream(path,'UTF-8');
-                        C.logger.info('Delimiter',unescape(req.body.delimiter));
-                        var csvStream = csv({delimiter:'\t'});
+            var totalRowCount = res.locals.rowCount * paths.length;
+            async.forEachOf(paths, function(path, key){
+                
+                //async.each(stats, function(stat, cb){
+                    //if(!stat.isDirectory()){
+                        const fileStream = fse.createReadStream(path,'UTF-8');
+                        C.logger.info('Delimiter',req.body.delimiter);
+                        
                         fileStream.pipe(csvStream);
 
                         var onData =function(row){
                             inputFileTempsRows.push(row);
-                            if(inputFileTempsRows.length == req.body.rowCount){
+                            if(inputFileTempsRows.length == totalRowCount){
                                 csvStream.emit('doneParsing');
                             }
                         }
                         
                         csvStream.on("data", onData);
                         csvStream.on("end", function(){
-                            console.log("done");
-                            
+                            C.logger.info('End');
+                            if(key +1 == paths.length){
+                                C.logger.info('End2');
+                                cb(null, inputFileTempsRows)
+                            }
                         })
                         csvStream.on('error', cb);
                         //custom event
                         csvStream.on('doneParsing', function(){
+                            
+                            C.logger.info('got '+req.body.rowCount+' rows', inputFileTempsRows);
                             fileStream.close();
                             csvStream.removeListener('data', onData);
-                            C.logger.info('got '+req.body.rowcount+' rows', inputFileTempsRows);
-                            uploadInputFile(inputFileTempsRows, req.body.project, cb);
+                            if(key +1 == paths.length){
+                                C.logger.info('doneParsing');
+                                cb(null, inputFileTempsRows)
+                            }
                         });
-                    }
-                });
+                    //}
+               //});
                 
             });
+        },
+        function(inputRows, cb){
+            
+            uploadInputFile(inputRows, req.body.project, cb);
         }
     ],function(err){
         if(err){
@@ -310,8 +326,7 @@ function uploadInputFile(recordsArray, projectName, cb) {
     //Split with new line
     var pool_array = [];
     recordsArray.forEach(el => {
-        
-        C.logger.info('projectName', projectName);
+        //C.logger.info(el);
             var plItem = new Pool({
                 "topic_id": el[0],
                 "document_id": el[2],
