@@ -6,8 +6,7 @@ var Topic = require('../../models/topic');
 var User = require('../../models/user');
 var Assign = require('../../models/assignment');
 var Doc = require('../../models/document');
-var fs = require('fs'),
-    xml2js = require('xml2js');
+var fs = require('fs');
 var path = require('path');
 
 router.get('/', function (req, res) {
@@ -132,10 +131,6 @@ router.post('/member/update', function(req, res, next){
    
 });
 var  getDocumentDetail = function(doc, assignItem) {
-    var parser = new xml2js.Parser({
-        trim: true,
-        async : false
-    });
     var tempDoc = {};
     var split = doc.document_file.split('/');
     C.logger.info('Doc= ', path.join(__dirname, '../', doc.document_file));

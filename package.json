@@ -23,6 +23,7 @@
     "busboy": "^0.2.14",
     "connect-flash": "*",
     "cookie-parser": "^1.4.1",
+    "csv-query": "0.0.4",
     "dateformat": "^3.0.2",
     "dotenv": "^4.0.0",
     "express": "*",
@@ -38,15 +39,13 @@
     "json2csv": "^3.11.5",
     "mongodb": "*",
     "mongoose": "*",
-    "no-gyp-xml-stream": "^1.0.3",
     "nodemailer": "^4.4.1",
     "nodemailer-express-handlebars": "^2.0.0",
     "passport": "*",
     "passport-http": "*",
     "passport-local": "*",
     "path": "^0.12.7",
-    "tracer": "^0.8.11",
-    "xml2js": "^0.4.19"
+    "tracer": "^0.8.11"
   },
   "devDependencies": {
     "gulp": "^3.9.1",
