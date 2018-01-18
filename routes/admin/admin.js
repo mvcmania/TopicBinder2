@@ -17,26 +17,7 @@ var api = require('../fileManager/routes');
 var Tools = require('../fileManager/tools');
 var path = require('path');
 var csv = require('fast-csv');
-/* var helpers = require('../../public/lib/helper'); 
-var hbs =exphbs.create({
-    layout:false,
-    layoutsDir: path.join(__dirname, "../../views/layouts"),
-    partialsDir: path.join(__dirname, "../../views/partials"),
-    helpers: helpers
-}); */
-/* 
-router.get('/admin/api(*)', function(req, resp, next){
-    C.logger.info('Admin api get', req.url);
-    api(req,resp,next);
-});
-router.post('/admin/api(*)', function(req, resp, next){
-    C.logger.info('Admin api post');
-    api(req,resp,next);
-});
-router.delete('/admin/api(*)', function(req, resp, next){
-    C.logger.info('Admin api delete');
-    api(req,resp,next);
-}); */
+var datasetPath = path.join(__dirname,'../../',C.datasetPath);
 router.all('/admin/api(*)', function(req, resp, next){
     C.logger.info('Admin api put');
     api(req,resp,next);
@@ -48,9 +29,13 @@ router.get('/', function(req, res) {
         },
         projects: function(next) {
             Project.find().distinct('name',next);
+        },
+        datasets: function(next){
+            fse.readdir(datasetPath, next);
+            //next(null, ['TREC5','TREC6']);
         }
     }, function(err, results) {
-        res.render('dashboard', { pools: {}, users: results['users'], projects: results['projects'] });
+        res.render('dashboard', { pools: {}, users: results['users'], projects: results['projects'], datasets: results['datasets']});
     });
 
 });
@@ -138,13 +123,14 @@ router.post('/admin/upload', function(req, res, next) {
     
     var topicFileRows = '';
     var projectName = '';
+    var dataset = '';
     var rowCount = 0;
     var prop = ['num','title','desc','narr'];
     busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
         C.logger.info('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
         
         file.on('data', function(data) {
-            if(fieldname == 'topicFile'){
+            if(fieldname.startsWith('topicFile')){
                 topicFileRows +=data;
             }
             C.logger.info('Data with read data : file name :' + fieldname);
@@ -159,6 +145,9 @@ router.post('/admin/upload', function(req, res, next) {
        if(fieldname == 'project-name'){
          projectName = inspect(val) ? inspect(val).replace(/'/g,'') : inspect(val);
        } 
+       if(fieldname == 'dataset'){
+         dataset = inspect(val) ? inspect(val).replace(/'/g,'') : inspect(val);
+       } 
        C.logger.info('FieldName' , fieldname);
        C.logger.info('inspect(val)' , inspect(val));
     });
@@ -166,11 +155,12 @@ router.post('/admin/upload', function(req, res, next) {
         C.logger.info('Done parsing form!');
         async.waterfall([
            function(cb){
-            Project.create({"name":projectName},function(err, res){
+            Project.create({"name":projectName,"dataset":dataset},function(err, res){
                 cb(err);
             });
           },
           function(cb){
+            
             uploadTopicFile(topicFileRows, res, prop, cb);
           },
           function(cb){
@@ -209,10 +199,11 @@ router.post('/admin/assignmentsummary', function(req, res, next) {
 router.post('/admin/createpool', Tools.checkTrackIdExists, function(req, res, next){
     //res.status(200).send(hbs.handlebars.compile('<p>ECHO: {{message}}</p>'));
     C.logger.info('Admin create pool =',req.body);
+    C.logger.info('Admin create pool rowCount=',res.locals.rowCount);
     res.locals.runRoot = path.join(__dirname,res.locals.runRoot);
     var inputFileTempsRows =[];
-    var csvStream = csv({delimiter:"\t"});
     
+    const totalCount = res.locals.rowCount;
     async.waterfall([
         function(cb){
             fse.readdir(res.locals.runRoot, cb);
@@ -220,19 +211,19 @@ router.post('/admin/createpool', Tools.checkTrackIdExists, function(req, res, ne
         function(files, cb){
             
             var paths = files.map(function(file){ return path.join(res.locals.runRoot,file)});
-            var totalRowCount = res.locals.rowCount * paths.length;
-            async.forEachOf(paths, function(path, key){
+            paths.forEach(function(path, key){
                 
                 //async.each(stats, function(stat, cb){
                     //if(!stat.isDirectory()){
-                        const fileStream = fse.createReadStream(path,'UTF-8');
-                        C.logger.info('Delimiter',req.body.delimiter);
+                        const tempInputFileTempsRows = [];
+                        const csvStream = csv({delimiter:"\t"});
+                        const fileStream = fse.createReadStream(path,{encoding:'UTF-8', autoClose:true}).pipe(csvStream);
                         
-                        fileStream.pipe(csvStream);
-
+                        C.logger.info('Delimiter',req.body.delimiter);
                         var onData =function(row){
-                            inputFileTempsRows.push(row);
-                            if(inputFileTempsRows.length == totalRowCount){
+                            tempInputFileTempsRows.push(row);
+                            if(tempInputFileTempsRows.length == totalCount){
+                                inputFileTempsRows = inputFileTempsRows.concat(tempInputFileTempsRows);
                                 csvStream.emit('doneParsing');
                             }
                         }
@@ -240,17 +231,17 @@ router.post('/admin/createpool', Tools.checkTrackIdExists, function(req, res, ne
                         csvStream.on("data", onData);
                         csvStream.on("end", function(){
                             C.logger.info('End');
-                            if(key +1 == paths.length){
+                           /*  if(key +1 == paths.length){
                                 C.logger.info('End2');
                                 cb(null, inputFileTempsRows)
-                            }
+                            } */
                         })
                         csvStream.on('error', cb);
                         //custom event
                         csvStream.on('doneParsing', function(){
                             
                             C.logger.info('got '+req.body.rowCount+' rows', inputFileTempsRows);
-                            fileStream.close();
+                           /*  fileStream.close(); */
                             csvStream.removeListener('data', onData);
                             if(key +1 == paths.length){
                                 C.logger.info('doneParsing');
@@ -323,7 +314,7 @@ function postProcessSummary(assMap, aggResult) {
 }
 
 function uploadInputFile(recordsArray, projectName, cb) {
-    //Split with new line
+    
     var pool_array = [];
     recordsArray.forEach(el => {
         //C.logger.info(el);
@@ -359,7 +350,7 @@ function uploadInputFile(recordsArray, projectName, cb) {
 function uploadTopicFile (data, res, prop, cb){
         let m;
         var topics = [];
-        
+        //Split with new line
         prop.forEach(pel =>{
             var reg = buildRegex(pel);
             var count = -1;

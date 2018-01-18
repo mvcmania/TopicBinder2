@@ -30,12 +30,15 @@
     "express-messages": "*",
     "express-session": "*",
     "express-validator": "*",
+    "fast-csv": "^2.4.1",
+    "file": "^0.2.2",
     "fs": "0.0.1-security",
     "fs-extra": "^5.0.0",
     "handlebars-dateformat": "^1.0.1",
     "json2csv": "^3.11.5",
     "mongodb": "*",
     "mongoose": "*",
+    "no-gyp-xml-stream": "^1.0.3",
     "nodemailer": "^4.4.1",
     "nodemailer-express-handlebars": "^2.0.0",
     "passport": "*",
@@ -43,8 +46,7 @@
     "passport-local": "*",
     "path": "^0.12.7",
     "tracer": "^0.8.11",
-    "xml2js": "^0.4.19",
-    "fast-csv": "^2.4.1"
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "gulp": "^3.9.1",

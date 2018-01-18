@@ -1,3 +1,13 @@
+var confirmDataSet = function(el){
+    var val = el.checked;
+    if(val){
+        $('#create-pool-form .form-group').show();
+        $('#create-pool').show();
+    }else{
+        $('#create-pool-form .form-group').hide();
+        $('#create-pool').hide();
+    }
+}
 var createPoolSuccess = function(result){
     toggleOverLay('createpool-modal-content');
 
@@ -237,7 +247,10 @@ $(function() {
         //var inputFile = document.getElementById('input-file');
         //C.logger.info('files=',typeof(projectFile.files));
         //fd.append('projectFile', projectFile.files[0]);
-        fd.append('topicFile', topicFile.files[0]);
+        $.each(topicFile.files,(index,element) => {
+            fd.append('topicFile_'+index, element);
+        });
+        
         /* $.each(inputFile.files,function(index,elem){
             fd.append('inputFile_'+index, elem);
         }); */
@@ -287,6 +300,11 @@ $(function() {
             error: createPoolError
         });
     })
+    $('#createPoolModal').on('hide.bs.modal', function() {
+        var cnf = document.getElementById('confirm-dataset');
+        cnf.checked = false;
+        confirmDataSet(cnf);
+    });
     getTopicsSummary();
     searchableMake('summary-table', 'search-topic-id');
 });

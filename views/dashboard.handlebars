@@ -172,13 +172,21 @@
                                     <div class="form-group">
                                         <label for="input-file">Row Count</label>
                                         <input class="form-control" id="row-count" type="number" name="row-count" value="50"/>
-                                    </div>
+                                    </div> 
                                 </div>
                             </div> --}}
-                
+                            <div class="form-group">
+                                <label for="topic-file">Choose DataSet</label>
+                                <select required="true" class="form-control" id="dataset" value="" name="dataset">
+                                     <option value="">--None--</option>
+                                    {{#each datasets as |ds|}}
+                                        <option value="{{ds}}">{{ds}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
                             <div class="form-group">
                                 <label for="topic-file">Topic File input</label>
-                                <input class="form-control" id="topic-file"  type="file" name="topic-file" id="topic_file">
+                                <input multiple="true" class="form-control" id="topic-file"  type="file" name="topic-file" id="topic_file">
                             </div>
                             <button class="form-control btn-primary" type="submit" class="btn btn-primary">Create Track</button>
                         </form>

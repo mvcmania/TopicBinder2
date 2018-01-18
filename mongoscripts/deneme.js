@@ -1,31 +1,10 @@
-var tab='\u0009';
+var fse = require('fs-extra');
+var path = require('path');
+var datasetPath = path.join('../../resources','DATASETS');
 
-console.log(tab);
-
-var csv = require('fast-csv');
-var fs = require('fs');
-var fileStream = fs.createReadStream('../projects/turkishtrack/run/input.wdf1t10q');
-var inputFileTempsRows =[];
-var csvStream = csv({delimiter:tab});
-fileStream.pipe(csvStream);
-var onData =function(row){
-    inputFileTempsRows.push(row);
-    if(inputFileTempsRows.length == 30){
-        csvStream.emit('doneParsing');
-    }
-}
-    csvStream.on("data", onData);
-    csvStream.on("end", function(){
-        console.log("done");
-        console.log("Done Size = "+ inputFileTempsRows.length);
-    });
-    csvStream.on("doneParsing", function(){
-      
-        fileStream.close();
-        csvStream.removeListener('data', onData);
-        console.log('got 30 rows', inputFileTempsRows);
-    }); 
-
+fse.readdir(datasetPath, function(err, files){
+    console.log(files);
+});
 //var mongoose = require('mongoose');
 /* var bcrypt = require('bcryptjs');
 bcrypt.genSalt(10, function (err, salt) {

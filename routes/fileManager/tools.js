@@ -60,7 +60,7 @@ module.exports = {
     console.log('Tool project exist',req.body);
     if(req.body.project){
       res.locals.runRoot = '../../projects/'+ req.body.project+'/run';
-      if(req.body.rowCount){
+      if(!req.body.rowCount){
         res.locals.rowCount = 50;
       }else{
         res.locals.rowCount = req.body.rowCount;

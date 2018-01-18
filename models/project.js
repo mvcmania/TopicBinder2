@@ -5,6 +5,11 @@ var projectSchema = mongoose.Schema({
         default: null,
         required: true
     },
+    "dataset":{
+        type: String,
+        default : null,
+        required : true
+    },
     "createddate":{
         type:Date,
         default : Date.now

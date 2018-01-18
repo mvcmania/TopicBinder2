@@ -138,7 +138,7 @@ var  getDocumentDetail = function(doc, assignItem) {
     });
     var tempDoc = {};
     var split = doc.document_file.split('/');
-    C.logger.info('Doc= ', path.join(__dirname, '../../projects/' +assignItem.project+'/'+split[0]+ '/parsed/' + split[1]));
+    C.logger.info('Doc= ', path.join(__dirname, '../', doc.document_file));
     try{
         var data = fs.readFileSync(path.join(__dirname, '../../projects/' +assignItem.project+'/'+split[0]+ '/parsed/'+ split[1]));
         if (data) {
