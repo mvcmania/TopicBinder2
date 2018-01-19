@@ -14,13 +14,13 @@ var mongoose = require('mongoose');
 var helpers = require('./public/lib/helper');
 require('dotenv').config();
 
-var db = mongoose.connect(process.env.MONGODB_URI,{
-    useMongoClient : true,
+var db = mongoose.connect(process.env.MONGODB_URI, {
+    useMongoClient: true,
     promiseLibrary: require('bluebird')
 });
 global.C = {
-    logger: require('tracer').console({level: 'info'}),
-    datasetPath:'resources/DATASETS'
+    logger: require('tracer').console({ level: 'info' }),
+    datasetPath: 'resources/DATASETS'
 };
 
 var routes = require('./routes/index');
@@ -55,7 +55,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
     secret: process.env.SESSION_SECRET,
     saveUninitialized: true,
-    cookie :{maxAge:1800000},
+    cookie: { maxAge: 1800000 },
     resave: false
 }));
 
@@ -99,11 +99,11 @@ app.use('/', routes);
 /* app.use('/admin', admins);
 app.use('/member', members);*/
 
-app.use(function(req, res, next){
-  // the status option, or res.statusCode = 404
-  // are equivalent, however with the option we
-  // get the "status" local available as well
-  res.render('404', { status: 404, url: req.url });
+app.use(function(req, res, next) {
+    // the status option, or res.statusCode = 404
+    // are equivalent, however with the option we
+    // get the "status" local available as well
+    res.render('404', { status: 404, url: req.url });
 });
 
 

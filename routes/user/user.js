@@ -134,7 +134,6 @@ router.post('/member/update', function(req, res, next) {
 
 });
 var getDocumentDetail = function(doc, assignItem) {
-
     var tempDoc = {};
     var split = doc.document_file.split('/');
     C.logger.info('Doc= ', path.join(__dirname, '../', doc.document_file));

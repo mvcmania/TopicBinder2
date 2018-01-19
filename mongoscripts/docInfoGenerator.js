@@ -14,6 +14,7 @@ var documentInfoCsv =path.join('../resources/DATASETS',process.argv[2],'document
 var reg = new RegExp('<DOCNO>(.*)<\\/DOCNO>', 'g');
 
 const writeStream = fse.createWriteStream(documentInfoCsv, {encoding:'UTF-8', autoClose: true});
+writeStream.write("DOCUMENTNO,PATH"+"\n");
 
 var readDocumentInfo = function(fPath, cb){
   fse.readFile(fPath, function(err, data) {

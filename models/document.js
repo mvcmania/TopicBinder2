@@ -9,8 +9,19 @@ var docSchema = mongoose.Schema({
         type: String,
         default: null,
         required: false
+    },
+    "project":{
+        type: String,
+        require: true
+    },
+    "unique_id":{
+        type: String,
+        unique: true
     }
 }, { collection: "dokumanlar" });
+docSchema.path('unique_id').get(function(value) {
+    return this.document_no+'_'+this.project;
+});
 var Docs = module.exports = mongoose.model("dokumanlar", docSchema);
 
 module.exports.getDocById = function(docid, callback){
