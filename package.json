@@ -1,61 +1,59 @@
 {
-  "name": "topicbinder",
-  "version": "1.0.0",
-  "description": "bind topic to the docs",
-  "main": "app.js",
-  "engines": {
-    "npm": "3.10.10",
-    "node": "6.9.5"
-  },
-  "scripts": {
-    "start": "node app.js"
-  },
-  "author": "",
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:mvcmania/topicbinder.git"
-  },
-  "license": "ISC",
-  "dependencies": {
-    "async": "^2.6.0",
-    "bcryptjs": "*",
-    "body-parser": "*",
-    "busboy": "^0.2.14",
-    "connect-flash": "*",
-    "cookie-parser": "^1.4.1",
-    "dateformat": "^3.0.2",
-    "dotenv": "^4.0.0",
-    "express": "*",
-    "express-handlebars": "*",
-    "express-messages": "*",
-    "express-session": "*",
-    "express-validator": "*",
-    "fast-csv": "^2.4.1",
-    "file": "^0.2.2",
-    "fs": "0.0.1-security",
-    "fs-extra": "^5.0.0",
-    "handlebars-dateformat": "^1.0.1",
-    "json2csv": "^3.11.5",
-    "mongodb": "*",
-    "mongoose": "*",
-    "no-gyp-xml-stream": "^1.0.3",
-    "nodemailer": "^4.4.1",
-    "nodemailer-express-handlebars": "^2.0.0",
-    "passport": "*",
-    "passport-http": "*",
-    "passport-local": "*",
-    "path": "^0.12.7",
-    "tracer": "^0.8.11",
-    "xml2js": "^0.4.19"
-  },
-  "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-compile-handlebars": "^0.6.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-declare": "^0.3.0",
-    "gulp-define-module": "^0.1.5",
-    "gulp-handlebars": "^4.0.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-wrap": "^0.13.0"
-  }
+    "name": "topicbinder",
+    "version": "1.0.0",
+    "description": "bind topic to the docs",
+    "main": "app.js",
+    "engines": {
+        "npm": "3.10.10",
+        "node": "6.9.5"
+    },
+    "scripts": {
+        "start": "node app.js"
+    },
+    "author": "",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:mvcmania/topicbinder.git"
+    },
+    "license": "ISC",
+    "dependencies": {
+        "async": "^2.6.0",
+        "bcryptjs": "*",
+        "body-parser": "*",
+        "busboy": "^0.2.14",
+        "connect-flash": "*",
+        "cookie-parser": "^1.4.1",
+        "dateformat": "^3.0.2",
+        "dotenv": "^4.0.0",
+        "express": "*",
+        "express-handlebars": "*",
+        "express-messages": "*",
+        "express-session": "*",
+        "express-validator": "*",
+        "fast-csv": "^2.4.1",
+        "file": "^0.2.2",
+        "fs": "0.0.1-security",
+        "fs-extra": "^5.0.0",
+        "handlebars-dateformat": "^1.0.1",
+        "json2csv": "^3.11.5",
+        "mongodb": "*",
+        "mongoose": "*",
+        "nodemailer": "^4.4.1",
+        "nodemailer-express-handlebars": "^2.0.0",
+        "passport": "*",
+        "passport-http": "*",
+        "passport-local": "*",
+        "path": "^0.12.7",
+        "tracer": "^0.8.11"
+    },
+    "devDependencies": {
+        "gulp": "^3.9.1",
+        "gulp-compile-handlebars": "^0.6.1",
+        "gulp-concat": "^2.6.1",
+        "gulp-declare": "^0.3.0",
+        "gulp-define-module": "^0.1.5",
+        "gulp-handlebars": "^4.0.0",
+        "gulp-rename": "^1.2.2",
+        "gulp-wrap": "^0.13.0"
+    }
 }
