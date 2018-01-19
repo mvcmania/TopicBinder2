@@ -26,7 +26,7 @@ var readDocumentInfo = function(fPath, cb){
             if (m.index === reg.lastIndex) {
                 reg.lastIndex++;
             }
-            if(m[1])writeStream.write(m[1].trim() + ',' + path.dirname(fPath) + '\n');
+            if(m[1])writeStream.write(m[1].trim() + ',' + path.basename(fPath) + '\n');
             //tempDoc['DOCNO'] = m[1];
         }
         cb(null);
