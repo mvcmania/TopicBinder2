@@ -3,7 +3,7 @@ if(!process.argv[2]){
   console.log('Please speficy the folder name in dataset!');
   return false;
 }
-console.log(process.argv[0],' started to be parsed!');
+console.log(process.argv[2],' started to be parsed!');
 var path = require('path');
 var fse= require('fs-extra');
 var async  = require('async');
@@ -18,7 +18,6 @@ writeStream.write("DOCUMENTNO,PATH"+"\n");
 
 var readDocumentInfo = function(fPath, cb){
   fse.readFile(fPath, function(err, data) {
-      console.log(fPath);
       if(!err){
         const ff = path.basename(fPath);
         while ((m = reg.exec(data)) !== null) {
@@ -26,7 +25,7 @@ var readDocumentInfo = function(fPath, cb){
             if (m.index === reg.lastIndex) {
                 reg.lastIndex++;
             }
-            if(m[1])writeStream.write(m[1].trim() + ',' + path.basename(fPath) + '\n');
+            if(m[1])writeStream.write(m[1].trim() + ',' +fPath + '\n');
             //tempDoc['DOCNO'] = m[1];
         }
         cb(null);

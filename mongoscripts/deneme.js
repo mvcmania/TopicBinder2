@@ -1,5 +1,6 @@
-/* var fse = require('fs-extra');
+ var fse = require('fs-extra');
 var path = require('path');
+/*
 var csv = require('fast-csv');
 var ids =["FT944-32","FT944-26"];
 
@@ -15,7 +16,7 @@ fse.createReadStream('../resources/DATASETS/TREC5/documents.csv',{autoClose:true
     }
 }); */
 
-var DOCUMENT = require('../models/document.js');
+/* var DOCUMENT = require('../models/document.js');
 
 var docs = [];
 docs.push(new DOCUMENT({
@@ -26,4 +27,6 @@ docs.push(new DOCUMENT({
 
 docs.forEach(element => {
     console.log(element.unique_id);
-});
+}); */
+
+console.log(path.join(__filename,'models','resources','DATASETS'));
