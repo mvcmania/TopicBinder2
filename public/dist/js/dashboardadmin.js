@@ -1,3 +1,27 @@
+var sseClient = function(){
+    if (!!window.EventSource) {
+        var source = new EventSource('admin/stream');
+        source.addEventListener('message', function(e) {
+            var msg  = e.data;
+            $('#main-alert').html(
+                Handlebars.templates.alert({
+                    info :msg
+                })
+            );
+          }, false);
+        source.addEventListener('open', function(e) {
+             console.info('Connectted');
+        }, false);
+        source.addEventListener('error', function(e) {
+            if (e.target.readyState == EventSource.CLOSED) {
+                console.info('Disconnected');
+            }
+            else if (e.target.readyState == EventSource.CONNECTING) {
+                console.info('Reconnecting...');
+            }
+        }, false);
+    }
+}
 var confirmDataSet = function(el){
     var val = el.checked;
     if(val){
@@ -10,8 +34,6 @@ var confirmDataSet = function(el){
 }
 var createPoolSuccess = function(result){
     toggleOverLay('createpool-modal-content');
-
-    $('#create-pool').popover('destroy');
     $('#createPoolModal').modal('hide');
     //var msg = prepareMessage('Error Occured!', 'Something Wrong' + JSON.stringify(err));
     $('#createPoolModal  div[role=message]').html(
@@ -33,19 +55,33 @@ var createPoolError = function(err){
     
 }
 var confirm = function(el){
-    $(el).popover('toggle');
+    $.confirm({
+        title : "Confirm!",
+        content : "You are about to create pool, please confirm once again!",
+        buttons :{
+            confirm :{ 
+                text:"CONFIRM",
+                btnClass: 'btn-warning',
+                action :function(){
+                    $('#create-pool-form').submit();
+                }
+            },
+            cancel :{
+                text:"CANCEL"
+            }
+        },
+        theme :"bootstrap",
+        type:"orange",
+        backgroundDismiss: function(){
+            return false; // modal wont close.
+        },
+
+    });
 }
 var launchCreatePoolModal = function(el){
     $('#createPoolModal #project-home').text(getProjectID());
     $('#createPoolModal').modal(modalOptions);
-    var content = Handlebars.templates.createpoolconfirm({});
-    $('#create-pool').popover({
-        placement :'top',
-        html: true,
-        title:'Please confirm <a href="#" class="close cancel" data-dismiss="alert">&times',
-        content: content,
-        trigger: 'manual'
-    });
+
 }
 var launchAssignModal = function(el) {
     $('#assignModal [role=assign-modal-title]').html('Topic Assignment for <strong>' + el.dataset.topicid + '</strong>');
@@ -84,7 +120,7 @@ var postAssignmentSuccess = function(data) {
 }
 var postAssignmentError = function(err) {
     toggleOverLay('assign-modal-content');
-    C.logger.info(err);
+    console.info(err);
     var msg = prepareMessage('Error!', err.responseJSON.message);
     $('#assignModal div[role=detail-modal]  div[role=message]').html(
         Handlebars.templates.error({
@@ -208,14 +244,6 @@ var getTopicsSummary = function() {
         error: getTopicSummaryError
     });
 }
-var selectFolder = function(e) {
-   /*  for (var i = 0; i < e.target.files.length; i++) {
-       var s = e.target.files[i].name + '\n';
-       s += e.target.files[i].size + ' Bytes\n';
-       s += e.target.files[i].type;
-       //alert(s);
-    } */
- }
 $(function() {
     $('#assignment-form').submit(function(e) {
         e.preventDefault();
@@ -245,15 +273,12 @@ $(function() {
         //var projectFile = document.getElementById('project-file');
         var topicFile = document.getElementById('topic-file');
         //var inputFile = document.getElementById('input-file');
-        //C.logger.info('files=',typeof(projectFile.files));
+        
         //fd.append('projectFile', projectFile.files[0]);
         $.each(topicFile.files,(index,element) => {
             fd.append('topicFile_'+index, element);
         });
         
-        /* $.each(inputFile.files,function(index,elem){
-            fd.append('inputFile_'+index, elem);
-        }); */
         
         $.ajax({
             url: actionurl,
@@ -284,9 +309,55 @@ $(function() {
      $('button[role=pool]').click(function(){
         launchCreatePoolModal();
     });
+    $('button[role=clean]').click(function(){
+        $.confirm({
+            theme:"bootstrap",
+            title:"CONFIRM TRACK CLEAN",
+                    content:"The track will be deleted along with all related pool, assignment, document items. Please confirm to proceed!",
+            backgroundDismiss : function(){
+                return false
+            },
+            buttons:{
+                confirm :{
+                    text :"CLEAN",
+                    btnClass :"btn-danger",
+                    action : function(){
+                        toggleOverLay('topic-summary-box');
+                        var pid = getProjectID();
+                        $.ajax({
+                            url :"admin/"+pid,
+                            type :"DELETE",
+                            success : function(res){
+                                toggleOverLay('topic-summary-box');
+                                $('#main-alert').html(
+                                    Handlebars.templates.alert({
+                                        success : JSON.stringify(res)
+                                    })
+                                );
+                                window.location.reload();
+                            },
+                            error : function(err){
+                                toggleOverLay('topic-summary-box');
+                                $('#main-alert').html(
+                                    Handlebars.templates.alert({
+                                        error : JSON.stringify(err)
+                                    })
+                                );
+                            }
+
+                        });
+                    }  
+                },
+                cancel : {
+                   text :'CANCEL',
+                   action: function(){}
+                }
+
+            }
+        });
+    });
     $('#create-pool-form').submit(function(e){
         e.preventDefault();
-        $('#create-pool').popover('hide');
         toggleOverLay('createpool-modal-content');
         var projectid = getProjectID();
         var fd =  $(e.currentTarget).serializeArray();
@@ -307,4 +378,5 @@ $(function() {
     });
     getTopicsSummary();
     searchableMake('summary-table', 'search-topic-id');
+    sseClient();
 });

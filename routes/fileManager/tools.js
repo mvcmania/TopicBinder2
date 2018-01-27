@@ -59,15 +59,31 @@ module.exports = {
   checkTrackIdExists: function(req, res, next){
     console.log('Tool project exist',req.body);
     if(req.body.project){
-      res.locals.runRoot = '../../projects/'+ req.body.project+'/run';
-      if(!req.body.rowCount){
-        res.locals.rowCount = 50;
-      }else{
-        res.locals.rowCount = req.body.rowCount;
-      }
+      res.locals.runRoot = path.join(__dirname, '../../','projects',req.body.project,'run');
+      console.log(res.locals.runRoot);
+      //res.status(400).send('Track id not exist!'); 
+      fs.readdir(res.locals.runRoot ,(err, files)=>{
+          if(err || files.length ==0){
+            res.status(400).send('Make sure the project directory exists and has input on run path!'); 
+          }else{
+            if(!req.body.rowCount){
+              res.locals.rowCount = 50;
+            }else{
+              res.locals.rowCount = req.body.rowCount;
+            }
+            next();
+          }
+      });
+      
+    }else{
+      res.status(400).send('Track id not exist!'); 
+    }
+  },
+  checkProjectId : function(req, res, next){
+    if(req.params.projectid){
       next();
     }else{
-      res.status(404).send('Track id not exist!'); 
+      res.sendError("Project id is required!",{ data: null});
     }
   }
 

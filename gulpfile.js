@@ -34,7 +34,7 @@ gulp.task('default', function() {
   gulp.start('server');
 
   gulp.watch(['./app.js', './models/*.js','./routes/**/*.js','./routes/*.js'],['templates','server']);
-  gulp.watch(['public/build/hb/templates/*.handlebars'], ['templates']);
+  gulp.watch(['public/build/hb/templates/*.handlebars','views/partials/alert.handlebars'], ['copy','templates']);
   // Need to watch for sass changes too? Just add another watch call!
   // no more messing around with grunt-concurrent or the like. Gulp is
   // async by default.
@@ -52,6 +52,9 @@ gulp.task('templates', function(){
     .pipe(concat('templates.js'))
     .pipe(gulp.dest('public/vendor/hb/templates/'));*/
 });
+gulp.task('copy', function(){
+  gulp.src('views/partials/alert.handlebars').pipe(gulp.dest('public/build/hb/templates/'));
+})
 // clean up if an error goes unhandled.
 process.on('exit', function() {
     if (node) node.kill()

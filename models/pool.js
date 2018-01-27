@@ -39,6 +39,9 @@ var poolSchema = mongoose.Schema({
         default: null,
         unique : true
     },
+    "docno_projectid":{
+        type: String
+    },
     "createddate":{
         type:Date,
         default : Date.now
@@ -173,9 +176,9 @@ module.exports.getTopicsSummary = function(projectid,callback) {
                      $cond:[{$eq:["$inProgressCount","$count"]},
                          "bg-green",
                           {
-                            $cond:[{ $or:[{$eq:["$notStartedCount","$count"]},{$eq:["$remains","$count"]}]},
+                            $cond:[{$eq:["$remains","$count"]},
                               "bg-red",
-                              "bg-yellow"
+                              "bg-yellow"// $or:[{$eq:["$notStartedCount","$count"]},{
                            ]
                           }
                      ]

@@ -1,5 +1,8 @@
  var fse = require('fs-extra');
 var path = require('path');
+var encoder = require('turkish-char-encoding');
+var str = encoder('iso-8859-9').toUTF8('ÖöÇçŞşİıĞğÜü');
+console.log(str);
 /*
 var csv = require('fast-csv');
 var ids =["FT944-32","FT944-26"];

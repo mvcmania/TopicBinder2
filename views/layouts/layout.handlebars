@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="304workaround" content="2013-10-24 21:17:23">
+  <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-9">
+  <meta HTTP-EQUIV="Content-language" CONTENT="tr">
   {{> favicon}}
   <title>TOPIC BINDER | Dashboard</title>
   <!-- Tell the browser to be responsive to screen width -->
@@ -74,26 +76,8 @@
                   {{/if}}
                 </p>
               </li>
-              <!-- Menu Body -->
-              <!--<li class="user-body">
-                <div class="row">
-                  <div class="col-xs-4 text-center">
-                    <a href="#">Followers</a>
-                  </div>
-                  <div class="col-xs-4 text-center">
-                    <a href="#">Sales</a>
-                  </div>
-                  <div class="col-xs-4 text-center">
-                    <a href="#">Friends</a>
-                  </div>
-                </div>
-               
-              </li>-->
               <!-- Menu Footer-->
               <li class="user-footer">
-                {{!-- <div class="pull-left">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                </div> --}}
                 <div class="pull-right">
                   <a href="/users/logout" class="btn btn-default btn-flat">Sign out</a>
                 </div>
@@ -121,27 +105,17 @@
           <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
         </div>
       </div>
-      <!-- search form -->
-      {{!-- <form action="#" method="get" class="sidebar-form">
-        <div class="input-group">
-          <input type="text" name="q" class="form-control" placeholder="Search...">
-              <span class="input-group-btn">
-                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                </button>
-              </span>
-        </div>
-      </form> --}}
-      <!-- /.search form -->
-      <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu">
         <li class="header">MAIN NAVIGATION</li>
         <li class="active">
           <a href="/">
             <i class="fa fa-dashboard"></i> <span>Dashboard</span>
-           {{!--  <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span> --}}
           </a>
+          {{#if user.isadmin}}
+          <a href="/usermanagement">
+            <i class="fa fa-user"></i> <span>User Management</span>
+          </a>
+          {{/if}}
         </li>
       </ul>
     </section>

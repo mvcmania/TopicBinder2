@@ -12,6 +12,8 @@ var LocalStrategy = require('passport-local').Strategy;
 //var mongo = require('mongodb');
 var mongoose = require('mongoose');
 var helpers = require('./public/lib/helper');
+var sse =  require('./sse');
+var exc =  require('./exception');
 require('dotenv').config();
 
 var db = mongoose.connect(process.env.MONGODB_URI, {
@@ -20,7 +22,8 @@ var db = mongoose.connect(process.env.MONGODB_URI, {
 });
 global.C = {
     logger: require('tracer').console({ level: 'info' }),
-    datasetPath: 'resources/DATASETS'
+    datasetPath: 'resources/DATASETS',
+    projectsPath : 'projects/'
 };
 
 var routes = require('./routes/index');
@@ -82,7 +85,10 @@ app.use(expressValidator({
 
 //connect flash
 app.use(flash());
-
+//SSE
+app.use(sse);
+//exception middleware
+app.use(exc);
 // Global Vars
 app.use(function(req, res, next) {
     res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');

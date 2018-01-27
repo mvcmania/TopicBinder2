@@ -12,7 +12,7 @@ var docSchema = mongoose.Schema({
     },
     "project":{
         type: String,
-        require: true
+        required : true
     },
     "unique_id":{
         type: String,

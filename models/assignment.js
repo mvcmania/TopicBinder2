@@ -241,11 +241,24 @@ module.exports.getAssignmentById = function(assignment_id, callback) {
                 "as": "doc"
             }
         },
+        {
+            $lookup:{
+                "from": "projeler",
+                "localField": "project",
+                "foreignField": "name",
+                "as": "proj"
+            }
+        },
          { 
             $unwind: {
                 path : "$doc",
                 includeArrayIndex :"0",
                 preserveNullAndEmptyArrays : true
+            }
+        },
+        { 
+            $unwind: {
+                path : "$proj"
             }
         },
         {
@@ -271,6 +284,12 @@ module.exports.getAssignmentById = function(assignment_id, callback) {
                     "title": "$topic.title",
                     "description": "$topic.description",
                     "narrative": "$topic.narrative"
+                },
+                "project":{
+                    "name":"$proj.name",
+                    "dataset":"$proj.dataset",
+                    "docno_tag":"$proj.docno_tag",
+                    "text_tag":"$proj.text_tag"
                 },
                 "document": {
                     "_id": "$doc._id",

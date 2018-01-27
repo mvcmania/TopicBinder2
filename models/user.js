@@ -29,6 +29,10 @@ var userSchema = mongoose.Schema({
     reset_password_expires:{
         type: Date
     },
+    isactive:{
+        type: Boolean,
+        default :true
+    },
     avatar:{
         type:String
     }
@@ -66,7 +70,8 @@ module.exports.createUser = function (newUser, callback) {
 } */
 module.exports.getUserByUserName = function (username, callback) {
     var query = {
-        username: username
+        username: username,
+        isactive :true
     };
     User.findOne(query, callback);
 }
@@ -81,7 +86,14 @@ module.exports.comparePassword = function (candidatePassword, hash, callback) {
 }
 module.exports.pullNonAdmins = function (callback) {
     var query = {
+        isadmin: false,
+        isactive :true
+    };
+    User.find(query, callback).sort({ username : 1});
+}
+module.exports.pullNonAdminsAll = function (callback) {
+    var query = {
         isadmin: false
     };
-    User.find(query, callback);
+    User.find(query, callback).sort({ username : 1});
 }

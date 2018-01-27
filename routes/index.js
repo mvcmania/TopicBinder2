@@ -21,6 +21,10 @@ router.get('/', ensureAuthenticated, function(req, res,next){
   req.routeStrategy = req.user.isadmin ? AdminRouteStrategy : UserRouteStrategy
   req.routeStrategy.home(req,res,next);
 });
+router.get('/usermanagement', ensureAuthenticated, function(req, res,next){
+  req.routeStrategy = req.user.isadmin ? AdminRouteStrategy : UserRouteStrategy
+  req.routeStrategy.home(req,res,next);
+});
 router.post('/', ensureAuthenticated, function(req, res,next){
   req.routeStrategy = req.user.isadmin ? AdminRouteStrategy : UserRouteStrategy
   req.routeStrategy.home(req,res,next);

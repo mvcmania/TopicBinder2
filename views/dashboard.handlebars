@@ -1,3 +1,6 @@
+{{#section 'css'}}
+ <link rel="stylesheet" href="/dist/css/jquery-confirm.min.css">
+{{/section}}
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1>
@@ -5,7 +8,7 @@
         <small>Control panel</small>
     </h1>
     <ol class="breadcrumb">
-        <li><a href="dashboard"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
         <li class="active">Dashboard</li>
     </ol>
 </section>
@@ -24,7 +27,7 @@
                 <div class="icon">
                     <i class="ion ion-person-stalker"></i>
                 </div>
-                <a href="dashboard" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="usermanagement" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
         <!-- ./col -->
@@ -38,7 +41,7 @@
                 <div class="icon">
                     <i class="ion ion-ios-checkmark-outline"></i>
                 </div>
-                <a href="dashboard" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="/" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
         <!-- ./col -->
@@ -53,7 +56,7 @@
                 <div class="icon">
                     <i class="ion ion-load-a"></i>
                 </div>
-                <a href="dashboard" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="/" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
         <!-- ./col -->
@@ -68,7 +71,7 @@
                 <div class="icon">
                     <i class="ion ion-alert"></i>
                 </div>
-                <a href="dashboard" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="/" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
     </div>
@@ -76,6 +79,8 @@
     <div class="row">
         <div class="col-sm-12 col-md-12">
             {{> fileManager}}
+            {{> alert}}
+            <div id="main-alert"></div>
         </div>
         <div class="col-sm-12 col-md-6">
             <div class="box box-primary" id="topic-summary-box">
@@ -108,7 +113,7 @@
                         <button type="button" onclick="getTopicsSummary()" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
                         <div class="pull-right">
                            
-                            <form action="/admin/exportqrel" method="GET" >
+                            <form action="/admin/exportqrel" method="GET" style="display: inline-block">
                             <input type="hidden" name="project" id="project-to-export" value="{{pool.project}}"/>
                                 <div class="btn-group" id="export-form" style="display:none;">
                                     <button type="submit" role="export" class="btn btn-xs btn-flat btn-warning"><i class="fa fa-file-text-o"></i>
@@ -120,7 +125,16 @@
                                         Create Pool
                                     </button>
                                 </div>
-                                </form>
+                              </form>
+                              {{#gt projects.length 0}}
+                                <div class="btn-group" id="delete-form">
+                                        
+                                        <button type="button" role="clean" class="btn btn-xs btn-flat btn-danger"><i class="fa fa-trash"></i>
+                                            Clean Track
+                                        </button>
+                                </div>
+                                {{/gt}}
+                               
                             
                         </div>
                         <!-- /.pull-right -->
@@ -185,9 +199,20 @@
                                 </select>
                             </div>
                             <div class="form-group">
+                                <label for="project-file">DOCNO TAG</label>
+                                <input type="text" class="form-control" name="docno-tag" id="docno_tag"  placeholder="default : DOCNO"/>
+                                <p class="help-block">Please specify the tag which indicates the DOCNO in document files.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="project-file">TEXT TAG</label>
+                                <input type="text" class="form-control" name="text-tag" id="text_tag"  placeholder="default : TEXT"/>
+                                <p class="help-block">Please specify the tag which indicates the TEXT in document files.</p>
+                            </div>
+                            <div class="form-group">
                                 <label for="topic-file">Topic File input</label>
                                 <input multiple="true" class="form-control" id="topic-file"  type="file" name="topic-file" id="topic_file">
                             </div>
+                            
                             <button class="form-control btn-primary" type="submit" class="btn btn-primary">Create Track</button>
                         </form>
                     </div>
@@ -217,4 +242,5 @@
 <script src="//cdn.bootcss.com/angular.js/1.4.5/angular.min.js"></script>
 <script src="/dist/js/angular-file.js"></script>
 <script src="/dist/js/fileManagerApp.js"></script>
+<script src="/dist/js/jquery-confirm.min.js"></script>
 {{/section}}

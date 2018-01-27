@@ -8,49 +8,65 @@ var Assign = require('../../models/assignment');
 var Doc = require('../../models/document');
 var fs = require('fs');
 var path = require('path');
+var es = require('event-stream');
+var Iconv  = require('iconv-lite');
 
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
     async.waterfall([
-            function(next) {
-                Assign.getDistinctValues(req.user._id, 'project', function(err, res2) {
+            function (next) {
+                Assign.getDistinctValues(req.user._id, 'project', function (err, res2) {
                     var result = {
                         projects: res2,
-                        relations: [
-                            { label: "Not Related", value: 0, selected: false },
-                            { label: "Related", value: 1, selected: false },
-                            { label: "Not Started", value: 2, selected: true }
+                        relations: [{
+                                label: "Not Related",
+                                value: 0,
+                                selected: false
+                            },
+                            {
+                                label: "Related",
+                                value: 1,
+                                selected: false
+                            },
+                            {
+                                label: "Not Started",
+                                value: 2,
+                                selected: true
+                            }
                         ]
                     };
                     next(null, result);
                 });
             }
         ],
-        function(err, result) {
+        function (err, result) {
             //C.logger.info('summary', result.summary);
             res.render('userdashboard', result);
         });
 
 });
-router.get('/member/assignmentsummary', function(req, res, next) {
+router.get('/member/assignmentsummary', function (req, res, next) {
     C.logger.info('user assignment', req.user._id);
     var projectid = req.query.projectid;
     var relation = req.query.relation ? req.query.relation : 0;
     if (projectid) {
         async.waterfall([
-            function(next) {
-                var returnResult = { 'assignments': null, 'summary': null };
-                Assign.getSpecificUserAssignmentSummary(req.user._id, projectid, relation, function(err, res1) {
+            function (next) {
+                var returnResult = {
+                    'assignments': null,
+                    'summary': null
+                };
+                Assign.getSpecificUserAssignmentSummary(req.user._id, projectid, relation, function (err, res1) {
                     returnResult.assignments = res1;
                     next(null, returnResult);
                 });
             },
-            function(returnResult, next) {
-                Assign.getUserAssignmentSummary(req.user._id, projectid, function(err, res2) {
+            function (returnResult, next) {
+                Assign.getUserAssignmentSummary(req.user._id, projectid, function (err, res2) {
                     returnResult.summary = res2;
                     next(null, returnResult);
                 });
             }
-        ], function(err, res3) {
+        ], function (err, res3) {
             res.status(200).send(res3);
         });
     } else {
@@ -61,37 +77,44 @@ router.get('/member/assignmentsummary', function(req, res, next) {
     }
 
 });
-router.get('/member/topic', function(req, res, next) {
-    C.logger.info(req.query.assignmentid);
-    Assign.getAssignmentById(req.query.assignmentid, function(err, doc) {
-        if (err) {
-            res.status(400).send({
-                status: 400,
-                data: err,
-                message: "Error while retriving!"
-            });
-        } else {
-            C.logger.info('document id= ', doc);
-            var returnData = {
-                "document": null,
-                "topic": doc[0].topic,
-                "assign": doc[0].assignment
-            };
-            if (doc[0].document && doc[0].document.document_file) {
-                var tempDoc = getDocumentDetail(doc[0].document, doc[0].assignment);
-                C.logger.info('Temp Obj = ', tempDoc);
-                returnData['document'] = tempDoc;
+router.get('/member/topic', function (req, res, next) {
+    try {
+        C.logger.info(req.query.assignmentid);
+        Assign.getAssignmentById(req.query.assignmentid, function (err, doc) {
+            if (err) {
+                res.status(400).send({
+                    status: 400,
+                    data: err,
+                    message: "Error while retriving!"
+                });
+            } else {
+                C.logger.info('document id= ', doc);
+                var returnData = {
+                    "document": null,
+                    "topic": doc[0].topic,
+                    "assign": doc[0].assignment
+                };
+                /* getDocumentDetail */getDocumentDetailStream(doc[0], function(err, tempDoc){
+                    C.logger.info('Temp Obj = ', tempDoc);
+                    C.logger.info('err = ', err);
+                    returnData['document'] = tempDoc;
+                    res.status(200).send({
+                        status: 200,
+                        data: returnData,
+                        message: "Topic successfully retrived!"
+                    });
+                    
+                });
+               
             }
-            C.logger.info(returnData);
-            res.status(200).send({
-                status: 200,
-                data: returnData,
-                message: "Topic successfully retrived!"
-            });
-        }
-    });
+        });
+    } catch (exp) {
+        res.sendError("Unexpected error occured!", {
+            data: null
+        });
+    }
 });
-router.post('/member/update', function(req, res, next) {
+router.post('/member/update', function (req, res, next) {
     C.logger.info('BODY');
     C.logger.info(req.body);
     var status = 200,
@@ -100,8 +123,8 @@ router.post('/member/update', function(req, res, next) {
 
     if (req.body.assignment_id) {
         async.parallel({
-            update: function(next) {
-                Assign.updateRelation(req.body.assignment_id, req.body.is_related, function(err, doc) {
+            update: function (next) {
+                Assign.updateRelation(req.body.assignment_id, req.body.is_related, function (err, doc) {
                     if (err) {
                         next(err, null);
                     } else {
@@ -109,7 +132,7 @@ router.post('/member/update', function(req, res, next) {
                     }
                 });
             }
-        }, function(err, results) {
+        }, function (err, results) {
             if (err) {
                 res.status(400).send({
                     data: err,
@@ -133,18 +156,23 @@ router.post('/member/update', function(req, res, next) {
 
 
 });
-var getDocumentDetail = function(doc, assignItem) {
-    var tempDoc = {};
-    var split = doc.document_file.split('/');
-    C.logger.info('Doc= ', path.join(__dirname, '../', doc.document_file));
-    try {
-        var data = fs.readFileSync(path.join(__dirname, '../../projects/' + assignItem.project + '/' + split[0] + '/parsed/' + split[1]));
-        if (data) {
+var getDocumentDetail = function (doc, cb) {
+    
+    if(!doc.document || !doc.document.document_file || !doc.assignment){
+        return cb('Record has not found', null);
+        
+    }
+    console.log(path.join(__dirname,'../',doc.document.document_file));
+    fs.readFile(path.join(__dirname,'../',doc.document.document_file),function(err, data){
+        if (err) {
+            return  cb(err, null);
+        }else{
+            const tempDoc = {};
             /* var newData ='<ROOT>'+data+'</ROOT>';
             C.logger.info('DATAA'+newData); */
             tempDoc['TEXT'] = '';
-            tempDoc['DOCNO'] = assignItem.document_no.length > 0 ? assignItem.document_no[0] : '';
-            var reg = buildRegex(doc.document_no);
+            tempDoc['DOCNO'] = doc.assignment.document_no.length > 0 ? doc.assignment.document_no[0] : '';
+            var reg = buildRegex(doc.document.document_no, doc.project);
             while ((m = reg.exec(data)) !== null) {
                 // This is necessary to avoid infinite loops with zero-width matches
                 if (m.index === reg.lastIndex) {
@@ -153,18 +181,49 @@ var getDocumentDetail = function(doc, assignItem) {
                 tempDoc['TEXT'] = m[2];
                 //tempDoc['DOCNO'] = m[1];
             }
-            return tempDoc;
-        } else {
-            return {};
+            return cb(null, tempDoc);
         }
-    } catch (err) {
-        return {};
-    }
-    return tempDoc;
+    });
 }
+var getDocumentDetailStream = function (doc, cb) {
+    
+    if(!doc.document || !doc.document.document_file || !doc.assignment){
+        return cb('Record has not found', null);
+        
+    }
+    var reg = buildRegex(doc.document.document_no, doc.project);
+    console.log(path.join(__dirname,'../',doc.document.document_file));
+    const tempDoc = {};
+    tempDoc['TEXT'] = '';
+    tempDoc['DOCNO'] = doc.assignment.document_no.length > 0 ? doc.assignment.document_no[0] : '';
+    var strm = fs.createReadStream(path.join(__dirname,'../',doc.document.document_file))
+        .pipe(Iconv.decodeStream('win1254'))
+        .pipe(es.split('</DOC>'))
+        .pipe(es.mapSync(function(line){
+            strm.pause();
+            var newLine = line +'</DOC>';
+            while ((m = reg.exec(newLine)) !== null) {
+                
+                // This is necessary to avoid infinite loops with zero-width matches
+                if (m.index === reg.lastIndex) {
+                    reg.lastIndex++;
+                }
+                tempDoc['TEXT'] = m[2];
+                
+                strm.end();
+             }
+             strm.resume();
+        }))
+        .on('error', function(err){
+            return cb(err, null);
+        })
+        .on('end', function(){
+            return cb(null, tempDoc);
+        });
+}
+function buildRegex(docno, prj) {
 
-function buildRegex(docno) {
-    var tempRegex = '<DOC>\\n<DOCNO>(\\s' + docno + '\\s)<\\/DOCNO>[\\s\\S]*?<TEXT>([\\s\\S]*?)<\\/TEXT>[\\s\\S]*?<\\/DOC>';
+    var tempRegex = '<DOC>\\n<'+prj.docno_tag+'>(\\s*' + docno + '\\s*)<\\/'+prj.docno_tag+'>[\\s\\S]*?<'+prj.text_tag+'>([\\s\\S]*?)<\\/'+prj.text_tag+'>[\\s\\S]*?<\\/DOC>';
     return new RegExp(tempRegex, 'g');
     //<DOC>\n<DOCNO>(\sFBIS3-10753\s)<\/DOCNO>[\s\S]*?<TEXT>([\s\S]*?)<\/TEXT>[\s\S]*?<\/DOC>
 }

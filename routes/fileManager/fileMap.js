@@ -1,7 +1,7 @@
 var path = require('path');
 
 var DATA_ROOT = path.join(__dirname,'../../projects');//C.data.root;
-
+var DATA_SET_ROOT = path.join(__dirname,'../../projects');//C.data.root;
 exports.filePath = function (relPath, projectid, decodeURI) {
   if (decodeURI) relPath = decodeURIComponent(relPath);
   if (relPath.indexOf('..') >= 0){

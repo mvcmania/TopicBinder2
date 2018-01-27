@@ -15,13 +15,13 @@
                 <td id="td-{{pool.topic}}">{{pool.count}}</td>
                 
                     <td>
-                        {{#ne pool.remains 0}}
+                       {{!--  {{#ne pool.remains 0}} --}}
                             <div class="btn-group">
                                 <button onclick="launchAssignModal(this)" type="button" role="assign"  data-remain="{{pool.remains}}" data-topicid="{{pool.topic}}"  class="btn btn-xs btn-flat btn-success"><i class="fa fa-plus"></i>
                                         Assign
                                 </button>
                             </div>
-                        {{/ne}}
+                       {{!--  {{/ne}} --}}
                     </td>  
                  
             </tr>
