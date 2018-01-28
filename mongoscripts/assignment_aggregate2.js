@@ -25,7 +25,7 @@ db.sorguHavuzu.aggregate(
 		// Stage 3
 		{
 			$lookup: {
-			    from: "atamalar",
+			    from: "assignments",
 			    localField: "_id",
 			    foreignField: "topic_id",
 			    as: "assigns"

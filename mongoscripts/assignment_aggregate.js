@@ -10,7 +10,7 @@ db.atamalar.aggregate(
 		// Stage 2
 		{
 			$lookup: {
-			                "from": "sorguHavuzu",
+			                "from": "pools",
 			                "localField": "pool_id",
 			                "foreignField": "_id",
 			                "as": "pool"
@@ -29,7 +29,7 @@ db.atamalar.aggregate(
 		// Stage 3
 		{
 			$lookup: {
-			                "from": "dokumanlar",
+			                "from": "documents",
 			                "localField": "pool.document_id",
 			                "foreignField": "document_no",
 			                "as": "doc"
@@ -56,7 +56,7 @@ db.atamalar.aggregate(
 		// Stage 5
 		{
 			$lookup: {
-			                "from": "sorgular",
+			                "from": "topics",
 			                "localField": "topic_id",
 			                "foreignField": "topic_id",
 			                "as": "topic"
