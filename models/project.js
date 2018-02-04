@@ -1,8 +1,5 @@
 var mongoose = require('mongoose');
 var async = require('async');
-var Pool = require('./pool');
-var Assignment = require('./assignment');
-var Doc = require('./document');
 var projectSchema = mongoose.Schema({
     "name": {
         type: String,
@@ -24,28 +21,42 @@ var projectSchema = mongoose.Schema({
         default :"TEXT",
         required: true
     },
+    "topic_file":{
+        type: String
+    },
+    "create_pool":{
+        type: Boolean,
+        default :true
+    },
     "createddate":{
         type:Date,
         default : Date.now
     }
-}, { collection: "projeler" });
+}, { collection: "tracks" });
 
-var Projects = module.exports = mongoose.model('projeler', projectSchema);
-module.exports.cleanTrack = function(projectid, cb){
-    async.parallel({
-        deleteProject : function(next){
-            Projects.remove({name:projectid}, next);
-        },
-        deletePool : function(next){
-            Pool.remove({project: projectid}, next);
-        },
-        deleteDocs : function(next){
-            Doc.remove({project: projectid}, next);
-        },
-        deleteAssignments : function(next){
-            Assignment.remove({project:projectid}, next);
-        }
-    }, function(err, results){
-        cb(err, results);
-    });
+var Projects = module.exports = mongoose.model('tracks', projectSchema);
+module.exports.findAndUpdate = function(projectid, cb){
+    console.log('Update ===',projectid);
+    Projects.collection.findOneAndUpdate({name:projectid}, {$set:{create_pool: false}},cb);
 };
+module.exports.getTrackDetail = function(trackid, cb){
+    Projects.aggregate([
+        {
+            $match:{
+                name :trackid
+            },
+        },
+        {
+            $project:{
+                track:{
+                    name :"$name",
+                    topic_file : "$topic_file",
+                    dataset:"$dataset",
+                    docno_tag :"$docno_tag",
+                    text_tag :"$text_tag",
+                    createddate : { $dateToString: { format: "%d/%m/%Y %H:%M", date: "$createddate" } }
+                }
+            }
+        }
+    ],cb);
+}

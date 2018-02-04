@@ -23,9 +23,9 @@ var topicSchema = mongoose.Schema({
         type:Date,
         default : Date.now
     }
-}, { collection: "sorgular" });
+}, { collection: "topics" });
 
-var Topics = module.exports = mongoose.model('sorgular', topicSchema);
+var Topics = module.exports = mongoose.model('topics', topicSchema);
 
 module.exports.createTopics = function(topicItems, callback) {
 

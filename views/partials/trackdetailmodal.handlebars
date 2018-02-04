@@ -1,0 +1,41 @@
+<div class="modal fade" id="trackDetailModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="detail">
+        <div class="modal-content box" id="trackdetail-modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
+                <h4 class="modal-title" role="trackdetail-modal-title"><strong>{{track.name}}</strong> Detail</h4>
+            </div>
+                <div class="modal-body">
+                    <ul class="list-group list-group-unbordered">
+                        <li class="list-group-item">
+                        <b class="col-md-5">Track Name</b> :<a > {{track.name}}</a>
+                        </li>
+                        <li class="list-group-item">
+                        <b class="col-md-5">Data Set</b> :<a > {{track.dataset}}</a>
+                        </li>
+                        <li class="list-group-item">
+                        <b class="col-md-5">DocNo Tag</b> :<a > {{track.docno_tag}}</a>
+                        </li>
+                        <li class="list-group-item">
+                        <b class="col-md-5">Text Tag</b> :<a > {{track.text_tag}}</a>
+                        </li>
+                        <li class="list-group-item">
+                        <b class="col-md-5">Topic File</b> :<a > {{track.topic_file}}</a>
+                        </li>
+                        <li class="list-group-item">
+                        <b class="col-md-5">Created Date</b> :<a > {{track.createddate}}</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            <div class="overlay hide">
+                <div class="loading-text">Track detail is loading!</div>
+                <i class="fa fa-refresh fa-spin"></i>
+            </div>
+        </div>
+    </div>
+</div>

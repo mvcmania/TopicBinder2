@@ -48,15 +48,18 @@ router.get('/member/assignmentsummary', function (req, res, next) {
     C.logger.info('user assignment', req.user._id);
     var projectid = req.query.projectid;
     var relation = req.query.relation ? req.query.relation : 0;
+    var skip =  req.query.skip;
     if (projectid) {
         async.waterfall([
             function (next) {
                 var returnResult = {
                     'assignments': null,
-                    'summary': null
+                    'summary': null,
+                    'pagination':null
                 };
-                Assign.getSpecificUserAssignmentSummary(req.user._id, projectid, relation, function (err, res1) {
-                    returnResult.assignments = res1;
+                Assign.getSpecificUserAssignmentSummary(req.user._id, projectid, relation, skip, function (err, res1) {
+                    returnResult.assignments = res1.records;
+                    returnResult.pagination = res1.pagination;
                     next(null, returnResult);
                 });
             },

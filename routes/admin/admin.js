@@ -9,6 +9,7 @@ var Project = require('../../models/project');
 var Topic = require('../../models/topic');
 var User = require('../../models/user');
 var Assign = require('../../models/assignment');
+var Doc = require('../../models/document');
 var mongoose = require('mongoose');
 var json2csv = require('json2csv');
 var dateFormat = require('dateformat');
@@ -39,18 +40,22 @@ router.get('/', function (req, res) {
                 User.pullNonAdmins(next);
             },
             projects: function (next) {
-                Project.find().distinct('name', next);
+                Project.find({},["name"],{
+                    sort:{"createddate":"-1"}
+                },next);
             },
             datasets: function (next) {
                 fse.readdir(datasetPath, next);
                 //next(null, ['TREC5','TREC6']);
             }
+            
         }, function (err, results) {
             res.render('dashboard', {
                 pools: {},
                 users: results['users'],
                 projects: results['projects'],
-                datasets: results['datasets']
+                datasets: results['datasets'],
+                stats : C.stats
             });
         });
     } catch (exp) {
@@ -63,6 +68,18 @@ router.get('/', function (req, res) {
     }
 
 });
+router.get('/admin/:projectid/detail', Tools.checkProjectId, function(req, res, next){
+    var prj = req.params.projectid;
+    Project.getTrackDetail(prj, function(err, record){
+        C.logger.info('detail', record);
+        var pageData={
+            layout : false,
+            track:record[0].track
+        }
+
+        res.render('partials/trackdetailmodal',pageData);
+    });
+})
 router.get('/admin/stream', function (req, res, next) {
     res.sseSetup();
     connections.push(res);
@@ -72,13 +89,18 @@ router.get('/admin/topicsummary', function (req, res, next) {
     try {
         C.logger.info('Topic Summary', req.url);
         var projectid = req.query.projectid;
+        var status = req.query.status;
         if (projectid) {
-            async.waterfall([
-                function (next) {
-                    Pool.getTopicsSummary(projectid, next);
+            async.parallel({
+                pool : function (next) {
+                    Pool.getTopicsSummary(projectid, status, next);
+                },
+                project: function(next){
+                    Project.findOne({name:projectid}, next);
                 }
-            ], function (err, result) {
-                res.send(result, {
+            }, function (err, results) {
+
+                res.send({"pool":results["pool"],"project":results["project"]}, {
                     'Content-Type': 'application/json'
                 }, 200);
             });
@@ -101,18 +123,18 @@ router.get('/admin/topicsummary', function (req, res, next) {
 router.post('/admin/assign', function (req, res, next) {
     try {
         async.waterfall([
-            function (cb) {
+            function (next) {
                 Topic.validateTopic(req.body.topicid, function (err, doc) {
                     if (!err && doc) {
-                        cb(null);
+                        next(null);
                     } else {
-                        cb({
+                        next({
                             "message": "You can not assign! Topic info not found in the system!"
-                        }, null);
+                        });
                     }
                 });
             },
-            function (cb) {
+            function (next) {
                 Pool.getTopics(req.body.topicid, req.body.projectid, req.body.numberoftopic, function (err, res1) {
                     var assignItemArr = [];
                     var uniqueidSet = [];
@@ -129,27 +151,29 @@ router.post('/admin/assign', function (req, res, next) {
                             assignItemArr.push(assignItem);
                         }, this);
                     } else {
-                        cb({
+                        next({
                             "message": "Error while getting topics to assign",
                             "data": err
                         }, null);
                     }
-                    cb(null, assignItemArr, uniqueidSet);
+                    next(null, assignItemArr, uniqueidSet);
                 });
             },
-            function (assignItemArr, uniqueidSet, cb) {
+            function (assignItemArr, uniqueidSet, next) {
+                C.logger.info('createAssignments');
                 //C.logger.info('Assignment err',assignItemArr);
                 Assign.createAssignments(assignItemArr, function (err, res2) {
-                    cb(err, uniqueidSet);
+                    next(err, uniqueidSet);
                 });
             },
-            function (uniqueidSet, cb) {
+            function (uniqueidSet, next) {
+                C.logger.info('updateTopicsByUniqueId');
                 Pool.updateTopicsByUniqueId(uniqueidSet, true, function (err, res3) {
                     var resultMain = {
                         "topic_id": req.body.topicid,
                         "result": res3
                     };
-                    cb(null, resultMain);
+                    next(null, resultMain);
                 });
             }
         ], function (err, results) {
@@ -188,7 +212,8 @@ router.post('/admin/upload', function (req, res, next) {
             "project-name":"",
             "dataset":"",
             "docno-tag":"",
-            "text-tag":""
+            "text-tag":"",
+            "topic_file":""
         };
         var rowCount = 0;
         var prop = ['num', 'title', 'desc', 'narr'];
@@ -202,6 +227,7 @@ router.post('/admin/upload', function (req, res, next) {
                 C.logger.info('Data with read data : file name :' + fieldname);
             });
             file.on('end', function () {
+                PROJECTITEM.topic_file = filename;
                 C.logger.info('End with read data : file name :' + fieldname);
 
             });
@@ -222,7 +248,9 @@ router.post('/admin/upload', function (req, res, next) {
                             "name": PROJECTITEM["project-name"],
                             "dataset": PROJECTITEM["dataset"],
                             "docno_tag": (PROJECTITEM["docno-tag"] ? PROJECTITEM["docno-tag"] : 'DOCNO'),
-                            "text_tag" : (PROJECTITEM["text-tag"] ? PROJECTITEM["text-tag"] : 'TEXT')
+                            "text_tag" : (PROJECTITEM["text-tag"] ? PROJECTITEM["text-tag"] : 'TEXT'),
+                            "topic_file":PROJECTITEM.topic_file,
+                            "create_pool":true
                         });
                         Project.create(projectRecord, function (err, res) {
                             cb(err);
@@ -291,7 +319,7 @@ router.post('/admin/createpool', Tools.checkTrackIdExists, function (req, res, n
         C.logger.info('Admin create pool rowCount=', res.locals.rowCount);
         C.logger.info('Admin create pool delimiter=', req.body.delimiter);
         //res.locals.runRoot = path.join(__dirname, res.locals.runRoot);
-        const inputFileTempsRows = {};
+        
         const totalRows = [];
 
         const totalCount = res.locals.rowCount;
@@ -300,19 +328,20 @@ router.post('/admin/createpool', Tools.checkTrackIdExists, function (req, res, n
                 fse.readdir(res.locals.runRoot, cb);
             },
             function (files, cb) {
+                
                 var paths = files.map(function (file) {
                     return path.join(res.locals.runRoot, file)
                 });
                 paths.forEach(function (path, key) {
-
+                    const inputFileTempsRows = {};
                     var onData = function (row) {
                         var spl = row.split('\t');
                         if(inputFileTempsRows.hasOwnProperty(spl[0])){
                             inputFileTempsRows[spl[0]] +=1; 
                         }else{
-                            inputFileTempsRows[spl[0]] =0; 
+                            inputFileTempsRows[spl[0]] =1; 
                         }
-                        if(inputFileTempsRows[spl[0]] < totalCount){
+                        if(inputFileTempsRows[spl[0]] <= totalCount){
                             totalRows.push(spl);
                         }
                     }
@@ -401,24 +430,31 @@ router.post('/admin/user/:userid', function(req, res, next){
 });
 router.delete('/admin/:projectid', Tools.checkProjectId, function(req, res, next){
     try {
-        var params = req.params;
-        C.logger.info('DELETE',params);
-        Project.cleanTrack(params.projectid, function(err, results){
-            
-            if(err){
-                res.sendError(JSON.stringify(err), {data:null});
-            }else{
-                var pPath = path.join(__dirname,'../..',C.projectsPath, params.projectid);
-                fse.remove(pPath, err=>{
-                    if(err){
-                        res.status(400).send('Track has been removed but not from the file system!');
-                    }else{
-                    
-                        res.status(200).send('Track has been removed from the system successfully!');
-                    }
-                });
-                
+        var projectid = req.params.projectid;
+        C.logger.info('DELETE',req.params);
+        async.parallel({
+            deleteProject : function(next){
+                Project.remove({name:projectid}, next);
+            },
+            deletePool : function(next){
+                Pool.remove({project: projectid}, next);
+            },
+            deleteDocs : function(next){
+                Doc.remove({project: projectid}, next);
+            },
+            deleteAssignments : function(next){
+                Assign.remove({project:projectid}, next);
             }
+        }, function(err, results){
+            var pPath = path.join(__dirname,'../..',C.projectsPath, projectid);
+            fse.remove(pPath, err=>{
+                if(err){
+                    res.status(400).send('Track has been removed but not from the file system!');
+                }else{
+                
+                    res.status(200).send('Track has been removed from the system successfully!');
+                }
+            });
         });
     } catch (exp) {
         res.sendError("Unexpected error occured!", {data:null});
@@ -450,21 +486,31 @@ function uploadInputFile(recordsArray, project, cb) {
 
 
     if (pool_array.length > 0) {
-        Pool.createPoolItems(pool_array, function (err, docs) {
-            //Error code : 11000 (duplicate error no need to send 400)
-            if (err && err.code != 11000) {
-                C.logger.info("Error occured..on bulk pool saving...", err);
-                cb({
-                    "message": "Error occured on bulk saving!"
+        async.waterfall([
+            function(next){
+                Pool.createPoolItems(pool_array, function (err, docs) {
+                    //Error code : 11000 (duplicate error no need to send 400)
+                    if (err && err.code != 11000) {
+                        C.logger.info("Error occured..on bulk pool saving...", err);
+                        next({
+                            "message": "Error occured on bulk saving!"
+                        });
+                    } else {
+                        
+                        next(null, doc_array, project);
+        
+                    }
                 });
-            } else {
+            },
+            function(doc_array, prj, next){
                 uploadDocumentInfo(doc_array, project);
-                cb(null);
-
+                next(null);
             }
-        });
+
+        ],cb);
+       
     } else {
-        cb(null);
+        return cb(null);
     }
 }
 
@@ -506,20 +552,29 @@ function uploadTopicFile(data, res, prop, cb) {
 }
 
 function uploadDocumentInfo(docNoArray, project) {
-    docInfoGenerator.findDocuments(docNoArray, project, function (err, docs) {
-        var msg = '';
-        if (err && err.code != 11000) {
-            msg = 'Error while uploading document info!>' + JSON.stringify(err);
-            C.logger.info('err', err);
-        } else {
-            msg = 'Document info has been inserted successfully!';
-        }
-        var id = (new Date()).toLocaleTimeString();
-        for (var i = 0; i < connections.length; i++) {
-            connections[i].sseSend(id, msg);
-        }
-    });
-    return;
+     return new Promise(function(resolve, reject){
+        docInfoGenerator.findDocuments(docNoArray, project, function (err, docs) {
+            var msg = '';
+            if (err && err.code != 11000) {
+                msg = 'Error while uploading document info!>' + JSON.stringify(err);
+                C.logger.info('err', err);
+            } else {
+                msg = 'Document info has been inserted successfully for track : '+project;
+            }
+             var id = (new Date()).toLocaleTimeString();
+            for (var i = 0; i < connections.length; i++) {
+                connections[i].sseSend(id, msg);
+            }
+            if(err){
+                reject(err);
+            }else{
+                resolve(null);
+            }
+            
+        });
+     })
+       
+    
 }
 
 function buildRegex(prop) {

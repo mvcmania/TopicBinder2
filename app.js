@@ -23,14 +23,35 @@ var db = mongoose.connect(process.env.MONGODB_URI, {
 global.C = {
     logger: require('tracer').console({ level: 'info' }),
     datasetPath: 'resources/DATASETS',
-    projectsPath : 'projects/'
+    projectsPath : 'projects/',
+    stats :[{
+                label: "Not Started",
+                value: "bg-red",
+                selected: true
+            },
+            {
+                label: "Returned",
+                value: "bg-green",
+                selected: false
+            },
+            {
+                label: "Partially Assigneds",
+                value: "bg-yellow",
+                selected: false
+            },
+            {
+                label: "Assigneds",
+                value: "bg-blue",
+                selected: false
+            }
+    ]
 };
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
-var admins = require('./routes/admin/admin');
-var members = require('./routes/user/user');
-var files = require('./routes/fileManager/routes');
+//var admins = require('./routes/admin/admin');
+//var members = require('./routes/user/user');
+//var files = require('./routes/fileManager/routes');
 
 //Init app js
 

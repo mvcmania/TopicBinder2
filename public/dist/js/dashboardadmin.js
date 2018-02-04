@@ -1,3 +1,21 @@
+var getTrackDetail = function(){
+    var trackId =  getProjectID();
+    if(!trackId)
+    return;
+    $.ajax({
+        url:'admin/'+trackId+'/detail',
+        type: 'GET',
+        success : function(res){
+            console.log(res);
+            $('#track-detail-container').html(res);
+            $('#trackDetailModal').modal('show');
+        },
+        error: function(err){
+            console.log('Error while retrieving track detail');
+        }
+    })
+    
+}
 var sseClient = function(){
     if (!!window.EventSource) {
         var source = new EventSource('admin/stream');
@@ -166,11 +184,11 @@ var getTopicSummarySuccess = function(data) {
     var tp = document.getElementById('topic-summary');
     toggleOverLay('topic-summary-box');
     tp.innerHTML = Handlebars.templates.topicsummary({
-        'pools': data
+        'pools': data.pool
     });
     summaryWidgets();
     dataTableMake('summary-table');
-    makeExportVisible();
+    makeExportVisible(data.project);
     triggerFileManager();
 }
 
@@ -186,18 +204,19 @@ var triggerFileManager = function(){
     var ang = angular.element(document.getElementById('file-manager-controller'));
     ang.scope().triggerHashChange();
 }
-var makeExportVisible = function(){
-    var makeVisible = $('#summary-table td[data-order=bg-red],#summary-table td[data-order=bg-yellow]').length > 0 ? false : true;
+var makeExportVisible = function(selectedProject){
+    //var makeVisible = $('#summary-table td[data-order=bg-red],#summary-table td[data-order=bg-yellow]').length > 0 ? false : true;
     var poolVisible = $('#summary-table td[data-order]').length > 0 ? false : true;
     var projectid = getProjectID();
-    if(makeVisible && !poolVisible){
+    if(!poolVisible){
         $('#export-form').show();
         $('#project-to-export').val(projectid);
     }else{
         $('#export-form').hide();
         $('#project-to-export').val('');
     }
-    if(makeVisible){
+    console.log('Createpool',selectedProject);
+    if(selectedProject.create_pool){
         $('#pool-form').show();
     }else{
         $('#pool-form').hide();
@@ -223,6 +242,7 @@ var uploadFileError = function(err) {
 
 var getTopicsSummary = function() {
     var pjId = getProjectID();
+    var status = document.getElementById('stats').value;
     //$('#topic-summary-box .overlay').removeClass('hide');
     if (!pjId) {
         var tp = document.getElementById('topic-summary');
@@ -234,7 +254,8 @@ var getTopicsSummary = function() {
     }
     toggleOverLay('topic-summary-box');
     var data = {
-        'projectid': pjId
+        'projectid': pjId,
+        'status':status
     };
     $.ajax({
         url: "admin/topicsummary",
@@ -243,6 +264,16 @@ var getTopicsSummary = function() {
         success: getTopicSummarySuccess,
         error: getTopicSummaryError
     });
+}
+var widgetButtonClick = function(){
+    $(document).on("click",".btn-widget", function(){
+        moreInfo(this);
+    })
+}
+var moreInfo = function(el){
+    var stat = $(el).data('status');
+    $('#stats').val(stat);
+    getTopicsSummary();
 }
 $(function() {
     $('#assignment-form').submit(function(e) {
@@ -379,4 +410,5 @@ $(function() {
     getTopicsSummary();
     searchableMake('summary-table', 'search-topic-id');
     sseClient();
+    widgetButtonClick();
 });

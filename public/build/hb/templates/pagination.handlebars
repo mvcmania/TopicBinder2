@@ -1,0 +1,6 @@
+<ul class="pagination pagination-sm inline">
+                            <li><button class="btn prev btn-sm" data-skip="0" title="First"><i class="fa fa-step-backward"></i></button></li>
+                            <li><button class="btn prev btn-sm" {{#if prev.disabled}}disabled{{/if}} data-skip="{{prev.skip}}">« Prev</button></li>
+                            <li><button class="btn next btn-sm" {{#if next.disabled}}disabled{{/if}} data-skip="{{next.skip}}">Next »</button></li>
+                            <li><button class="btn prev btn-sm" data-skip="{{last}}" title="Last"><i class="fa fa-step-forward"></i></button></li>
+                            </ul>

@@ -38,7 +38,7 @@ var userSchema = mongoose.Schema({
     }
 
 }, {
-    collection: "kullanicilar"
+    collection: "users"
 });
 
 /* module.exports.setPassword = function(v, cb){
@@ -46,7 +46,7 @@ var userSchema = mongoose.Schema({
         bcrypt.hash(v, salt, cb);
     });
 } */
-var User = module.exports = mongoose.model('kullanicilar', userSchema);
+var User = module.exports = mongoose.model('users', userSchema);
 
 module.exports.createUser = function (newUser, callback) {
     bcrypt.genSalt(10, function (err, salt) {

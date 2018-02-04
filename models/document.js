@@ -18,11 +18,11 @@ var docSchema = mongoose.Schema({
         type: String,
         unique: true
     }
-}, { collection: "dokumanlar" });
+}, { collection: "documents" });
 docSchema.path('unique_id').get(function(value) {
     return this.document_no+'_'+this.project;
 });
-var Docs = module.exports = mongoose.model("dokumanlar", docSchema);
+var Docs = module.exports = mongoose.model("documents", docSchema);
 
 module.exports.getDocById = function(docid, callback){
     Docs.findOne({ document_no : docid}, callback);

@@ -22,13 +22,13 @@
                 <td>{{asg.assignedDate}}</td>
                 <td aria-describedby="{{asg.isRelated}}">
                     {{#eq asg.isRelated 2}}
-                        <label class="badge bg-red">&nbsp;</label>                    
+                        <label class="badge bg-yellow">&nbsp;</label>                    
                     {{/eq}}
                     {{#eq asg.isRelated 1}}
                         <label class="badge bg-green">&nbsp;</label>                     
                     {{/eq}}
                     {{#eq asg.isRelated 0}} 
-                        <label class="badge bg-yellow">&nbsp;</label>                    
+                        <label class="badge bg-red">&nbsp;</label>                    
                     {{/eq}}
                 </td>
                 <td>

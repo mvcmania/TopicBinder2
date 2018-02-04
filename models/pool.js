@@ -46,14 +46,14 @@ var poolSchema = mongoose.Schema({
         type:Date,
         default : Date.now
     }
-}, { collection: "sorguHavuzu" });
+}, { collection: "pools" });
 /* poolSchema.path('score').get(function(num) {
     return 
 });
 poolSchema.path('score').set(function(num) {
     return (num * 100);
 }); */
-var Pools = module.exports = mongoose.model('sorguHavuzu', poolSchema);
+var Pools = module.exports = mongoose.model('pools', poolSchema);
 module.exports.createPoolItems = function(poolItems, callback) {
         populateUniqueId(poolItems);
         Pools.collection.insertMany(poolItems,{ordered:false},callback);      
@@ -76,44 +76,70 @@ not started  - bg-teal
 in progress - bg-yellow
 success : bg-green
 */
-module.exports.getTopicsSummary = function(projectid,callback) {
+module.exports.getTopicsSummary = function(projectid, stat, callback) {
+    console.log('stat', stat);
+    console.log('projectid', projectid);
     // Get the unique topic numbers
     //Pools.find({"project": projectid,"topic_id":{$ne:null}}).distinct("topic_id",function(err, docs){
-         Pools.aggregate([
-            {
-                $match:{
-                    "project":projectid
-                }
-            },
-            {
-                $group: {
-                    _id :"$topic_id",
-                    actualCount:{
-                        $sum:1
-                    },
-                    projects: {
-                        $addToSet : "$project"
+         Pools.aggregate(// Pipeline
+            [
+                // Stage 1
+                {
+                    $match: {
+                        "project": projectid
                     }
-                }
-            },
-            {
-                $lookup : {
-                    from: "atamalar",
-                    localField: "_id",
-                    foreignField: "topic_id",
-                    as: "assigns"
-                } 
-            },
-            {
-                $unwind : {
-                    path : "$assigns",
-                    preserveNullAndEmptyArrays : true
-                }
-            },
-            {
-                    $group:{
+                },
+        
+                // Stage 2
+                {
+                    $group: {
+                        _id :"$topic_id",
+                        actualCount:{
+                            $sum:1
+                        },
+                    }
+                },
+        
+                // Stage 3
+                {
+                    $lookup: {
+                        from: "assignments",
+                        localField: "_id",
+                        foreignField: "topic_id",
+                        as: "assignsTemp"
+                    }
+                },
+        
+                // Stage 4
+                {
+                    $project: {
+                        _id:"$_id",
+                        assigns:{
+                            $filter:{
+                                input:"$assignsTemp",
+                                as :"asg",
+                                cond:{
+                                    $eq:["$$asg.project",projectid]
+                                }
+                            }
+                        },
+                        actualCount:"$actualCount"
+                    }
+                },
+        
+                // Stage 5
+                {
+                    $unwind: {
+                        path : "$assigns",
+                        preserveNullAndEmptyArrays : true
+                    }
+                },
+        
+                // Stage 6
+                {
+                    $group: {
                         _id :"$_id",
-                        project :{
+                        proj :{
                             $first : "$assigns.project"
                         },
                         count:{
@@ -141,52 +167,73 @@ module.exports.getTopicsSummary = function(projectid,callback) {
                         }
                         }
                     }
-            },
-            {
-                $project:{
-                    topic :"$_id",
-                    project :"$project",
-                    count:"$count",
-                    remains : {
-                      /* $cond:[{$eq :["$assignCount",0]},
-                        0,
-                        { */$subtract :[
-                            "$count",{ $add : ["$relatedCount","$notRelatedCount","$notStartedCount"]}
-                        ]/* }
-                      ] */
-                    },
-                    inProgressCount : {
-                        $add : ["$relatedCount","$notRelatedCount"]
-                    },
-                    relatedCount : "$relatedCount",
-                    notRelatedCount : "$notRelatedCount",
-                    notStartedCount :"$notStartedCount"
-                }
-            },
-            {
-                $project:{
-                    topic :"$topic",
-                    project :"$project",
-                    count :"$count",
-                    remains :"$remains",
-                    relatedCount :"$relatedCount",
-                    notRelatedCount :"$notRelatedCount",      
-                    notStartedCount :"$notStartedCount",    
-                    status :{
-                     $cond:[{$eq:["$inProgressCount","$count"]},
-                         "bg-green",
-                          {
-                            $cond:[{$eq:["$remains","$count"]},
-                              "bg-red",
-                              "bg-yellow"// $or:[{$eq:["$notStartedCount","$count"]},{
-                           ]
-                          }
-                     ]
-                    }     
-                 }
-            }
+                },
         
-        ], callback);
+                // Stage 7
+                {
+                    $project: {
+                        topic :"$_id",
+                        count:"$count",
+                        proj:"$proj",
+                        remains : {
+                          /* $cond:[{$eq :["$assignCount",0]},
+                            0,
+                            { */$subtract :[
+                                "$count",{ $add : ["$relatedCount","$notRelatedCount","$notStartedCount"]}
+                            ]/* }
+                          ] */
+                        },
+                        inProgressCount : {
+                            $add : ["$relatedCount","$notRelatedCount"]
+                        },
+                        relatedCount : "$relatedCount",
+                        notRelatedCount : "$notRelatedCount",
+                        notStartedCount :"$notStartedCount"
+                    }
+                },
+        
+                // Stage 8
+                {
+                    $project: {
+                       topic :"$topic",
+                       project :"$proj",
+                       count :"$count",
+                       remains :"$remains",
+                       relatedCount :"$relatedCount",
+                       notRelatedCount :"$notRelatedCount",      
+                       notStartedCount :"$notStartedCount",    
+                       status :{
+                        $cond:[{$eq:["$inProgressCount","$count"]},
+                            "bg-green",
+                             {
+                               $cond:[{$eq:["$remains","$count"]},
+                                 "bg-red",
+                                 { 
+                                     $cond :[ {$eq:["$remains",0]},
+                                     "bg-blue",
+                                     "bg-yellow"
+                                    ]
+                                 }
+                              ]
+                             }
+                        ]
+                       }     
+                    }
+                },
+        
+                // Stage 9
+                {
+                    $sort: {"topic":1}
+                },
+        
+                // Stage 10
+                {
+                    $match: {
+                        status : stat
+                    }
+                },
+        
+            ], callback);
     //});
    
 

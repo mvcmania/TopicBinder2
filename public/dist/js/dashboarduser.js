@@ -1,3 +1,16 @@
+var globalSkip = 0;
+var moreInfo = function(el){
+    var relation = $(el).data('relation');
+    $('#relations').val(relation);
+    getUserAssignmentSummary();
+}
+var pagination = function(){
+    $(document).on("click",".pagination button",function() {
+        globalSkip = $(this).data('skip');
+        console.log(globalSkip);
+        getUserAssignmentSummary(globalSkip);
+    });
+}
 var submitClick = function(){
     $('#relate-modal-form button[type=submit]').click(function(ev){
         console.info(ev);
@@ -46,7 +59,7 @@ var launchRelatedModal = function(el){
     var target = el.dataset.target;
     $(target).modal(modalOptions);
 }
-var getUserAssignmentSummary = function() {
+var getUserAssignmentSummary = function(skp) {
     var pjId = getProjectID();
     var relation = $('#relations').val();
     //$('#topic-summary-box .overlay').removeClass('hide');
@@ -61,7 +74,8 @@ var getUserAssignmentSummary = function() {
     toggleOverLay('assignment-summary-box');
     var data = {
         'projectid': pjId,
-        'relation' :relation
+        'relation' :relation,
+        'skip': (skp ? skp : 0)
     };
     $.ajax({
         url: "member/assignmentsummary",
@@ -81,7 +95,7 @@ var relateModalOnShown = function(){
         document.addEventListener('keydown', keyDownListener);
     });
     $('#relate-modal').on('hidden.bs.modal', function(ev) {
-        getUserAssignmentSummary();
+        getUserAssignmentSummary(globalSkip);
         document.removeEventListener('keydown', keyDownListener, false);
     });
 }
@@ -127,7 +141,7 @@ var getSummary = function(){
 var getTopicSuccess = function(resp,assignmentid){
     console.info('Get Topic Data = ',resp);
     var tp = document.querySelector('#relate-modal .box-body');
-    var noDocMessage = {'title':'Warning!','description':'Document info has not been found! Please contact admin!'}
+    var noDocMessage = {'title':'<strong>'+resp.data.assign.document_no+'</strong> NOT FOUND!','description':'Document info is not found in the system! Please contact admin!'}
     tp.innerHTML = Handlebars.templates.topicdetail({
         'topic': resp.data.topic,
         'document': resp.data.document,
@@ -145,8 +159,16 @@ var getUserAssignmentSummarySuccess = function(data) {
     var tp = document.getElementById('assignment-summary');
     console.info('Assignment summary',data);
     tp.innerHTML = Handlebars.templates.assignsummary({
-        'assignments': data.assignments
+        'assignments': data.assignments,
     });
+    var paginationHtml = Handlebars.templates.pagination(data.pagination);
+    var pageContainer= document.querySelectorAll('.user-dashboard-pagination');
+    console.log('Container', pageContainer);
+    pageContainer.forEach(element => {
+        element.innerHTML = paginationHtml;
+    });
+
+    
     summaryWidgets(data);
     afterGetUserAssignmentSummary();
 
@@ -206,11 +228,17 @@ var keyDownListener = function(event){
         btn.click();
     }
 }
-
+var widgetButtonClick = function(){
+    $(document).on("click",".btn-widget", function(){
+        moreInfo(this);
+    })
+}
 $(function() {
     getUserAssignmentSummary();
     relateModalOnShown();
     postForm();
     submitClick();
+    pagination();
+    widgetButtonClick();
     Handlebars.registerPartial('warning',Handlebars.templates.warning);
 });
