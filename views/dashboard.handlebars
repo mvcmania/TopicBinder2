@@ -16,7 +16,7 @@
 <!-- Main content -->
 <section class="content">
     <!-- Small boxes (Stat box) -->
-    <div class="row">
+    <div class="row" id="admin-summary-widget">
         <div class="col-lg-4 col-xs-12">
             <!-- small box -->
             <div class="small-box bg-purple">
@@ -30,64 +30,8 @@
                 <a href="usermanagement" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
-        <!-- ./col -->
-        <div class="col-lg-2 col-xs-6">
-            <!-- small box -->
-            <div class="small-box bg-green">
-                <div class="inner">
-                    <h3 id="completed-count">0</h3>
-                    <p>Returned</p>
-                </div>
-                <div class="icon">
-                    <i class="ion ion-ios-checkmark-outline"></i>
-                </div>
-                <a href="javascript:void(0)" data-status="bg-green" class="small-box-footer btn-widget">More info <i class="fa fa-arrow-circle-right"></i></a>
-            </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-2 col-xs-6">
-            <!-- small box -->
-            <div class="small-box bg-yellow">
-                <div class="inner">
-                    <h3 id="inprogress-count">0</h3>
-
-                    <p>Partially Assigned</p>
-                </div>
-                <div class="icon">
-                    <i class="ion ion-load-a"></i>
-                </div>
-                <a href="javascript:void(0)" data-status="bg-yellow" class="small-box-footer btn-widget">More info <i class="fa fa-arrow-circle-right"></i></a>
-            </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-2 col-xs-6">
-            <!-- small box -->
-            <div class="small-box bg-red">
-                <div class="inner">
-                    <h3 id="notstarted-count">0</h3>
-
-                    <p>Not Assigned</p>
-                </div>
-                <div class="icon">
-                    <i class="ion ion-alert"></i>
-                </div>
-                <a href="javascript:void(0)" data-status="bg-red" class="small-box-footer btn-widget">More info <i class="fa fa-arrow-circle-right"></i></a>
-            </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-2 col-xs-6">
-            <!-- small box -->
-            <div class="small-box bg-blue">
-                <div class="inner">
-                    <h3 id="assigned-count">0</h3>
-
-                    <p>Assigned</p>
-                </div>
-                <div class="icon">
-                    <i class="ion ion-compass"></i>
-                </div>
-                <a href="javascript:void(0)" data-status="bg-blue" class="small-box-footer btn-widget">More info <i class="fa fa-arrow-circle-right"></i></a>
-            </div>
+        <div id="other-widget">
+            {{> adminsummarywidget}}
         </div>
     </div>
     <!-- .row-->

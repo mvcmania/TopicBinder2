@@ -71,18 +71,14 @@ module.exports.getTopics = function(topicId, projectid, nofRec,callback) {
         { $project : { "_id" :"$topicid" , "uniqueid" : "$_id" , "count" : "$count"}}
     ],callback); */
 }
-/*
-not started  - bg-teal
-in progress - bg-yellow
-success : bg-green
-*/
-module.exports.getTopicsSummary = function(projectid, stat, callback) {
+
+var summary =  function(projectid, stat, callback) {
     console.log('stat', stat);
     console.log('projectid', projectid);
     // Get the unique topic numbers
     //Pools.find({"project": projectid,"topic_id":{$ne:null}}).distinct("topic_id",function(err, docs){
-         Pools.aggregate(// Pipeline
-            [
+         
+         var summaryPipeline = [
                 // Stage 1
                 {
                     $match: {
@@ -219,26 +215,43 @@ module.exports.getTopicsSummary = function(projectid, stat, callback) {
                         ]
                        }     
                     }
-                },
+                }
         
-                // Stage 9
-                {
-                    $sort: {"topic":1}
-                },
-        
+            ];
+        if(stat){
+            
                 // Stage 10
+            summaryPipeline.push(
                 {
                     $match: {
                         status : stat
-                    }
+                    },
+
                 },
-        
-            ], callback);
+                {
+                    $sort: {"topic":1}
+                }
+            );
+        }else{
+            
+            summaryPipeline.push({
+                    $group:{
+                        _id:"$status",
+                        statusCount :{
+                            $sum:1
+                        }
+                    }
+                });
+        }
+        Pools.aggregate(summaryPipeline, callback);
     //});
    
 
     //User.findOne(query, callback);
 }
+
+module.exports.getTopicsSummary = summary;
+
 module.exports.getDistinctValues =  function(distinctCol,callback){
     Pools.find().distinct(distinctCol,callback);
 }

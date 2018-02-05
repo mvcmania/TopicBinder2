@@ -25,7 +25,7 @@ global.C = {
     datasetPath: 'resources/DATASETS',
     projectsPath : 'projects/',
     stats :[{
-                label: "Not Started",
+                label: "Not Assigneds",
                 value: "bg-red",
                 selected: true
             },

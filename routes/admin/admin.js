@@ -55,7 +55,8 @@ router.get('/', function (req, res) {
                 users: results['users'],
                 projects: results['projects'],
                 datasets: results['datasets'],
-                stats : C.stats
+                stats : C.stats,
+                
             });
         });
     } catch (exp) {
@@ -67,6 +68,29 @@ router.get('/', function (req, res) {
         });
     }
 
+});
+router.get('/admin/:projectid/summarywidget', Tools.checkProjectId, function(req, res, next){
+    Pool.getTopicsSummary(req.params.projectid, null, function(err, summary){
+        C.logger.info(summary);
+        var pageData = {
+            layout : false,
+            assigneds : 0,
+            returneds : 0,
+            partials : 0,
+            notassigneds : 0
+        }
+        summary.forEach(elem =>{
+            if(elem._id == 'bg-blue')
+                pageData.assigneds = elem.statusCount;
+            else if(elem._id == 'bg-green')
+                pageData.returneds = elem.statusCount;
+            else if(elem._id == 'bg-yellow')
+                pageData.partials = elem.statusCount;
+            else if(elem._id ==  'bg-red')
+                pageData.notassigneds = elem.statusCount;
+        });
+        res.render('partials/adminsummarywidget',pageData);
+    })
 });
 router.get('/admin/:projectid/detail', Tools.checkProjectId, function(req, res, next){
     var prj = req.params.projectid;

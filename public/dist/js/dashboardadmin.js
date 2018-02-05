@@ -126,13 +126,22 @@ var tpCheckBox = function() {
     });
 }
 var summaryWidgets = function() {
-    $('#notstarted-count').text($('#summary-table td label.bg-red').length);
-    $('#inprogress-count').text($('#summary-table td label.bg-yellow').length);
-    $('#completed-count').text($('#summary-table td label.bg-green').length);
+    var trackid = getProjectID();
+    $.ajax({
+        url: 'admin/'+trackid+'/summarywidget',
+        type : 'GET',
+        success : function(res){
+            $('#other-widget').html(res);
+        },
+        error: function(err){
+            console.log('Error while getting summary widget data!');
+        }
+    })
 }
 var postAssignmentSuccess = function(data) {
     toggleOverLay('assign-modal-content');
     $('#assignModal').modal('hide');
+    
     getTopicsSummary();
     dataTableMake('summary-table');
 }
@@ -186,9 +195,10 @@ var getTopicSummarySuccess = function(data) {
     tp.innerHTML = Handlebars.templates.topicsummary({
         'pools': data.pool
     });
-    summaryWidgets();
+    
     dataTableMake('summary-table');
     makeExportVisible(data.project);
+    summaryWidgets();
     triggerFileManager();
 }
 
@@ -257,6 +267,7 @@ var getTopicsSummary = function() {
         'projectid': pjId,
         'status':status
     };
+
     $.ajax({
         url: "admin/topicsummary",
         type: "GET",
@@ -265,6 +276,7 @@ var getTopicsSummary = function() {
         error: getTopicSummaryError
     });
 }
+
 var widgetButtonClick = function(){
     $(document).on("click",".btn-widget", function(){
         moreInfo(this);
