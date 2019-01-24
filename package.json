@@ -50,12 +50,12 @@
         "tracer": "^0.8.11"
     },
     "devDependencies": {
-        "gulp": "^3.9.1",
+        "gulp": "^4.0.0",
         "gulp-compile-handlebars": "^0.6.1",
         "gulp-concat": "^2.6.1",
         "gulp-declare": "^0.3.0",
         "gulp-define-module": "^0.1.5",
-        "gulp-handlebars": "^4.0.0",
+        "gulp-handlebars": "^5.0.2",
         "gulp-rename": "^1.2.2",
         "gulp-wrap": "^0.13.0"
     }
