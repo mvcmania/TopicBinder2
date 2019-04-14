@@ -28,7 +28,9 @@ router.all('/admin/api(*)', function (req, resp, next) {
 });
 router.get('/usermanagement', function(req, res, next){
     User.pullNonAdminsAll(function(err, usrs){
+
         res.render('usermanagement',{users:usrs});
+
     })
     /* res.render('usermanagement'); */
 })
@@ -48,15 +50,16 @@ router.get('/', function (req, res) {
                 fse.readdir(datasetPath, next);
                 //next(null, ['TREC5','TREC6']);
             }
-            
+
         }, function (err, results) {
+
             res.render('dashboard', {
                 pools: {},
                 users: results['users'],
                 projects: results['projects'],
                 datasets: results['datasets'],
                 stats : C.stats,
-                
+
             });
         });
     } catch (exp) {
@@ -343,7 +346,7 @@ router.post('/admin/createpool', Tools.checkTrackIdExists, function (req, res, n
         C.logger.info('Admin create pool rowCount=', res.locals.rowCount);
         C.logger.info('Admin create pool delimiter=', req.body.delimiter);
         //res.locals.runRoot = path.join(__dirname, res.locals.runRoot);
-        
+
         const totalRows = [];
 
         const totalCount = res.locals.rowCount;
@@ -352,7 +355,7 @@ router.post('/admin/createpool', Tools.checkTrackIdExists, function (req, res, n
                 fse.readdir(res.locals.runRoot, cb);
             },
             function (files, cb) {
-                
+
                 var paths = files.map(function (file) {
                     return path.join(res.locals.runRoot, file)
                 });
@@ -361,9 +364,9 @@ router.post('/admin/createpool', Tools.checkTrackIdExists, function (req, res, n
                     var onData = function (row) {
                         var spl = row.split('\t');
                         if(inputFileTempsRows.hasOwnProperty(spl[0])){
-                            inputFileTempsRows[spl[0]] +=1; 
+                            inputFileTempsRows[spl[0]] +=1;
                         }else{
-                            inputFileTempsRows[spl[0]] =1; 
+                            inputFileTempsRows[spl[0]] =1;
                         }
                         if(inputFileTempsRows[spl[0]] <= totalCount){
                             totalRows.push(spl);
@@ -382,9 +385,9 @@ router.post('/admin/createpool', Tools.checkTrackIdExists, function (req, res, n
                     });
 
                     C.logger.info('Delimiter', req.body.delimiter);
-                    
 
-                   
+
+
 
                 });
             },
@@ -450,7 +453,7 @@ router.post('/admin/user/:userid', function(req, res, next){
             res.status(200).send({});
         }
     });
-    
+
 });
 router.delete('/admin/:projectid', Tools.checkProjectId, function(req, res, next){
     try {
@@ -475,7 +478,7 @@ router.delete('/admin/:projectid', Tools.checkProjectId, function(req, res, next
                 if(err){
                     res.status(400).send('Track has been removed but not from the file system!');
                 }else{
-                
+
                     res.status(200).send('Track has been removed from the system successfully!');
                 }
             });
@@ -520,9 +523,9 @@ function uploadInputFile(recordsArray, project, cb) {
                             "message": "Error occured on bulk saving!"
                         });
                     } else {
-                        
+
                         next(null, doc_array, project);
-        
+
                     }
                 });
             },
@@ -532,7 +535,7 @@ function uploadInputFile(recordsArray, project, cb) {
             }
 
         ],cb);
-       
+
     } else {
         return cb(null);
     }
@@ -571,7 +574,7 @@ function uploadTopicFile(data, res, prop, cb) {
         });
     } else {
        return cb(null);
-        
+
     }
 }
 
@@ -594,11 +597,11 @@ function uploadDocumentInfo(docNoArray, project) {
             }else{
                 resolve(null);
             }
-            
+
         });
      })
-       
-    
+
+
 }
 
 function buildRegex(prop) {

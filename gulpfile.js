@@ -32,7 +32,6 @@ gulp.task('server', function() {
 gulp.task('default', function() {
   /* gulp.run('templates');*/
   gulp.start('server');
-
   gulp.watch(['./app.js', './models/*.js','./routes/**/*.js','./routes/*.js'],['templates','server']);
   gulp.watch(['public/build/hb/templates/*.handlebars','views/partials/alert.handlebars'], ['copy','templates']);
   // Need to watch for sass changes too? Just add another watch call!
@@ -55,6 +54,9 @@ gulp.task('templates', function(){
 gulp.task('copy', function(){
   gulp.src('views/partials/alert.handlebars').pipe(gulp.dest('public/build/hb/templates/'));
 })
+
+
+
 // clean up if an error goes unhandled.
 process.on('exit', function() {
     if (node) node.kill()

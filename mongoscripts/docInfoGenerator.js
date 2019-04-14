@@ -4,6 +4,7 @@ if(!process.argv[2]){
   return false;
 }
 console.log(process.argv[2],' started to be parsed!');
+
 var docno_tag = process.argv[3] ? process.argv[3] : 'DOCNO'; 
 var es = require('event-stream');
 var path = require('path');
@@ -11,9 +12,9 @@ var fse= require('fs-extra');
 var async  = require('async');
 var transformer = require('./transform.js');
 var fswalk = require('./filewalk.js');
-var dataSetPath =path.join('../resources/DATASETS',process.argv[2],'DATA');
-var documentInfoCsv =path.join('../resources/DATASETS',process.argv[2],'documents.csv');
-var reg = new RegExp('<'+docno_tag+'>(.*)<\\/'+docno_tag+'>', 'g');
+var dataSetPath =path.join('./resources/DATASETS',process.argv[2],'DATA');
+var documentInfoCsv =path.join('./resources/DATASETS',process.argv[2],'documents.csv');
+var reg = new RegExp('<'+docno_tag+'>\n(.*)\n<\\/'+docno_tag+'>', 'g');
 const writeStream = fse.createWriteStream(documentInfoCsv, {encoding:'UTF-8', autoClose: true});
 writeStream.write("DOCUMENTNO,PATH"+"\n");
 
@@ -62,4 +63,6 @@ var readDocumentInfo = function(fPath, cb){
         });
     });
   });
+
+  
   

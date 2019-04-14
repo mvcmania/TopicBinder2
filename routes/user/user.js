@@ -97,7 +97,8 @@ router.get('/member/topic', function (req, res, next) {
                     "topic": doc[0].topic,
                     "assign": doc[0].assignment
                 };
-                /* getDocumentDetail */getDocumentDetailStream(doc[0], function(err, tempDoc){
+                /* getDocumentDetail */
+                getDocumentDetailStream(doc[0], function(err, tempDoc){
                     C.logger.info('Temp Obj = ', tempDoc);
                     C.logger.info('err = ', err);
                     returnData['document'] = tempDoc;
@@ -195,11 +196,11 @@ var getDocumentDetailStream = function (doc, cb) {
         
     }
     var reg = buildRegex(doc.document.document_no, doc.project);
-    console.log(path.join(__dirname,'../',doc.document.document_file));
+    console.log("document path:"+path.join(__dirname,'../../',doc.document.document_file));
     const tempDoc = {};
     tempDoc['TEXT'] = '';
     tempDoc['DOCNO'] = doc.assignment.document_no.length > 0 ? doc.assignment.document_no[0] : '';
-    var strm = fs.createReadStream(path.join(__dirname,'../',doc.document.document_file))
+    var strm = fs.createReadStream(path.join(__dirname,'../../',doc.document.document_file))
         .pipe(Iconv.decodeStream('win1254'))
         .pipe(es.split('</DOC>'))
         .pipe(es.mapSync(function(line){

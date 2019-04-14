@@ -21,7 +21,9 @@
             <!-- small box -->
             <div class="small-box bg-purple">
                 <div class="inner">
-                    <h3>{{len users}}</h3>
+                    <h3>{{len users}}</h3><!-- etiket içindeki { {len users} } kodu hata veriyor kaldırıldı parantezler arası boşluk kalkacak -->
+                                            <!--public > lib > helper.js içindeki ilk fonksiyona kontrol eklendi hata giderildi
+                                                mongodb'deki nonadminlerin sayısı gözüküyor, ancak hatalı veri çekiyor kontrol edilecek -->
                     <p>Users in System</p>
                 </div>
                 <div class="icon">
@@ -45,7 +47,7 @@
             <div class="box box-primary" id="topic-summary-box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Topic Summary</h3>
-                    
+
                     <div class="box-tools pull-right">
                         <div class="has-feedback">
                             <input type="text" data-column="1" class="form-control input-sm" placeholder="Search Topic ID" id="search-topic-id">
@@ -54,10 +56,10 @@
                     </div>
                     <!-- /.box-tools -->
                 </div>
-                
+
                 <!-- /.box-header -->
                 <div class="box-body">
-                    
+
                     <div class="row">
                         <div class="col-md-12">
                             <div class="btn-group">
@@ -85,9 +87,9 @@
                             </div>
                             <button type="button" onclick="getTopicsSummary()" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
                         </div>
-                       
+
                         <!-- /.btn-group -->
-                        
+
                         <div class="col-md-12 text-right">
                             <form action="/admin/exportqrel" method="GET" style="display: inline-block">
                                 <ul class="pagination pagination-sm inline">
@@ -98,7 +100,7 @@
                                             </button>
                                         </div>
                                     </li>
-                                    <li> 
+                                    <li>
                                         <div class="btn-group" id="pool-form" style="display: none">
                                             <button type="button" role="pool" class="btn btn-xs btn-flat btn-success"><i class="fa fa-cube"></i>
                                                 Create Pool
@@ -110,24 +112,24 @@
                               </form>
                               {{#gt projects.length 0}}
                                 <div class="btn-group" id="delete-form">
-                                        
+
                                         <button type="button" role="clean" class="btn btn-xs btn-flat btn-danger"><i class="fa fa-trash"></i>
                                             Clean Track
                                         </button>
                                 </div>
                                 {{/gt}}
-                               
-                            
+
+
                         </div>
                         <!-- /.pull-right -->
                     </div>
                     <div class="table-responsive" id="topic-summary">
-                        
+
                     </div>
-                   
+
                     <!-- /.mail-box-messages -->
                 </div>
-                
+
                 <!-- /.box-body -->
                  <div class="overlay hide">
                         <div class="loading-text">Track summary is loading!</div>
@@ -144,10 +146,10 @@
                 </div>
                 <!-- /.box-header -->
                 <!-- form start -->
-                
+
                     <div class="box-body">
                         <form role="form" id="upload-form" action="/admin/upload" enctype="multipart/form-data" method="post">
-                            
+
                             <div class="form-group">
                                 <label for="project-name">Track Name</label>
                                 <input class="form-control" type="text" id="project-name" name="project-name" required="true"/>
@@ -168,7 +170,7 @@
                                     <div class="form-group">
                                         <label for="input-file">Row Count</label>
                                         <input class="form-control" id="row-count" type="number" name="row-count" value="50"/>
-                                    </div> 
+                                    </div>
                                 </div>
                             </div> --}}
                             <div class="form-group">
@@ -194,7 +196,7 @@
                                 <label for="topic-file">Topic File input</label>
                                 <input multiple="true" class="form-control" id="topic-file"  type="file" name="topic-file" id="topic_file">
                             </div>
-                            
+
                             <button class="form-control btn-primary" type="submit" class="btn btn-primary">Create Track</button>
                         </form>
                     </div>

@@ -1,7 +1,10 @@
 'use strict';
 //var moment = require('moment');
 exports.len = function (json) {
-    return Object.keys(json).length;
+    if(json)
+        return Object.keys(json).length;
+    else return 0;
+    //return Object.keys(json).length;
 };
 exports.section = function (name, options) {
     if (!this._sections) this._sections = {};

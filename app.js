@@ -135,7 +135,15 @@ app.use(function(req, res, next) {
 
 
 // Set Port
-app.set('port', (process.env.PORT || 5000));
+app.set('port', (process.env.PORT || 80));
+
 app.listen(app.get('port'), function() {
     C.logger.info('Server started on port ' + app.get('port'));
 });
+
+//var server = app.listen(80, function(){
+    //var host = server.address().address;
+    //var port = server.address().port;
+
+    //console.log('Server listening at http://'+host+':'+port)
+//});

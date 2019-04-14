@@ -9,8 +9,9 @@ var crypto = require("crypto");
 var mail = require('../models/mail');
 
 router.get('/', function(req, res,next){
-    
+
     res.redirect('/users/login');
+
 });
 // Get register
 router.get('/register', function(req, res) {
@@ -45,6 +46,7 @@ router.get('/reset/:token', function(req, res) {
       res.render('resetpassword', {islogin: true, layout: "loginlayout", token: req.params.token});
     });
 });
+
 router.post('/reset/:token', function(req, res) {
     C.logger.info('Password', req.body.password);
     async.waterfall([
@@ -64,7 +66,7 @@ router.post('/reset/:token', function(req, res) {
                     done(err, usr);
                   });
               });
-              
+
           } else {
               req.flash("error", "Passwords do not match.");
               return res.redirect('back');
@@ -143,6 +145,7 @@ passport.use(new LocalStrategy(
         });
     }
 ));
+
 passport.serializeUser(function(user, done) {
     done(null, user.id);
 });
@@ -159,7 +162,7 @@ router.post('/login',
     });
 router.post('/forgot', function(req, res, next){
     async.waterfall([
-        function(done){    
+        function(done){
             crypto.randomBytes(20, function(err, buf){
                 var token = buf.toString('hex');
                 done(err, token);
@@ -177,7 +180,7 @@ router.post('/forgot', function(req, res, next){
                     done(err, token, user);
                 });
 
-                
+
             });
         },
         function(token, user, done){
@@ -189,7 +192,7 @@ router.post('/forgot', function(req, res, next){
                 done(err, 'done');
             })
         }
-    ], 
+    ],
     function(err){
         if (err) return next(err);
         return res.redirect('/users/login');
