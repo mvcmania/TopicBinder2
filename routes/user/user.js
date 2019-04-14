@@ -160,6 +160,7 @@ router.post('/member/update', function (req, res, next) {
 
 
 });
+
 var getDocumentDetail = function (doc, cb) {
     
     if(!doc.document || !doc.document.document_file || !doc.assignment){
@@ -201,7 +202,7 @@ var getDocumentDetailStream = function (doc, cb) {
     tempDoc['TEXT'] = '';
     tempDoc['DOCNO'] = doc.assignment.document_no.length > 0 ? doc.assignment.document_no[0] : '';
     var strm = fs.createReadStream(path.join(__dirname,'../../',doc.document.document_file))
-        .pipe(Iconv.decodeStream('win1254'))
+        .pipe(Iconv.decodeStream('utf8'))
         .pipe(es.split('</DOC>'))
         .pipe(es.mapSync(function(line){
             strm.pause();
